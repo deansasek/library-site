@@ -163,6 +163,50 @@
       </figure>
     </section>
 
+    <section class="block band" id="quick-facts" aria-labelledby="quick-facts-heading">
+      <div class="copy center">
+        <h2 id="quick-facts-heading">The details, at a glance.</h2>
+        <p class="subhead">Shortcuts, services, updates, and locks, one line each.</p>
+      </div>
+      <div class="cards">
+          <a class="card" href="https://github.com/deansasek/library/blob/main/docs/guide.md#shortcuts">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01M11 10h.01M15 10h.01M8 14h8"/></svg>
+            <h3>Shortcuts</h3>
+            <p>Set global keys, modified clicks, and hot corners.</p>
+          </a>
+          <a class="card" href="https://github.com/deansasek/library/blob/main/docs/guide.md#work-with-other-apps">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4l8 4.5-8 4.5-8-4.5z"/><path d="M4 12.5l8 4.5 8-4.5"/></svg>
+            <h3>Services</h3>
+            <p>Add a selected link from any app with Services.</p>
+          </a>
+          <a class="card" href="https://github.com/deansasek/library/blob/main/docs/guide.md#work-with-other-apps">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+            <h3>Spotlight</h3>
+            <p>Find bookmarks, apps, and commands in Spotlight.</p>
+          </a>
+          <a class="card" href="https://github.com/deansasek/library/blob/main/docs/guide.md#work-with-other-apps">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>
+            <h3>URL scheme</h3>
+            <p>Open items, the menu, or Quick Open with library:// links.</p>
+          </a>
+          <a class="card" href="https://github.com/deansasek/library/blob/main/docs/privacy.md">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="9.5" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+            <h3>Touch ID lock</h3>
+            <p>Require Touch ID or your password to show pinned items.</p>
+          </a>
+          <a class="card" href="https://github.com/deansasek/library/blob/main/docs/privacy.md">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="12" r="3.5"/><path d="M11.5 12H21M17 12v3M20 12v2"/></svg>
+            <h3>Keychain-protected pins</h3>
+            <p>Pinned clipboard items are encrypted with a key in your Keychain.</p>
+          </a>
+          <a class="card" href="https://github.com/deansasek/library/blob/main/docs/guide.md#stay-up-to-date">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/></svg>
+            <h3>Check for Updates</h3>
+            <p>Check GitHub for new releases, and install them when you choose.</p>
+          </a>
+      </div>
+    </section>
+
     <section class="block" id="privacy" aria-labelledby="privacy-heading">
       <div class="copy center">
         <h2 id="privacy-heading">Your library stays on your Mac.</h2>
@@ -184,7 +228,16 @@
         <div class="code-block">
           <pre><code>git clone https://github.com/deansasek/library.git "$HOME/Library/Application Support/Library/Source" &amp;&amp; "$HOME/Library/Application Support/Library/Source/install.sh"</code></pre>
         </div>
-        <p class="note">Requires macOS 26 or later, and the Xcode Command Line Tools.</p>
+        <dl class="requirements">
+          <div>
+            <dt>Operating system</dt>
+            <dd>macOS 26 or later</dd>
+          </div>
+          <div>
+            <dt>Developer tools</dt>
+            <dd>Xcode Command Line Tools</dd>
+          </div>
+        </dl>
         <p class="note">Library checks for updates itself, and Check for Updates… installs them. Your library and clipboard history are kept.</p>
       </div>
     </section>

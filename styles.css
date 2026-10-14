@@ -347,7 +347,7 @@ figcaption {
 }
 
 .learn:hover {
-  text-decoration: underline;
+  color: var(--accent-hover);
 }
 
 .learn .icon {
@@ -521,5 +521,92 @@ footer a:hover {
 
   .nav nav {
     gap: 16px;
+  }
+}
+
+/* Quick facts cards */
+.cards {
+  display: grid;
+  gap: 16px;
+  max-width: 1080px;
+  margin: 56px auto 0;
+  text-align: left;
+}
+
+.card {
+  display: block;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--bg);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.card:hover {
+  border-color: var(--link);
+}
+
+.card .icon {
+  color: var(--accent);
+}
+
+.card h3 {
+  margin-top: 16px;
+  font-size: 21px;
+  line-height: 1.2;
+}
+
+.card p {
+  margin-top: 6px;
+  font-size: 17px;
+  color: var(--text-2);
+}
+
+/* Requirements comparison row */
+.requirements {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 640px;
+  margin: 48px auto 0;
+  text-align: left;
+  border-top: 1px solid var(--border);
+}
+
+.requirements > div {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.requirements dt {
+  font-size: 15px;
+  color: var(--text-2);
+}
+
+.requirements dd {
+  margin: 4px 0 0;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  text-wrap: balance;
+}
+
+@media (min-width: 735px) {
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .requirements {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 32px;
+  }
+}
+
+@media (min-width: 980px) {
+  .cards {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
