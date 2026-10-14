@@ -10,18 +10,20 @@
   --focus: #0071e3;
   --border: #d2d2d7;
   --code-bg: #f5f5f7;
+  --nav-bg: rgba(255, 255, 255, 0.8);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #1d1d1f;
-    --band: #000000;
+    --bg: #000000;
+    --band: #1d1d1f;
     --text: #f5f5f7;
     --text-2: #a1a1a6;
     --link: #2997ff;
     --focus: #2997ff;
     --border: #424245;
     --code-bg: #000000;
+    --nav-bg: rgba(0, 0, 0, 0.8);
   }
 }
 
@@ -46,7 +48,9 @@ body {
 h1,
 h2,
 h3,
-p {
+p,
+ul,
+figure {
   margin: 0;
 }
 
@@ -59,6 +63,11 @@ h3 {
 
 a {
   color: var(--link);
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
 }
 
 :focus-visible {
@@ -82,6 +91,7 @@ a {
   position: absolute;
   top: -100px;
   left: 16px;
+  z-index: 30;
   padding: 8px 14px;
   border-radius: 8px;
   background: var(--bg);
@@ -92,6 +102,69 @@ a {
   top: 16px;
 }
 
+.icon {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+
+/* Sticky navigation */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--nav-bg);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 980px;
+  height: 48px;
+  margin: 0 auto;
+  padding: 0 16px;
+  font-size: 14px;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.nav-brand img {
+  display: block;
+  border-radius: 5px;
+}
+
+.nav nav {
+  display: flex;
+  gap: 24px;
+}
+
+.nav nav a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.nav nav a:hover {
+  text-decoration: underline;
+}
+
+/* Sections */
 main > section {
   padding: 96px 16px;
   text-align: center;
@@ -101,24 +174,60 @@ main > section {
   background: var(--band);
 }
 
+main h2 {
+  max-width: 880px;
+  margin: 0 auto;
+  font-size: clamp(40px, 6vw, 64px);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+
+main section > p {
+  max-width: 680px;
+  margin: 16px auto 0;
+  font-size: 21px;
+  line-height: 1.38;
+  letter-spacing: -0.015em;
+  color: var(--text-2);
+}
+
+main section > p.fine {
+  font-size: 17px;
+}
+
+main figure {
+  margin: 56px auto 0;
+  max-width: 100%;
+}
+
+main img {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  margin: 0 auto;
+  border-radius: 18px;
+}
+
+main figcaption {
+  margin-top: 16px;
+  font-size: 17px;
+  color: var(--text-2);
+}
+
+main code {
+  font-size: 0.9em;
+}
+
 /* Hero */
 .hero {
-  padding-top: 120px;
+  padding-top: 88px;
   padding-bottom: 96px;
 }
 
-.app-icon {
-  display: block;
-  width: 128px;
-  height: 128px;
-  margin: 0 auto 24px;
-  border-radius: 28px;
-}
-
 .hero h1 {
-  font-size: clamp(48px, 9vw, 96px);
-  line-height: 1.05;
-  letter-spacing: -0.04em;
+  font-size: clamp(56px, 10vw, 112px);
+  line-height: 1;
+  letter-spacing: -0.045em;
 }
 
 .pitch {
@@ -129,7 +238,7 @@ main > section {
   color: var(--text-2);
 }
 
-.actions {
+.hero .actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -164,84 +273,74 @@ main > section {
   text-decoration: underline;
 }
 
-.icon {
-  width: 24px;
-  height: 24px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  flex: none;
+.hero-media {
+  margin-top: 64px;
 }
 
-/* Demo */
-.demo figure {
-  margin: 0 auto;
-}
-
-.demo img {
-  display: block;
-  height: auto;
-  max-width: 100%;
-  margin: 0 auto;
-  border-radius: 18px;
-}
-
-.demo .quick-open {
+.hero-media img {
   width: min(100%, 558px);
 }
 
-.demo .menu-bar {
+#menu-bar img {
   width: min(100%, 479px);
 }
 
-.demo figcaption,
-.install > p {
-  margin-top: 16px;
-  font-size: 21px;
-  line-height: 1.38;
-  letter-spacing: -0.015em;
-  color: var(--text-2);
+.clipboard-menu {
+  width: min(100%, 292px);
 }
 
-/* Features */
-.features h2,
-.install h2 {
-  font-size: clamp(36px, 5vw, 56px);
-  line-height: 1.08;
-  letter-spacing: -0.03em;
+.manager {
+  width: min(100%, 921px);
 }
 
-.feature-grid {
-  display: grid;
-  gap: 56px 40px;
-  max-width: 880px;
-  margin: 0 auto;
+.get-info {
+  width: min(100%, 455px);
+}
+
+.settings {
+  width: min(100%, 524px);
+}
+
+/* Fact lists */
+.facts {
+  max-width: 640px;
+  margin: 40px auto 0;
+  padding: 0;
+  list-style: none;
   text-align: left;
-}
-
-.feature .icon {
-  color: var(--accent);
-  margin-bottom: 16px;
-}
-
-.feature h3 {
-  font-size: 24px;
-  line-height: 1.2;
-}
-
-.feature p {
-  margin-top: 8px;
-  font-size: 19px;
-  line-height: 1.42;
+  font-size: 17px;
   color: var(--text-2);
+}
+
+.facts li {
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+}
+
+.facts li:last-child {
+  border-bottom: 1px solid var(--border);
+}
+
+.facts strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.facts.icons li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.facts.icons .icon {
+  color: var(--accent);
+  margin-top: 1px;
 }
 
 /* Install */
 .code-block {
   max-width: 720px;
-  margin: 32px auto 0;
+  margin: 40px auto 0;
   padding: 20px;
   border-radius: 18px;
   background: var(--code-bg);
@@ -255,36 +354,47 @@ main > section {
 }
 
 .code-block code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 15px;
   line-height: 1.5;
 }
 
-.install .note {
-  margin-top: 20px;
+#install .note {
+  margin-top: 16px;
   font-size: 15px;
   color: var(--text-2);
 }
 
 /* Footer */
 footer {
-  padding: 24px 16px 40px;
+  padding: 32px 16px 40px;
   border-top: 1px solid var(--border);
   text-align: center;
   font-size: 14px;
   color: var(--text-2);
 }
 
-footer p {
-  max-width: 980px;
-  margin: 0 auto;
+footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 24px;
+  margin-bottom: 12px;
 }
 
 footer a {
   color: var(--link);
+  text-decoration: none;
 }
 
-/* Motion: a subtle fade-up. Disabled for reduced motion. */
+footer a:hover {
+  text-decoration: underline;
+}
+
+footer p {
+  margin: 0;
+}
+
+/* Motion: a subtle fade-up, disabled for reduced motion. */
 @media (prefers-reduced-motion: no-preference) {
   .hero > * {
     animation: rise 0.8s ease-out both;
@@ -297,7 +407,7 @@ footer a {
 
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .reveal {
+    main > section:not(.hero) {
       animation: rise linear both;
       animation-timeline: view();
       animation-range: entry 0% cover 30%;
@@ -317,27 +427,23 @@ footer a {
   }
 }
 
-/* Narrow screens: 375px and similar. */
+/* Narrow screens (375px and up to 734px). */
 @media (max-width: 734px) {
   main > section {
-    padding-top: 64px;
-    padding-bottom: 64px;
+    padding-top: 72px;
+    padding-bottom: 72px;
   }
 
   .hero {
-    padding-top: 72px;
-    padding-bottom: 64px;
+    padding-top: 56px;
+    padding-bottom: 72px;
   }
 
-  .demo figcaption,
-  .install > p {
+  main section > p {
     font-size: 17px;
   }
-}
 
-/* Wide screens: two-column feature grid. */
-@media (min-width: 735px) {
-  .feature-grid {
-    grid-template-columns: 1fr 1fr;
+  .nav nav {
+    gap: 16px;
   }
 }
