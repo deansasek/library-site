@@ -10,6 +10,7 @@
   --focus: #0071e3;
   --border: #d2d2d7;
   --code-bg: #f5f5f7;
+  --link-hover: #004f9e;
   --nav-bg: rgba(255, 255, 255, 0.8);
   --section-space: clamp(80px, 12vw, 128px);
   --gutter: 16px;
@@ -31,6 +32,7 @@
     --focus: #2997ff;
     --border: #424245;
     --code-bg: #000000;
+    --link-hover: #7cbcff;
     --nav-bg: rgba(0, 0, 0, 0.8);
   }
 }
@@ -67,6 +69,7 @@ h2,
 h3 {
   font-weight: 600;
   letter-spacing: -0.03em;
+  text-wrap: balance;
 }
 
 a {
@@ -81,18 +84,6 @@ code {
 :focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 3px;
-}
-
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
 }
 
 .skip-link {
@@ -347,7 +338,7 @@ figcaption {
 }
 
 .learn:hover {
-  color: var(--accent-hover);
+  color: var(--link-hover);
 }
 
 .learn .icon {
@@ -437,28 +428,59 @@ figcaption {
 
 /* Footer */
 footer {
-  padding: 32px var(--gutter) 40px;
+  padding: 48px var(--gutter) 40px;
   border-top: 1px solid var(--border);
-  text-align: center;
-  font-size: 14px;
+  font-size: 12px;
   color: var(--text-2);
 }
 
-footer nav {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px 24px;
-  margin-bottom: 12px;
+.footer-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px 24px;
+  max-width: 980px;
+  margin: 0 auto;
 }
 
-footer a {
-  color: var(--link);
+.footer-cols h3 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--text);
+}
+
+.footer-cols ul {
+  padding: 0;
+  list-style: none;
+}
+
+.footer-cols li + li {
+  margin-top: 8px;
+}
+
+.footer-cols a {
+  color: var(--text-2);
   text-decoration: none;
 }
 
-footer a:hover {
-  text-decoration: underline;
+.footer-cols a:hover {
+  color: var(--text);
+}
+
+.legal {
+  max-width: 980px;
+  margin: 40px auto 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+@media (min-width: 735px) {
+  .footer-cols {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 /* Motion: a subtle fade-up, disabled for reduced motion. */
@@ -588,10 +610,6 @@ footer a:hover {
   font-size: 21px;
   font-weight: 600;
   letter-spacing: -0.02em;
-}
-
-h1 {
-  text-wrap: balance;
 }
 
 @media (min-width: 735px) {
