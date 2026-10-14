@@ -11,6 +11,14 @@
   --border: #d2d2d7;
   --code-bg: #f5f5f7;
   --nav-bg: rgba(255, 255, 255, 0.8);
+  --section-space: clamp(80px, 12vw, 128px);
+  --gutter: 16px;
+}
+
+@media (min-width: 735px) {
+  :root {
+    --gutter: 22px;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -90,7 +98,7 @@ code {
 .skip-link {
   position: absolute;
   top: -100px;
-  left: 16px;
+  left: var(--gutter);
   z-index: 30;
   padding: 8px 14px;
   border-radius: 8px;
@@ -131,7 +139,7 @@ code {
   max-width: 980px;
   height: 48px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 var(--gutter);
   font-size: 14px;
 }
 
@@ -164,9 +172,9 @@ code {
   text-decoration: underline;
 }
 
-/* Sections */
-main > section {
-  padding: 96px 16px;
+/* Sections and rhythm */
+.block {
+  padding: var(--section-space) var(--gutter);
   text-align: center;
 }
 
@@ -174,54 +182,100 @@ main > section {
   background: var(--band);
 }
 
-main h2 {
+.block h2 {
   max-width: 880px;
   margin: 0 auto;
   font-size: clamp(40px, 6vw, 64px);
   line-height: 1.05;
   letter-spacing: -0.035em;
+  text-wrap: balance;
 }
 
-main section > p {
-  max-width: 680px;
-  margin: 16px auto 0;
-  font-size: 21px;
-  line-height: 1.38;
-  letter-spacing: -0.015em;
+.subhead {
+  margin-top: 12px;
+  font-size: clamp(21px, 2.4vw, 28px);
+  line-height: 1.19;
+  letter-spacing: -0.02em;
   color: var(--text-2);
 }
 
-main section > p.fine {
-  font-size: 17px;
+.copy > p:not(.subhead) {
+  max-width: 680px;
+  margin: 20px auto 0;
+  font-size: 19px;
+  line-height: 1.42;
+  color: var(--text);
 }
 
-main figure {
-  margin: 56px auto 0;
+.copy > p.fine {
+  font-size: 17px;
+  color: var(--text-2);
+}
+
+.copy.center > p:not(.subhead) {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+figure {
   max-width: 100%;
 }
 
-main img {
+figure img {
   display: block;
   height: auto;
   max-width: 100%;
   margin: 0 auto;
+  border: 1px solid var(--border);
   border-radius: 18px;
 }
 
-main figcaption {
+figcaption {
   margin-top: 16px;
   font-size: 17px;
   color: var(--text-2);
 }
 
-main code {
-  font-size: 0.9em;
+/* Split rows: text and media side by side on wide screens */
+.split {
+  display: grid;
+  gap: 48px;
+  align-items: center;
+  max-width: 1080px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.split .copy {
+  text-align: left;
+}
+
+.split .copy > p:not(.subhead) {
+  margin-left: 0;
+}
+
+.split h2 {
+  margin: 0;
+  max-width: none;
+}
+
+.split .subhead {
+  margin-left: 0;
+}
+
+.wide {
+  margin-top: 56px;
+}
+
+.wide img {
+  width: min(100%, 921px);
 }
 
 /* Hero */
 .hero {
   padding-top: 88px;
-  padding-bottom: 96px;
+  padding-bottom: var(--section-space);
+  text-align: center;
 }
 
 .hero h1 {
@@ -279,18 +333,35 @@ main code {
 
 .hero-media img {
   width: min(100%, 558px);
+  border: 0;
 }
 
-#menu-bar img {
+/* Learn-more links */
+.learn {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 28px;
+  font-size: 17px;
+  text-decoration: none;
+}
+
+.learn:hover {
+  text-decoration: underline;
+}
+
+.learn .icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Media sizes at their natural width, scaled down to the column */
+.menu-bar {
   width: min(100%, 479px);
 }
 
 .clipboard-menu {
   width: min(100%, 292px);
-}
-
-.manager {
-  width: min(100%, 921px);
 }
 
 .get-info {
@@ -358,7 +429,7 @@ main code {
   line-height: 1.5;
 }
 
-#install .note {
+.note {
   margin-top: 16px;
   font-size: 15px;
   color: var(--text-2);
@@ -366,7 +437,7 @@ main code {
 
 /* Footer */
 footer {
-  padding: 32px 16px 40px;
+  padding: 32px var(--gutter) 40px;
   border-top: 1px solid var(--border);
   text-align: center;
   font-size: 14px;
@@ -390,10 +461,6 @@ footer a:hover {
   text-decoration: underline;
 }
 
-footer p {
-  margin: 0;
-}
-
 /* Motion: a subtle fade-up, disabled for reduced motion. */
 @media (prefers-reduced-motion: no-preference) {
   .hero > * {
@@ -407,7 +474,7 @@ footer p {
 
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    main > section:not(.hero) {
+    .block {
       animation: rise linear both;
       animation-timeline: view();
       animation-range: entry 0% cover 30%;
@@ -427,19 +494,28 @@ footer p {
   }
 }
 
-/* Narrow screens (375px and up to 734px). */
+/* Two-column rows from 735px up. Stacked below. */
+@media (min-width: 735px) {
+  .split {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .split.reverse .copy {
+    order: 2;
+  }
+
+  .split.reverse figure {
+    order: 1;
+  }
+}
+
 @media (max-width: 734px) {
-  main > section {
+  .block {
     padding-top: 72px;
     padding-bottom: 72px;
   }
 
-  .hero {
-    padding-top: 56px;
-    padding-bottom: 72px;
-  }
-
-  main section > p {
+  .copy > p:not(.subhead) {
     font-size: 17px;
   }
 
