@@ -709,6 +709,8 @@ footer {
   color:var(--text-2);
 }
 .guide-nav details ol { margin:0; }
+/* The navigation lists are not numbered, on phones as well as desktop. */
+.toc ol { list-style:none; }
 .toc{position:relative;}
 .toc-indicator{position:absolute;left:0;top:0;width:2px;height:0;background:var(--accent);}
 .back a {

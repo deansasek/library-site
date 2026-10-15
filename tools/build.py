@@ -322,7 +322,8 @@ def write_search_index(rendered, guide_groups):
             first = re.split(r'(?<=[.!?])\s', text)[0][:100]
             label = guide_groups[sid] if pg.startswith('/guide/') else SEARCH_PAGES[pg]
             items.append({'t': H.unescape(title), 'p': label,
-                          'u': pg.strip('/') + '/index.html#' + sid, 's': first})
+                          # Relative to the script's folder (assets/), so the link works under any base path.
+                          'u': '../' + pg.strip('/') + '/#' + sid, 's': first})
     data = json.dumps(items, ensure_ascii=False, separators=(',', ':'))
     with open(os.path.join(ROOT, 'assets', 'search-index.json'), 'w') as f:
         f.write(data)
