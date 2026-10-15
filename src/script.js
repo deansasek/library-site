@@ -183,6 +183,12 @@ a.classList.toggle("is-active", on);
 if (on) { a.setAttribute("aria-current", "location"); active = a; } else { a.removeAttribute("aria-current"); }
 });
 if (active) {
+// Open the groups and features around the current section, so its entry is visible in the navigation.
+var folder = active.closest("details");
+while (folder) {
+folder.open = true;
+folder = folder.parentElement ? folder.parentElement.closest("details") : null;
+}
 var box = textBox(active);
 var origin = toc.getBoundingClientRect();
 indicator.style.height = box.height + "px";

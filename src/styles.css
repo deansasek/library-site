@@ -641,6 +641,24 @@ footer {
 .toc a.is-active {
   color:var(--accent);
 }
+.guide-nav > details + details { margin-top:var(--space-2); }
+.guide-nav summary {
+  cursor:pointer;
+  min-height: var(--tap);
+  display:flex;
+  align-items:center;
+  font-size:var(--type-small);
+  font-weight:600;
+  color:var(--text-1);
+}
+.guide-nav details details summary { font-weight:400; color:var(--text-2); }
+.guide-nav summary a { color:inherit; }
+.group-intro {
+  margin:0 0 var(--space-1);
+  font-size:var(--type-small);
+  color:var(--text-2);
+}
+.guide-nav details ol { margin:0; }
 .toc{position:relative;}
 .toc-indicator{position:absolute;left:0;top:0;width:2px;height:0;background:var(--accent);}
 .back a {
