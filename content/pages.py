@@ -97,7 +97,7 @@ def render(page):
 <li><strong>Services:</strong> select a link in any app, then choose <strong>Services &gt; Add to Library</strong>. In Finder, select apps or folders and choose the same item.</li>
 <li><strong>Share:</strong> right-click a bookmark or app and choose <strong>Share…</strong>. Drag a row into any app to drop its link or file.</li>
 <li><strong>URL scheme:</strong> <code>library://open?name=Jira&amp;value=ABC-123</code> opens a bookmark and fills in its template. <code>library://menu</code> shows the menu. <code>library://search</code> opens Quick Open. Terminal commands can't be opened this way, so a web page can't run one.</li>
-<li><strong>Shortcuts app:</strong> actions for opening and searching items, adding bookmarks and apps, Frequently Used, and the clipboard. Run Terminal Command always asks first. These actions appear only in a build that includes App Intents metadata, which Xcode generates. <code>./build.sh</code> doesn't do that yet.</li>
+<li><strong>Shortcuts app:</strong> actions for opening and searching items, adding bookmarks and apps, Frequently Used, and the clipboard. Run Terminal Command always asks first. These actions appear only in builds that include App Intents metadata. Builds from the repository don't include it yet.</li>
 </ul>'''),
         ('stay-up-to-date', 'Stay up to date', '''<p>While Library runs, it checks GitHub for a new release every hour. It also checks at launch if the last check was an hour or more ago.</p>
 <p>When a newer version exists, one item appears at the top of the menu. Nothing pops up. To turn checks off, use <strong>Settings &gt; General</strong>. Choose <strong>Check for Updates…</strong> at any time. See <a href="/privacy/#what-is-sent">what is sent</a>.</p>'''),
