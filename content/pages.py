@@ -8,7 +8,7 @@ Values to bump at each release (the only place they live):
 """
 import datetime
 
-REVIEWED_VERSION = '1.6.3'
+REVIEWED_VERSION = '1.6.4'
 REVIEWED_DATE = None
 
 # Set by build.py at build time: the latest releases from GitHub (or None when offline) and the Markdown converter.
