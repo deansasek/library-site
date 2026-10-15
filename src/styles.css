@@ -3,6 +3,7 @@
   color-scheme:light dark;
   --hairline: 1px;
   --control: #86868b;
+  --accent-pressed: #0064d2;
   --radius-field: 10px;
   --tap: 44px;
   --radius-media: 18px;
@@ -52,7 +53,7 @@
   :root{--gutter:22px;
 }
 
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--control:#98989d;--bg:#000000;--band:#1d1d1f;--text:#f5f5f7;--text-2:#a1a1a6;--link:#2997ff;--accent:#0a84ff;--accent-hover:#409cff;--on-accent:#000000;--focus:#0a84ff;--border:#424245;--media-border:rgba(255,255,255,0.12);--code-bg:#000000;--link-hover:#7cbcff;--nav-bg:rgba(0,0,0,0.8);}}/* ---- base ---- */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--control:#98989d;--accent-pressed:#0a7ae6;--bg:#000000;--band:#1d1d1f;--text:#f5f5f7;--text-2:#a1a1a6;--link:#2997ff;--accent:#0a84ff;--accent-hover:#409cff;--on-accent:#000000;--focus:#0a84ff;--border:#424245;--media-border:rgba(255,255,255,0.12);--code-bg:#000000;--link-hover:#7cbcff;--nav-bg:rgba(0,0,0,0.8);}}/* ---- base ---- */
 *,*::before,*::after {
   box-sizing:border-box;
 }
@@ -279,7 +280,8 @@ figcaption {
   display:inline-flex;
   align-items:center;
   min-height: var(--tap);
-  padding:var(--space-3) var(--space-6);
+  padding:0 var(--space-6);
+  font-weight:400;
   border-radius: var(--radius-pill);
   background:var(--accent);
   color:var(--on-accent);
@@ -289,6 +291,9 @@ figcaption {
 .button:hover {
   background:var(--accent-hover);
 }
+.button:active {
+  background:var(--accent-pressed);
+}
 .text-link {
   display:inline-flex;
   align-items:center;
@@ -296,6 +301,9 @@ figcaption {
   min-height: var(--tap);
   font-size:var(--type-body);
   text-decoration:none;
+}
+.text-link:active {
+  color:var(--link-hover);
 }
 .text-link:hover {
   color: var(--link-hover);
@@ -828,13 +836,16 @@ footer {
   padding:0 var(--space-2);
   border:0;
   background:none;
-  color:var(--text-2);
+  color:var(--link);
   font:inherit;
   font-size:var(--type-small);
   cursor:pointer;
 }
 .copy-button:hover {
-  color:var(--accent);
+  color:var(--link-hover);
+}
+.copy-button:active {
+  color:var(--link-hover);
 }
 .copy-button .icon {
   width:18px;
