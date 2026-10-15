@@ -39,7 +39,7 @@ def render(page):
 
     # ---------- Guide ----------
     guide_toc = [
-        ('get-started', 'Get started'), ('open-anything', 'Open anything'), ('find-it-with-quick-open', 'Find it with Quick Open'),
+        ('get-started', 'Get started'), ('open-anything', 'Open anything'), ('the-library-menu', 'The Library menu'), ('find-it-with-quick-open', 'Find it with Quick Open'),
         ('keep-what-you-copy', 'Keep what you copy'), ('save-snippets', 'Save snippets'),
         ('organize-your-library', 'Organize your library'), ('edit-an-item', 'Edit an item'), ('color-items', 'Color items'),
         ('add-notes', 'Add notes'), ('use-templates', 'Use templates'), ('read-later', 'Read later'),
@@ -110,6 +110,18 @@ def render(page):
 <li><strong>Find colored items.</strong> Type the color's name in Quick Open, such as <code>blue</code>. Spotlight finds them by color name too.</li>
 </ul>
 <p>The color is saved with the item in <code>bookmarks.json</code>. If you keep your library in iCloud Drive, the color syncs to your other Macs with the item.</p>'''),
+        ('the-library-menu', 'The Library menu', '''<p>Click the Library icon in the menu bar to open the menu. To open it at the pointer, press the Show Library Menu shortcut. <strong>Settings &gt; Shortcuts &gt; Library menu opens</strong> decides where it appears.</p>
+<ul>
+<li><strong>Update Available.</strong> Appears at the top when a newer version exists. Choose it to see the update options. See <a href="/guide/#stay-up-to-date">Stay up to date</a>.</li>
+<li><strong>Your items.</strong> Bookmarks, apps, terminal commands, folders, and dividers, in the order you set in Edit Library. Folders open as submenus.</li>
+<li><strong>Frequently Used.</strong> Up to five top-level items you have opened at least twice, most opened first.</li>
+<li><strong>Reading List.</strong> Your bookmarks in the Reading List. Unread bookmarks show first.</li>
+<li><strong>Clipboard.</strong> Your latest copies. Choose one to copy it again. When the history is empty, it says No Clipboard History. <strong>Clear History</strong> removes the unpinned history.</li>
+<li><strong>Paste Queue.</strong> Appears when the queue has items. <strong>Paste Next</strong> pastes the next one, and <strong>Clear Queue</strong> empties it.</li>
+<li><strong>Lock Pinned Items.</strong> Appears only when the Touch ID or password lock is on. It is dimmed while the pinned items are already locked.</li>
+<li><strong>Edit Library…</strong>, <strong>Settings…</strong>, <strong>Open at Login</strong>, <strong>Check for Updates…</strong>, <strong>About Library</strong>, and <strong>Quit Library</strong>.</li>
+</ul>
+<p>A folder with nothing in it shows <strong>Empty</strong>. <strong>Open All</strong> opens every item in a folder at once. It is dimmed when none of the folder's items can be opened.</p>'''),
         ('add-notes', 'Add notes', '''<p>Write a note on any item in Get Info. Quick Open shows the note under the item's name. Spotlight includes it in the description. Notes are plain text and stay in your library.</p>'''),
         ('use-templates', 'Use templates', '''<p>Put <code>{}</code> in a URL where a value goes. Library asks for the value when you open the bookmark.</p>
 <p>To name several values, use <code>{project}</code> or <code>{id:Issue number}</code>. Library asks for all of them in one sheet.</p>'''),
