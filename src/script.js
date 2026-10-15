@@ -175,7 +175,14 @@ var current = null;
 tocTargets.forEach(function (t) {
 if (t && t.getBoundingClientRect().top <= 120) { current = t.id; }
 });
+// At the bottom of the page the last section cannot scroll up under the top edge, so the last one is current.
+var scrollable = document.documentElement.scrollHeight > window.innerHeight + 4;
+var atBottom = scrollable && window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
+var lastTarget = tocTargets[tocTargets.length - 1];
+if (atBottom && lastTarget) { current = lastTarget.id; }
 if (!current && tocTargets[0]) { current = tocTargets[0].id; }
+// A section chosen from the navigation stays current while the page scrolls to it, until the reader scrolls by hand.
+if (pinnedId) { current = pinnedId; }
 var active = null;
 tocLinks.forEach(function (a) {
 var on = current !== null && a.getAttribute("href") === "#" + current;
@@ -195,6 +202,16 @@ indicator.style.height = box.height + "px";
 indicator.style.transform = "translate(" + list.offsetLeft + "px," + (box.top - origin.top) + "px)";
 }
 }
+var pinnedId = null;
+tocLinks.forEach(function (a) {
+a.addEventListener("click", function () {
+pinnedId = a.getAttribute("href").slice(1);
+markCurrent();
+});
+});
+["wheel", "touchstart", "keydown"].forEach(function (name) {
+window.addEventListener(name, function () { pinnedId = null; }, { passive: true });
+});
 window.addEventListener("resize", markCurrent);
 window.addEventListener("load", markCurrent);
 if (document.fonts && document.fonts.ready) { document.fonts.ready.then(markCurrent); }
