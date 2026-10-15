@@ -139,4 +139,22 @@ input.focus();
 }
 });
 }
+var tocLinks = Array.prototype.slice.call(document.querySelectorAll('.toc a[href^="#"]'));
+var tocTargets = tocLinks.map(function (a) { return document.getElementById(a.getAttribute("href").slice(1)); });
+if (tocLinks.length) {
+function markCurrent() {
+var current = null;
+tocTargets.forEach(function (t) {
+if (t && t.getBoundingClientRect().top <= 120) { current = t.id; }
+});
+if (!current && tocTargets[0]) { current = tocTargets[0].id; }
+tocLinks.forEach(function (a) {
+var on = current !== null && a.getAttribute("href") === "#" + current;
+a.classList.toggle("is-active", on);
+if (on) { a.setAttribute("aria-current", "location"); } else { a.removeAttribute("aria-current"); }
+});
+}
+window.addEventListener("scroll", markCurrent, { passive: true });
+markCurrent();
+}
 })();

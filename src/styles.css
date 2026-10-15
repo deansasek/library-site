@@ -623,9 +623,24 @@ footer {
   padding-left:var(--space-4);
 }
 .toc a {
+  position:relative;
   display:inline-flex;
   align-items:center;
   min-height: var(--tap);
+  padding-left:var(--space-3);
+  color:var(--text-2);
+}
+.toc a.is-active {
+  color:var(--accent);
+}
+.toc a.is-active::before {
+  content:"";
+  position:absolute;
+  left:0;
+  top:var(--space-2);
+  bottom:var(--space-2);
+  width:var(--hairline);
+  background:var(--accent);
 }
 .back a {
   display:inline-flex;
