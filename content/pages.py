@@ -145,11 +145,34 @@ def render(page):
 <li><strong>Undo</strong> brings back the library you had before the restore.</li>
 </ul>
 <p>Clipboard items are not in a backup. Pinned clipboard items are encrypted with a key that stays on this Mac. Recently Deleted items in a backup stay deleted after a restore.</p>'''),
-        ('settings', 'Settings', '''<p>Press ⌘, to open Settings.</p>
+        ('settings', 'Settings', '''<p>Press ⌘, to open Settings. It has three tabs: General, Shortcuts, and Clipboard.</p>
+<h3>General</h3>
 <ul>
-<li><strong>General:</strong> startup, iCloud Drive, automatic update checks, link checks, names for new bookmarks, backup and restore, and link cleaning.</li>
-<li><strong>Shortcuts:</strong> the global keys for the menu, Quick Open, the clipboard, and Open Copied Link.</li>
-<li><strong>Clipboard:</strong> history, keeping history across restarts, pasting, GIFs, and the Touch ID or password lock for pinned items.</li>
+<li><strong>Open at login</strong> starts Library when you log in.</li>
+<li><strong>Name new bookmarks from their pages</strong>. Library reads each new bookmark's title from its page. Until the title arrives, or when the page has none, the bookmark is named after its host. Off by default.</li>
+<li><strong>Keep Library in iCloud Drive</strong>. See <a href="/privacy/#icloud-drive">iCloud Drive</a>. Off by default.</li>
+<li><strong>Check for updates automatically</strong>. On by default. See <a href="/guide/#stay-up-to-date">Stay up to date</a>.</li>
+<li><strong>Check links periodically</strong>. Off by default. See <a href="/guide/#check-links">Check links</a>.</li>
+<li><strong>Export…</strong> and <strong>Restore…</strong> save and restore your library. See <a href="/guide/#back-up-and-restore">Back up and restore</a>.</li>
+<li><strong>Show…</strong> opens the welcome screen, which explains Library, lists your shortcuts, and asks for access.</li>
+<li><strong>Remove tracking parameters when copying links</strong>. On by default. Library removes tracking codes such as <code>utm_source</code>, <code>fbclid</code>, and <code>gclid</code> from a link you copy. The rest of the link stays the same, and the saved link is not changed.</li>
+</ul>
+<h3>Shortcuts</h3>
+<ul>
+<li><strong>Show Library Menu</strong>, <strong>Show Quick Open</strong>, <strong>Show Clipboard Menu</strong>, and <strong>Open Copied Link</strong>. Click a field and press the new keys. These work in every app. Open Copied Link opens the web link you last copied. A beep means the clipboard has no link.</li>
+<li><strong>Library menu opens</strong>: <strong>At the Pointer</strong> or <strong>From the Menu Bar</strong>.</li>
+<li><strong>Allow…</strong> asks for Accessibility access. Clicks, scrolls, pinches, swipes, and suggesting a selected link need it.</li>
+<li><strong>Restore Defaults</strong> puts the shortcuts back to their defaults: Control and right-click for the Library menu, Control-Space for Quick Open, and Control-Command-V for the clipboard menu. macOS may use Control-Space to switch input sources.</li>
+</ul>
+<h3>Clipboard</h3>
+<ul>
+<li><strong>Keep clipboard history</strong>. On by default. Turn it off to stop recording new copies.</li>
+<li><strong>Paste into text fields</strong>. On by default. If a text field has the keyboard, choosing an item pastes it. Otherwise it copies. This needs Accessibility access.</li>
+<li><strong>Play copied GIFs</strong>. Off by default. See <a href="/privacy/#what-is-sent">What is sent</a>.</li>
+<li><strong>Clear History</strong> removes the unpinned history.</li>
+<li><strong>Keep clipboard history across restarts</strong>. Off by default. See <a href="/guide/#keep-what-you-copy">Keep what you copy</a>.</li>
+<li><strong>Put the Latest Item on the Clipboard When Library Opens</strong>. Off by default. The newest saved item is copied when Library opens, so you can paste it right away. A password copied before a restart could be pasted by someone else at this Mac.</li>
+<li><strong>Require Touch ID or password to show pinned items</strong>. Off by default. See <a href="/privacy/#touch-id-lock">Touch ID or password lock</a>.</li>
 </ul>'''),
         ('permissions', 'Permissions', '''<ul>
 <li>Keyboard shortcuts, hot corners, Quick Open, and the menus don't need any permission.</li>
