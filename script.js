@@ -45,7 +45,7 @@ box.insertBefore(bar, pre);
 var button = document.createElement("button");
 button.type = "button";
 button.className = "copy-button";
-button.innerHTML = COPY_ICON + "<span>Copy</span>";
+var icon=document.createElementNS("http://www.w3.org/2000/svg","svg");icon.setAttribute("class","icon");icon.setAttribute("viewBox","0 0 24 24");icon.setAttribute("aria-hidden","true");icon.setAttribute("focusable","false");var rect=document.createElementNS("http://www.w3.org/2000/svg","rect");rect.setAttribute("x","8.5");rect.setAttribute("y","8.5");rect.setAttribute("width","11");rect.setAttribute("height","11");rect.setAttribute("rx","2");var path=document.createElementNS("http://www.w3.org/2000/svg","path");path.setAttribute("d","M5.5 15.5h-1a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1");icon.appendChild(rect);icon.appendChild(path);button.appendChild(icon);var labelText=document.createElement("span");labelText.textContent="Copy";button.appendChild(labelText);
 bar.appendChild(button);
 var label = button.querySelector("span");
 button.addEventListener("click", function () {
