@@ -38,7 +38,7 @@ def render(page):
 <li>Press Control-Command-V to open the clipboard menu at the pointer. Press 1 through 9 to copy an item. Hold Option to copy it as plain text.</li>
 <li>If a text field has the keyboard, choosing an item pastes it. Otherwise it copies. To turn this off, use <strong>Paste into text fields</strong> in <strong>Settings &gt; Clipboard</strong>. Pasting needs Accessibility access.</li>
 <li>Select an item in Quick Open and press Space to preview it in Quick Look.</li>
-<li>When you copy a link, Library removes tracking codes such as <code>utm_source</code>, <code>fbclid</code>, and <code>gclid</code>. To turn this off, use <strong>Settings &gt; General</strong>. The link in your history doesn't change.</li>
+<li>When you copy a link, Library removes tracking codes such as <code>utm_source</code>, <code>fbclid</code>, and <code>gclid</code>. Turn this off in <strong>Settings &gt; General</strong>. Your history keeps the original link.</li>
 <li>Copy as lower or upper case, trimmed, with its lines joined, or with smart punctuation. You can also copy a bookmark as a Markdown link. Find these in Quick Open, under Tab.</li>
 <li>Text with an address, phone number, or date gets actions in Quick Open, under Tab. See <a href="/smart-features/">smart features</a>.</li>
 <li>Type <code>from Safari</code> in Quick Open to see only what you copied in Safari.</li>
@@ -51,8 +51,8 @@ def render(page):
 <ul>
 <li>Add items with the <strong>+</strong> menu. You can also drag an app or a link into the window.</li>
 <li>Drag rows to reorder them, or to move them into a folder.</li>
-<li>Select several rows to move, reorder, or edit them together. A bulk change counts as one undo step.</li>
-<li>Right-click a row to open it, show it in Finder, get info, rename, move, share, or delete it.</li>
+<li>Select several rows to move, reorder, or edit them together. A bulk change is one undo step.</li>
+<li>Right-click a row to open, show, rename, move, share, or delete it.</li>
 <li>To merge duplicate bookmarks, choose <strong>File &gt; Find Duplicates…</strong>.</li>
 <li>To import bookmarks from Safari or Chrome, choose <strong>File &gt; Import Bookmarks…</strong>. They go into one folder. Press ⌘Z to undo the import.</li>
 <li>To export or restore your whole library, use <strong>Settings &gt; General</strong>.</li>
@@ -85,8 +85,8 @@ def render(page):
 <li><strong>URL scheme:</strong> <code>library://open?name=Jira&amp;value=ABC-123</code> opens a bookmark and fills in its template. <code>library://menu</code> shows the menu. <code>library://search</code> opens Quick Open. Terminal commands can't be opened this way, so a web page can't run one.</li>
 <li><strong>Shortcuts app:</strong> actions for opening and searching items, adding bookmarks and apps, Frequently Used, and the clipboard. Run Terminal Command always asks first. These actions appear only in a build that includes App Intents metadata, which Xcode generates. <code>./build.sh</code> doesn't do that yet.</li>
 </ul>'''),
-        ('stay-up-to-date', 'Stay up to date', '''<p>Library checks GitHub for a new release every hour while it runs. It also checks at launch if the last check was an hour or more ago.</p>
-<p>When a newer version exists, one item appears at the top of the menu. Nothing pops up. To turn checks off, use <strong>Settings &gt; General</strong>. You can also choose <strong>Check for Updates…</strong> at any time. See <a href="/privacy/#what-is-sent">what is sent</a>.</p>'''),
+        ('stay-up-to-date', 'Stay up to date', '''<p>While Library runs, it checks GitHub for a new release every hour. It also checks at launch if the last check was an hour or more ago.</p>
+<p>When a newer version exists, one item appears at the top of the menu. Nothing pops up. To turn checks off, use <strong>Settings &gt; General</strong>. Choose <strong>Check for Updates…</strong> at any time. See <a href="/privacy/#what-is-sent">what is sent</a>.</p>'''),
         ('settings', 'Settings', '''<p>Press ⌘, to open Settings.</p>
 <ul>
 <li><strong>General:</strong> startup, iCloud Drive, automatic update checks, backup and restore, and link cleaning.</li>
@@ -114,7 +114,7 @@ def render(page):
     privacy = [
         ('what-is-stored', 'What is stored', '''<p>Library keeps your library and clipboard history on your Mac. Unpinned clipboard history stays in memory. It is cleared when you quit, unless you turn on <strong>Keep clipboard history across restarts</strong> in <strong>Settings &gt; Clipboard</strong>.</p>
 <p>Clipboard history never leaves your Mac.</p>'''),
-        ('your-files', 'Your files', '''<p>Your files are in <code>~/.library/</code>.</p>
+        ('your-files', 'Your files', '''<p>Your files are in <code>~/.library/</code>:</p>
 <table>
 <caption>Files in ~/.library</caption>
 <thead><tr><th scope="col">File</th><th scope="col">Contents</th></tr></thead>
@@ -135,7 +135,7 @@ def render(page):
 <li><strong>Update checks</strong> to <code>https://api.github.com/repos/deansasek/library/releases/latest</code>. This happens when you choose <strong>Check for Updates…</strong>, and every hour when automatic checks are on. Automatic checks are on by default. The request includes only the app's version, in its User-Agent header, and the ETag from GitHub's last answer. No account or other data is sent.</li>
 </ul>'''),
         ('touch-id-lock', 'Touch ID or password lock', '''<p>To lock pinned items, turn on <strong>Require Touch ID or password to show pinned items</strong> in <strong>Settings &gt; Clipboard</strong>. It is off by default.</p>
-<p>Pinned items stay hidden until you authenticate. The unlock lasts until you choose <strong>Lock Pinned Items</strong>, your Mac sleeps, or Library quits. Search doesn't look inside locked items. If your Mac has no password and no Touch ID, Library won't turn the lock on. It explains how to add one.</p>'''),
+<p>Pinned items stay hidden until you authenticate. The unlock lasts until you choose <strong>Lock Pinned Items</strong>, your Mac sleeps, or Library quits. Search doesn't look inside locked items. If your Mac has no password or Touch ID, Library won't turn the lock on, and it explains how to add one.</p>'''),
         ('icloud-drive', 'iCloud Drive', '''<p>To keep your library in iCloud Drive, turn on <strong>Keep Library in iCloud Drive</strong> in <strong>Settings &gt; General</strong>. It is off by default.</p>
 <p>Library moves <code>bookmarks.json</code> into iCloud Drive and links to it from <code>~/.library</code>. Your library then follows you to your other Macs. Clipboard history never leaves your Mac.</p>
 <p>If two Macs change the library at the same time, the newer change wins for each item. Library tells you when a change from another Mac replaced an edit you hadn't saved.</p>'''),
@@ -199,7 +199,7 @@ git push origin v1.2.0</code></pre></div>
         ('smart-actions', 'Smart actions', '''<p>If text has an address, a phone number, or a date, Library offers actions for it. Press Tab in Quick Open to see them: <strong>Open in Maps</strong>, <strong>Copy Phone Number</strong>, or <strong>Add to Calendar</strong>. Detection happens on your Mac.</p>'''),
         ('smart-punctuation', 'Smart Punctuation', '''<p>In <strong>Copy as</strong>, Smart Punctuation turns straight quotes and dashes into curly quotes, apostrophes, em dashes, and ellipses.</p>'''),
         ('smart-titles', 'Smart titles', '''<p>Turn on <strong>Name new bookmarks from their pages</strong> in <strong>Settings &gt; General</strong>. It is off by default. A new bookmark then takes its page's title.</p>
-<p>Library reads only the start of the page. It requests each new bookmark's page once.</p>'''),
+<p>Library reads only the start of the page, and it requests each new bookmark's page once.</p>'''),
         ('smart-sorting', 'Smart sorting', '''<p>In the Edit Library window, open the sort menu in the header. Choose <strong>Most Used</strong> or <strong>Recently Opened</strong>.</p>'''),
     ]
     out['/smart-features/index.html'] = page('/smart-features/', 'Smart features', 'Smart actions, Smart Punctuation, smart titles, and smart sorting in Library.',
