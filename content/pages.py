@@ -54,7 +54,7 @@ def render(page):
 <li><strong>Bookmarks</strong> open in a new tab or a new window.</li>
 <li><strong>Apps</strong> come to the front. To start a new copy, add a launch argument, such as <code>--profile work</code>.</li>
 <li><strong>Terminal commands</strong> run in a login shell in a new Terminal window. Add only commands you trust.</li>
-<li><strong>Folders</strong> open all of their bookmarks and apps at once. Library asks first if there are more than five.</li>
+<li><strong>Folders</strong> open as submenus. Choose <strong>Open All</strong> in a folder to open its bookmarks and apps, one after another. Library skips dividers, terminal commands, templates, and apps that are no longer installed. It asks first when more than five items would open.</li>
 </ul>'''),
         ('find-it-with-quick-open', 'Find it with Quick Open', '''<p>Press Control-Space to search your whole library.</p>
 <ul>
@@ -121,7 +121,7 @@ def render(page):
 <li><strong>Lock Pinned Items.</strong> Appears only when the Touch ID or password lock is on. It is dimmed while the pinned items are already locked.</li>
 <li><strong>Edit Library…</strong>, <strong>Settings…</strong>, <strong>Open at Login</strong>, <strong>Check for Updates…</strong>, <strong>About Library</strong>, and <strong>Quit Library</strong>.</li>
 </ul>
-<p>A folder with nothing in it shows <strong>Empty</strong>. <strong>Open All</strong> opens every item in a folder at once. It is dimmed when none of the folder's items can be opened.</p>'''),
+<p>A folder with nothing in it shows <strong>Empty</strong>. <strong>Open All</strong> opens the bookmarks and apps in the folder, including those in its subfolders, one after another. It is dimmed when none of them can be opened.</p>'''),
         ('add-notes', 'Add notes', '''<p>Write a note on any item in Get Info. Quick Open shows the note under the item's name. Spotlight includes it in the description. Notes are plain text and stay in your library.</p>'''),
         ('use-templates', 'Use templates', '''<p>Put <code>{}</code> in a URL where a value goes. Library asks for the value when you open the bookmark.</p>
 <p>To name several values, use <code>{project}</code> or <code>{id:Issue number}</code>. Library asks for all of them in one sheet.</p>'''),
