@@ -54,7 +54,7 @@ def head(title, desc, path):
     url = 'https://getlibrary.app' + path
     t = title if 'Library' in title else f'{title} · Library'
     return f'''<!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">

@@ -2,6 +2,7 @@
 :root {
   color-scheme:light dark;
   --hairline: 1px;
+  --control: #8e8e93;
   --tap: 44px;
   --radius-media: 18px;
   --radius-pill: 980px;
@@ -52,6 +53,10 @@
 *,*::before,*::after {
   box-sizing:border-box;
 }
+html {
+  scroll-padding-top: 64px;
+}
+
 body {
   margin:0;
   background:var(--bg);
@@ -703,7 +708,7 @@ footer {
   width:100%;
   min-height: var(--tap);
   padding:0 var(--space-3);
-  border: var(--hairline) solid var(--border);
+  border: var(--hairline) solid var(--control);
   border-radius:10px;
   background:var(--bg);
   color:var(--text);
