@@ -166,8 +166,8 @@ def relativize(html, path):
 
 def code_bars(html):
     """Give each code block a header bar. The label is static text; script.js adds the Copy button to the bar."""
-    return html.replace('<div class="code-block"><pre>',
-                        '<div class="code-block"><div class="code-head"><span class="code-label">Terminal</span></div><pre>')
+    return re.sub(r'<div class="code-block">\s*<pre>',
+                  '<div class="code-block"><div class="code-head"><span class="code-label">Terminal</span></div><pre>', html)
 
 
 def write(path, html):
