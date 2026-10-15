@@ -1,0 +1,35 @@
+name: Sync releases
+
+# Keeps the Releases page in step with the app. Runs every day, and by hand from the Actions tab. It reads the
+# published releases of the app, rebuilds the site, and commits any change to main.
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Read the app's releases
+        run: python3 tools/sync_releases.py
+      - name: Build the site
+        run: python3 tools/build.py --check-release
+      - name: Commit any change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes."
+          else
+            git commit -m "Sync releases from the Library app"
+            git push
+          fi

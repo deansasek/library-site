@@ -1,0 +1,173 @@
+[
+  {
+    "tag": "v1.6.4",
+    "version": "1.6.4",
+    "date": "2026-10-15",
+    "url": "https://github.com/deansasek/library/releases/tag/v1.6.4",
+    "notes": [
+      "Move Help into the menu bar menu and cover every feature in the welcome tour"
+    ]
+  },
+  {
+    "tag": "v1.6.3",
+    "version": "1.6.3",
+    "date": "2026-10-15",
+    "url": "https://github.com/deansasek/library/releases/tag/v1.6.3",
+    "notes": [
+      "Keep a clip's source app when it is copied back from the menu",
+      "Add an option to confirm terminal commands before they run",
+      "Add new screenshots and recordings to clipboard history",
+      "Add a Support Library item to the Help menu",
+      "Install the Command Line Tools when they are missing"
+    ]
+  },
+  {
+    "tag": "v1.6.2",
+    "version": "1.6.2",
+    "date": "2026-10-15",
+    "url": "https://github.com/deansasek/library/releases/tag/v1.6.2",
+    "notes": [
+      "fix(ui): describe link checks in plain language",
+      "docs: correct the documentation against the app",
+      "chore: license the project under the MIT License",
+      "docs: link the website and its source from the README",
+      "docs: point the README at the website source only",
+      "feat(library): let each folder show or hide Open All"
+    ]
+  },
+  {
+    "tag": "v1.6.1",
+    "version": "1.6.1",
+    "date": "2026-10-15",
+    "url": "https://github.com/deansasek/library/releases/tag/v1.6.1",
+    "notes": [
+      "fix(ui): use Apple capitalization in new labels",
+      "docs(readme): describe the smart features and the restart option",
+      "fix(update): download, build, and install the release, then remove the download"
+    ]
+  },
+  {
+    "tag": "v1.6.0",
+    "version": "1.6.0",
+    "date": "2026-10-15",
+    "url": "https://github.com/deansasek/library/releases/tag/v1.6.0",
+    "notes": [
+      "docs: add screenshots and recordings",
+      "docs: give Settings its own section and shrink the GIFs",
+      "docs: move Install above Features in the README",
+      "docs: keep only the one-command install in the README",
+      "docs: make the README a short guide and move the reference into docs",
+      "fix(manage): reorder rows by dragging them",
+      "ci: run the checks on pull requests and the heavy steps only on main",
+      "docs: restore the screenshots and feature detail in the README",
+      "docs: lead with the introduction and caption each demo in the README",
+      "docs: end the demo captions with a colon",
+      "docs: add a support link with the Buy Me a Coffee button",
+      "Smart clipboard actions and smart punctuation",
+      "Add notes to items and a Reading List",
+      "feat(links): check bookmarks once a day when turned on",
+      "Name new bookmarks from their pages; sort by most used and recently opened",
+      "fix: bug sweep across recent features",
+      "feat(clipboard): keep clipboard history across restarts, when turned on",
+      "docs: remove the internal audit report from the repository",
+      "docs: describe the smart features in the README"
+    ]
+  },
+  {
+    "tag": "v1.5.0",
+    "version": "1.5.0",
+    "date": "2026-10-14",
+    "url": "https://github.com/deansasek/library/releases/tag/v1.5.0",
+    "notes": [
+      "feat(quick-open): make the Actions hint a button",
+      "chore(theming): validate symbols, lint colors and fonts, and check contrast",
+      "perf(clipboard): load pinned items off the main thread",
+      "feat(update): check for updates and add an update script",
+      "feat(library): open a folder's bookmarks together",
+      "feat(library): find and merge duplicates, edit several items at once",
+      "fix: security and performance audit",
+      "feat(update): check automatically each hour, like Software Update",
+      "feat(backup): export and restore the library",
+      "feat(quick-open): snippets, clean links, and time zone conversion",
+      "fix: keep shortcuts when merging duplicates, and only treat declared fields as template placeholders",
+      "fix(quick-open): remove answers and web search that Spotlight already provides",
+      "feat(clipboard): lock pinned items behind Touch ID or password",
+      "feat(clipboard): copy as transforms, Markdown links, source filter, paste queue",
+      "feat(sync): optionally keep the library in iCloud Drive"
+    ]
+  },
+  {
+    "tag": "v1.4.0",
+    "version": "1.4.0",
+    "date": "2026-10-14",
+    "url": "https://github.com/deansasek/library/releases/tag/v1.4.0",
+    "notes": [
+      "ci: retry release publish and cache SwiftPM builds",
+      "feat(clipboard): encrypt pinned items with a Keychain key",
+      "fix(favicon): cap icon downloads and remember failing sites",
+      "perf(quick-open): index the library once and coalesce keystrokes",
+      "perf(store): skip icon and hotkey work for name-only edits",
+      "fix(quick-look): keep Quick Open open while the preview is interactive",
+      "fix(ui): align settings, quick open, and manager with HIG",
+      "perf(quick-open): narrow matches incrementally and match on bytes"
+    ]
+  },
+  {
+    "tag": "v1.3.0",
+    "version": "1.3.0",
+    "date": "2026-10-14",
+    "url": "https://github.com/deansasek/library/releases/tag/v1.3.0",
+    "notes": [
+      "fix(services): link Finder folders instead of creating empty groups",
+      "fix(a11y): label search, hide decorative icons, and expose Quick Open actions as buttons",
+      "feat(help): add a Help menu with the guide, shortcuts, tour, and issue reporting"
+    ]
+  },
+  {
+    "tag": "v1.2.0",
+    "version": "1.2.0",
+    "date": "2026-10-14",
+    "url": "https://github.com/deansasek/library/releases/tag/v1.2.0",
+    "notes": [
+      "fix(manage): label the edit action Edit…",
+      "feat(i18n): localize menu and Settings labels via a bundled strings file",
+      "feat(quick-look): preview clipboard items with Space",
+      "feat(services): add apps and folders from Finder",
+      "fix(ui): use system secondary colors in Quick Open and the tag ring",
+      "feat(onboarding): start new libraries with a link to the project",
+      "feat(import): import bookmarks from Safari and Chrome",
+      "feat(manage): native toolbar, search, and empty states for the library window",
+      "feat(intents): add App Intents for bookmarks, search, and clipboard"
+    ]
+  },
+  {
+    "tag": "v1.1.0",
+    "version": "1.1.0",
+    "date": "2026-10-14",
+    "url": "https://github.com/deansasek/library/releases/tag/v1.1.0",
+    "notes": [
+      "fix: harden bookmark storage, clipboard capture, and hotkeys"
+    ]
+  },
+  {
+    "tag": "v1.0.0",
+    "version": "1.0.0",
+    "date": "2026-10-14",
+    "url": "https://github.com/deansasek/library/releases/tag/v1.0.0",
+    "notes": [
+      "docs: condense README",
+      "docs: restore feature overview and fix README details",
+      "docs: remove contributing section from README",
+      "docs: document all features in README",
+      "docs: remove title underline from README header",
+      "docs: use a wordmark for the README title",
+      "docs: enlarge README title text",
+      "docs: restore heading title in README",
+      "docs: use h1 for README title",
+      "feat: suggest a selected link and paste into text fields",
+      "feat: run checks on pull requests and publish a zipped release",
+      "fix: publish the source as the release, not a built app",
+      "@deansasek made their first contribution"
+    ]
+  }
+]
