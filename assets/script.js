@@ -157,6 +157,15 @@ var tocLinks = Array.prototype.slice.call(document.querySelectorAll('.toc a[href
 var tocTargets = tocLinks.map(function (a) { return document.getElementById(a.getAttribute("href").slice(1)); });
 if (tocLinks.length) {
 var toc = tocLinks[0].closest(".toc");
+var list = tocLinks[0].closest("ol");
+function textBox(a) {
+var node = a.firstChild;
+while (node && !(node.nodeType === 3 && node.textContent.trim())) { node = node.nextSibling; }
+if (!node) { return a.getBoundingClientRect(); }
+var range = document.createRange();
+range.selectNodeContents(node);
+return range.getBoundingClientRect();
+}
 var indicator = document.createElement("span");
 indicator.className = "toc-indicator";
 indicator.setAttribute("aria-hidden", "true");
@@ -173,7 +182,12 @@ var on = current !== null && a.getAttribute("href") === "#" + current;
 a.classList.toggle("is-active", on);
 if (on) { a.setAttribute("aria-current", "location"); active = a; } else { a.removeAttribute("aria-current"); }
 });
-if (active) { indicator.style.transform = "translate(" + active.offsetLeft + "px," + active.offsetTop + "px)"; }
+if (active) {
+var box = textBox(active);
+var origin = toc.getBoundingClientRect();
+indicator.style.height = box.height + "px";
+indicator.style.transform = "translate(" + list.offsetLeft + "px," + (box.top - origin.top) + "px)";
+}
 }
 window.addEventListener("resize", markCurrent);
 window.addEventListener("load", markCurrent);
