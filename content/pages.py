@@ -17,7 +17,7 @@ def render(page):
 
     # ---------- Guide ----------
     guide_toc = [
-        ('open-anything', 'Open anything'), ('find-it-with-quick-open', 'Find it with Quick Open'),
+        ('get-started', 'Get started'), ('open-anything', 'Open anything'), ('find-it-with-quick-open', 'Find it with Quick Open'),
         ('keep-what-you-copy', 'Keep what you copy'), ('save-snippets', 'Save snippets'),
         ('organize-your-library', 'Organize your library'), ('edit-an-item', 'Edit an item'),
         ('add-notes', 'Add notes'), ('use-templates', 'Use templates'), ('read-later', 'Read later'),
@@ -26,6 +26,7 @@ def render(page):
         ('permissions', 'Permissions'), ('troubleshooting', 'Troubleshooting'),
     ]
     guide = [
+        ('get-started', 'Get started', '<p>Install Library first, then follow the first steps in <a href="/install/#first-steps">Install</a>.</p>'),
         ('open-anything', 'Open anything', '''<p>Bookmarks, apps, folders, and terminal commands open from the menu bar, a keyboard shortcut, or Spotlight. To open an item the other way, hold Option while you click it.</p>
 <ul>
 <li><strong>Bookmarks</strong> open in a new tab or a new window.</li>
@@ -49,7 +50,7 @@ def render(page):
 <li>Select an item in Quick Open and press Space to preview it in Quick Look.</li>
 <li>When you copy a link, Library removes tracking codes such as <code>utm_source</code>, <code>fbclid</code>, and <code>gclid</code>. Turn this off in <strong>Settings &gt; General</strong>. Your history keeps the original link.</li>
 <li>Copy as lower or upper case, trimmed, with its lines joined, or with smart punctuation. You can also copy a bookmark as a Markdown link. Find these in Quick Open, under Tab.</li>
-<li>Text with an address, phone number, or date gets actions in Quick Open, under Tab. See <a href="/smart-features/">smart features</a>.</li>
+<li>Library also finds addresses, phone numbers, and dates in copied text. See <a href="/smart-features/">smart features</a>.</li>
 <li>Type <code>from Safari</code> in Quick Open to see only what you copied in Safari.</li>
 <li>Build a paste queue. Add several items, then paste them one at a time, in order.</li>
 </ul>
