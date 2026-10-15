@@ -685,18 +685,21 @@ footer {
   min-height: var(--tap);
   color:var(--text-2);
 }
+/* The current section reads like a selected sidebar row: primary text, semibold, with the accent bar. */
 .toc a.is-active {
-  color:var(--accent);
+  color:var(--text);
+  font-weight:600;
 }
 .guide-nav > details + details { margin-top:var(--space-2); }
+/* Group headings read like macOS sidebar section headers: small, semibold, secondary. */
 .guide-nav summary {
   cursor:pointer;
   min-height: var(--tap);
   display:flex;
   align-items:center;
-  font-size:var(--type-small);
+  font-size:12px;
   font-weight:600;
-  color:var(--text-1);
+  color:var(--text-2);
 }
 .guide-nav details details summary { font-weight:400; color:var(--text-2); }
 .guide-nav summary a { color:inherit; }
