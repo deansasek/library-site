@@ -31,7 +31,10 @@ def header():
             '<a href="/guide/">Guide</a>'
             f'<a class="nav-extra" href="/privacy/">Privacy</a>'
             '<a href="/install/">Install</a>'
+            '<a class="nav-extra" href="/accessibility/">Accessibility</a>'
+            '<a class="nav-extra" href="/whats-new/">What\'s new</a>'
             '<a class="nav-extra" href="/releases/">Releases</a>'
+            f'<a class="nav-extra" href="{REPO}" rel="noopener noreferrer">GitHub</a>'
             '</nav></div></header>')
 
 
