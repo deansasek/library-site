@@ -1,5 +1,7 @@
 import re
 import os
+import json
+import html as _html
 """Page copy for the site. Setting and menu names match the app's own labels.
 
 Values to bump at each release (the only place they live):
@@ -9,7 +11,7 @@ Values to bump at each release (the only place they live):
 import datetime
 
 REVIEWED_VERSION = '1.6.4'
-REVIEWED_DATE = None
+REVIEWED_DATE = datetime.date(2026, 10, 15)  # set when the docs are reviewed, so a daily build does not change it
 
 # Set by build.py at build time: the latest releases from GitHub (or None when offline) and the Markdown converter.
 RELEASES = None
@@ -138,6 +140,31 @@ def guide_pages(toc, sections, page):
     return out
 
 
+
+
+def release_history(minor_ids):
+    """Every published Library release, newest first, from content/releases.json (written by tools/sync_releases.py).
+
+    Each release gets its date, its changes, and a link to the GitHub release. Releases with a What's new page
+    link to it too.
+    """
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'releases.json')
+    try:
+        with open(path) as f:
+            releases = json.load(f)
+    except FileNotFoundError:
+        return '<p>The release list is not available right now. See <a href="https://github.com/deansasek/library/releases" rel="noopener noreferrer">all releases on GitHub</a>.</p>'
+    out = []
+    for r in releases:
+        date = datetime.date.fromisoformat(r['date']).strftime('%B %-d, %Y')
+        wn_id = r['version'].replace('.', '-')
+        items = ''.join(f'<li>{_html.escape(n)}</li>' for n in r['notes'])
+        changes = f'<ul>{items}</ul>' if items else '<p>No changes listed.</p>'
+        whats_new = f' <a href="/whats-new/{wn_id}/">What\'s new</a>.' if wn_id in minor_ids else ''
+        out.append(f'<section class="release" id="{_html.escape(r["tag"])}">'
+                   f'<h2><a href="{_html.escape(r["url"])}" rel="noopener noreferrer">Library {_html.escape(r["version"])}</a></h2>'
+                   f'<p class="updated">Released {date}.{whats_new}</p>{changes}</section>')
+    return ''.join(out)
 
 
 def render(page):
@@ -454,14 +481,6 @@ git push origin vX.Y.Z</code></pre></div>
 
     # ---------- Releases ----------
     # No version or date here: the links always show the current release on GitHub.
-    out['/releases/index.html'] = page('/releases/', 'Library releases: latest version and downloads', 'Download and read the release notes for every version of Library, all published on GitHub.',
-        'Release notes and downloads for every version of Library are on GitHub.',
-        [], [], plain=True, extra=(
-            '<ul class="links">'
-            '<li><a href="https://github.com/deansasek/library/releases/latest" rel="noopener noreferrer">Get the Latest Release</a></li>'
-            '<li><a href="https://github.com/deansasek/library/releases" rel="noopener noreferrer">See All Releases</a></li>'
-            '</ul>'))
-
     # ---------- Accessibility ----------
     acc_toc = [('vision-and-motion', 'Motion and contrast'), ('keyboard', 'Keyboard'), ('voiceover', 'VoiceOver')]
     acc = [
@@ -508,6 +527,12 @@ git push origin vX.Y.Z</code></pre></div>
         [], [], plain=True, extra=entries + '<p class="links"><a href="https://github.com/deansasek/library/releases" rel="noopener noreferrer">See all releases on GitHub</a></p>')
     for r in _wn.RELEASES:
         out['/whats-new/' + r['id'] + '/index.html'] = release_page(page, r)
+
+    out['/releases/index.html'] = page('/releases/', 'Library releases: every version and what changed', 'Every Library release, newest first, with its date and changes, and links to the downloads on GitHub.',
+        'Every version of Library, newest first. Patch releases are listed too.',
+        [], [], plain=True, extra=(
+            '<p class="links"><a href="https://github.com/deansasek/library/releases/latest" rel="noopener noreferrer">Get the Latest Release</a></p>'
+            + release_history(set(r['id'] for r in _wn.RELEASES))))
 
     # ---------- 404 ----------
     out['/404.html'] = ('<!doctype html>\n<html lang="en" dir="ltr">\n<head>\n<meta charset="utf-8">\n'
