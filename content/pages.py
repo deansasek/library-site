@@ -45,7 +45,7 @@ def render(page):
         ('add-notes', 'Add notes'), ('use-templates', 'Use templates'), ('read-later', 'Read later'),
         ('shortcuts', 'Shortcuts'), ('work-with-other-apps', 'Work with other apps'),
         ('stay-up-to-date', 'Stay up to date'), ('check-links', 'Check links'), ('back-up-and-restore', 'Back up and restore'), ('settings', 'Settings'),
-        ('permissions', 'Permissions'), ('troubleshooting', 'Troubleshooting'),
+        ('permissions', 'Permissions'), ('help-menu', 'Help menu'), ('troubleshooting', 'Troubleshooting'),
     ]
     guide = [
         ('get-started', 'Get started', '<p>Install Library first, then follow the first steps in <a href="/install/#first-steps">Install</a>.</p>'),
@@ -190,6 +190,14 @@ def render(page):
 <li>Keyboard shortcuts, hot corners, Quick Open, and the menus don't need any permission.</li>
 <li>Click, scroll, pinch, and swipe shortcuts, pasting into text fields, and suggesting a selected link need Accessibility access. Turn it on in <strong>System Settings &gt; Privacy &amp; Security &gt; Accessibility</strong>. Library reads your selection only when you open one of its menus, and it doesn't keep it.</li>
 </ul>'''),
+        ('help-menu', 'Help menu', '''<p>The Help menu is in the menu bar at the top of the screen.</p>
+<ul>
+<li><strong>Library Help</strong> opens the Library README on GitHub.</li>
+<li><strong>Keyboard Shortcuts</strong> opens the shortcuts section of the README on GitHub.</li>
+<li><strong>Welcome Tour…</strong> opens the welcome screen. It is the same as <strong>Settings &gt; General &gt; Show…</strong>.</li>
+<li><strong>Report an Issue…</strong> opens a new issue on GitHub.</li>
+</ul>
+<p>The GitHub links open in your default browser. Library does not load them.</p>'''),
         ('troubleshooting', 'Troubleshooting', '''<ul>
 <li><strong>A shortcut doesn't work.</strong> Another app may use the same keys. Check <strong>Settings &gt; Shortcuts</strong>. Control-Space can conflict with the macOS input source shortcut.</li>
 <li><strong>Clicks stop working after a macOS update.</strong> Remove Library from Accessibility, then add it again.</li>
