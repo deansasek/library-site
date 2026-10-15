@@ -532,23 +532,16 @@ git push origin vX.Y.Z</code></pre></div>
         'Every release of Library, newest first, with what changed in each. Major and minor releases also have their own page.',
         "Every release of Library, newest first, with what changed in each. Major and minor releases also have their own page.",
         [], [], plain=True, extra=entries + '<p class="links"><a href="https://github.com/deansasek/library/releases" rel="noopener noreferrer">See all releases on GitHub</a></p>')
+    # Every published release has a hand-written entry. A release without one stops the build, so no release
+    # ships without notes.
+    published = _release_records()
+    curated_versions = {r['version'] for r in _wn.RELEASES}
+    missing = [r['version'] for r in published if r['version'] not in curated_versions]
+    if missing:
+        raise SystemExit('Hand-written release notes are missing in content/whats_new.py for: ' + ', '.join(missing))
+    dates = {r['version']: datetime.date.fromisoformat(r['date']).strftime('%B %-d, %Y') for r in published}
     for r in _wn.RELEASES:
-        out['/whats-new/' + r['id'] + '/index.html'] = release_page(page, r)
-    # Patch releases have no curated entry. Each still gets a page, built from the release's own notes.
-    curated = set(r['id'] for r in _wn.RELEASES)
-    for release in _release_records():
-        wn_id = release['version'].replace('.', '-')
-        if wn_id in curated:
-            continue
-        date = datetime.date.fromisoformat(release['date']).strftime('%B %-d, %Y')
-        notes = release['notes'] or ['No changes are listed for this release.']
-        out['/whats-new/' + wn_id + '/index.html'] = release_page(page, {
-            'id': wn_id, 'version': release['version'], 'tag': release['tag'], 'date': date,
-            'summary': notes[0] if release['notes'] else 'A patch release of Library.',
-            'intro': f"Library {release['version']} is a patch release. It changes the items below.",
-            'sections': [('Changes', [_html.escape(n) for n in notes])],
-        })
-
+        out['/whats-new/' + r['id'] + '/index.html'] = release_page(page, dict(r, date=dates.get(r['version'], r['date'])))
     out['/releases/index.html'] = page('/releases/', 'Library releases: every version and what changed', 'Every Library release, newest first, with its date and changes, and links to the downloads on GitHub.',
         'Every version of Library, newest first. Patch releases are listed too.',
         [], [], plain=True, extra=(
