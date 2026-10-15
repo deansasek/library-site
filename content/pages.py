@@ -29,7 +29,7 @@ def release_page(page, r):
         sid = re.sub(r'[^a-z0-9]+', '-', h.lower()).strip('-')
         sections.append((sid, h, '<ul>' + ''.join(f'<li>{i}</li>' for i in items) + '</ul>'))
     tag = r['tag']
-    download = (f'<p>Download Library {r["version"]} from the <a href="https://github.com/deansasek/library/releases/tag/{tag}" '
+    download = (f'<p>Download Library {r["version"]} from the <a href="https://github.com/deansasek/library/releases/tag/{_html.escape(tag)}" '
                 'rel="noopener noreferrer">GitHub release page</a>, or install it with the command on the <a href="/install/">install page</a>.</p>')
     sections.append(('download', 'Download', download))
     return page('/whats-new/' + r['id'] + '/', f"What's new in Library {r['version']}", f"{r['summary']} Released {r['date']}.", r['intro'], toc, sections,
