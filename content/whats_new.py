@@ -83,6 +83,22 @@ RELEASES = [
             ]),
         ],
     },
+    {
+        'id': '1-3-0', 'version': '1.3.0', 'tag': 'v1.3.0', 'date': 'October 14, 2026',
+        'summary': 'A Help menu, and better labels for VoiceOver.',
+        'intro': 'Library 1.3.0 adds a Help menu and labels for VoiceOver, and fixes Services for Finder folders.',
+        'sections': [
+            ('New', [
+                'A Help menu with the guide, the keyboard shortcuts, a tour, and a way to report an issue.',
+            ]),
+            ('Improved', [
+                'Search fields, Quick Open actions, and buttons have labels for VoiceOver. Decorative icons are hidden from it.',
+            ]),
+            ('Fixed', [
+                'Services link Finder folders, and no longer create empty groups.',
+            ]),
+        ],
+    },
 ]
 
 LATEST = RELEASES[0]['id'] if RELEASES else None
