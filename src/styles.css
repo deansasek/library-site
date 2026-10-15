@@ -1,6 +1,12 @@
 /* ---- tokens ---- */
 :root {
   color-scheme:light dark;
+  --hairline: 1px;
+  --tap: 44px;
+  --radius-media: 18px;
+  --radius-pill: 980px;
+  --icon: 24px;
+  --icon-sm: 20px;
   --type-display:clamp(56px,10vw,112px);
   --type-title:clamp(40px,5vw,56px);
   --type-section:28px;
