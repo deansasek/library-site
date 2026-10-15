@@ -552,10 +552,6 @@ footer {
   }
 
   /* Nav collapses to the logo and one Install link. */
-  .nav nav .nav-github {
-    display: none;
-  }
-
   .nav-brand {
     font-size: 17px;
   }
@@ -679,4 +675,143 @@ footer {
 
 .notfound .actions {
   margin-top: 32px;
+}
+
+/* Documentation pages */
+.doc {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px var(--gutter) 96px;
+  text-align: left;
+}
+
+.doc h1 {
+  font-size: clamp(40px, 6vw, 56px);
+  line-height: 1.07;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.lede {
+  margin-top: 16px;
+  font-size: 21px;
+  line-height: 1.38;
+  letter-spacing: -0.015em;
+  color: var(--text-2);
+}
+
+.doc section {
+  padding-top: 56px;
+}
+
+.doc h2 {
+  margin: 0 0 16px;
+  font-size: clamp(28px, 4vw, 36px);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  scroll-margin-top: 72px;
+}
+
+.doc section > * + * {
+  margin-top: 16px;
+}
+
+.doc p,
+.doc li {
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.doc ul,
+.doc ol {
+  padding-left: 20px;
+}
+
+.doc li + li {
+  margin-top: 8px;
+}
+
+.doc code {
+  font-size: 0.9em;
+  overflow-wrap: anywhere;
+}
+
+.doc .code-block {
+  max-width: none;
+  margin: 0;
+}
+
+.doc table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.doc caption {
+  padding-bottom: 8px;
+  text-align: left;
+  font-size: 14px;
+  color: var(--text-2);
+}
+
+.doc th,
+.doc td {
+  padding: 12px 12px 12px 0;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.toc {
+  margin-top: 40px;
+  padding: 24px;
+  border-radius: 18px;
+  background: var(--band);
+}
+
+.toc-title {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.toc ol {
+  padding-left: 20px;
+}
+
+.toc a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.back a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: none;
+}
+
+.back a:hover {
+  color: var(--link-hover);
+}
+
+.back.bottom {
+  margin-top: 56px;
+}
+
+.version {
+  font-size: 21px;
+}
+
+.nav nav .nav-extra {
+  display: inline-flex;
+}
+
+@media (max-width: 734px) {
+  .nav nav .nav-extra {
+    display: none;
+  }
 }
