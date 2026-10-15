@@ -21,6 +21,7 @@ LEFT = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focusab
 def release_page(page, r):
     """One page per large release: summary, sidebar contents, sections, download line, Related."""
     toc = [(re.sub(r'[^a-z0-9]+', '-', h.lower()).strip('-'), h) for h, _ in r['sections']]
+    toc.append(('download', 'Download'))
     sections = []
     for h, items in r['sections']:
         sid = re.sub(r'[^a-z0-9]+', '-', h.lower()).strip('-')
