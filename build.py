@@ -21,6 +21,9 @@ REPO = 'https://github.com/deansasek/library'
 CHEV_R = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 6 6 6-6 6"/></svg>'
 CHEV_L = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 6-6 6 6 6"/></svg>'
 
+# ----------------------------------------------------------------------
+# shared chrome: nav, footer, and document head
+# ----------------------------------------------------------------------
 
 def header():
     return ('<header class="nav"><div class="nav-inner">'
@@ -87,6 +90,10 @@ RELATED = {
 }
 
 
+# ----------------------------------------------------------------------
+# page templates and related links
+# ----------------------------------------------------------------------
+
 def search_box(path):
     if path not in SEARCH_PAGES:
         return ''
@@ -115,6 +122,10 @@ def page(path, title, desc, lede, toc, sections, plain=False, extra='', released
             '</div></div></main>'
             + footer() + '\n</body>\n</html>\n')
 
+
+# ----------------------------------------------------------------------
+# text transforms: minify, relative links, code bars
+# ----------------------------------------------------------------------
 
 def minify_html(s):
     pre = []
@@ -169,6 +180,10 @@ def code_bars(html):
                   '<div class="code-block"><div class="code-head"><span class="code-label">Terminal</span></div><pre>', html)
 
 
+# ----------------------------------------------------------------------
+# file writers and generated files
+# ----------------------------------------------------------------------
+
 def write(path, html):
     full = os.path.join(ROOT, path.lstrip('/'))
     os.makedirs(os.path.dirname(full), exist_ok=True)
@@ -192,15 +207,9 @@ def update_landing():
     open(p, 'w').write(s)
 
 
-def search_box(path):
-    if path not in SEARCH_PAGES:
-        return ''
-    return ('<div class="search" hidden><label class="visually-hidden" for="docs-search">Search the docs</label>'
-            '<input id="docs-search" type="search" placeholder="Search the docs" autocomplete="off">'
-            '<ul class="results" hidden></ul></div>')
-
 def path_key(path):
     return path.replace('index.html', '')
+
 
 def pager(path):
     """Previous and next links between the docs pages, in PAGER_ORDER."""
@@ -212,6 +221,7 @@ def pager(path):
     if i < len(keys) - 1:
         parts.append(f'<a class="next" href="{keys[i+1]}">Next: {PAGER_ORDER[i+1][1]}</a>')
     return '<nav class="pager" aria-label="Previous and next pages">' + ''.join(parts) + '</nav>'
+
 
 def write_search_index(rendered):
     """A small JSON index of each docs section's heading and first sentence, for script.js."""
@@ -231,6 +241,10 @@ def write_search_index(rendered):
     with open(os.path.join(ROOT, 'search-index.json'), 'w') as f:
         f.write(data)
 
+
+# ----------------------------------------------------------------------
+# release check and build entry point
+# ----------------------------------------------------------------------
 
 def check_release(reviewed):
     """Warn if the latest GitHub release is newer than the version the docs were reviewed against.
@@ -267,9 +281,9 @@ def build_all(check=False):
         html = html.replace('</main>', pager(path) + '</main>', 1) if path_key(path) in dict(PAGER_ORDER) else html
         write(path, html)
     update_landing()
-    css = open(os.path.join(ROOT, 'styles.css')).read()
+    css = open(os.path.join(ROOT, 'src', 'styles.css')).read()
     open(os.path.join(ROOT, 'styles.css'), 'w').write(minify_css(css))
-    js = open(os.path.join(ROOT, 'script.js')).read()
+    js = open(os.path.join(ROOT, 'src', 'script.js')).read()
     js = '\n'.join(l.strip() for l in js.splitlines() if l.strip() and not l.strip().startswith('//'))
     open(os.path.join(ROOT, 'script.js'), 'w').write(js + '\n')
     release_paths = sorted(k.replace('index.html', '') for k in rendered if k.startswith('/whats-new/') and k != '/whats-new/index.html')
@@ -284,3 +298,4 @@ def build_all(check=False):
 if __name__ == '__main__':
     build_all(check='--check-release' in sys.argv)
     print('built')
+
