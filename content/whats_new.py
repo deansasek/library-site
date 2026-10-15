@@ -31,6 +31,39 @@ RELEASES = [
             ]),
         ],
     },
+    {
+        'id': '1-5-0', 'version': '1.5.0', 'tag': 'v1.5.0', 'date': 'October 14, 2026',
+        'summary': 'Keep your library in iCloud Drive, paste a queue of clipboard items, and find and merge duplicate bookmarks.',
+        'intro': 'Library 1.5.0 can keep your library in iCloud Drive, adds a clipboard queue and a lock for pinned items, and makes it easier to tidy your library.',
+        'sections': [
+            ('New', [
+                'Keep the library in iCloud Drive, off by default. Turn it on in <strong>Settings &gt; General</strong>.',
+                'Paste a queue of items, one at a time, in order.',
+                'Filter clipboard history by app. Type <code>from Safari</code> in Quick Open.',
+                'Copy text as lower or upper case, trimmed, or with its lines joined.',
+                'Copy a bookmark as a Markdown link.',
+                'Lock pinned items behind Touch ID or your password, off by default. Turn it on in <strong>Settings &gt; Clipboard</strong>.',
+                'Find and merge duplicate bookmarks from <strong>File &gt; Find Duplicates…</strong>.',
+                'Edit several items at once.',
+                'Open a folder\'s bookmarks and apps together.',
+                'Export and restore your whole library from <strong>Settings &gt; General</strong>.',
+                'Snippets in Quick Open. Save reusable text and find it by name.',
+                'Copy links without tracking codes such as <code>utm_source</code>.',
+                'Check for Updates checks for a newer version. Automatic checks run each hour, as the default.',
+            ]),
+            ('Improved', [
+                'Quick Open no longer shows calculator, unit, or web answers that Spotlight already gives.',
+                'The Actions hint in Quick Open is a button.',
+            ]),
+            ('Fixed', [
+                'Your bookmarks file stays private.',
+                'Terminal command files are private from the moment they are created.',
+                'Services accept only web links.',
+                'Leftover Quick Look copies are cleared when Library launches.',
+                'Merging duplicates keeps the shortcuts of the copies.',
+            ]),
+        ],
+    },
 ]
 
 LATEST = RELEASES[0]['id'] if RELEASES else None
