@@ -41,7 +41,7 @@ def render(page):
     guide_toc = [
         ('get-started', 'Get started'), ('open-anything', 'Open anything'), ('find-it-with-quick-open', 'Find it with Quick Open'),
         ('keep-what-you-copy', 'Keep what you copy'), ('save-snippets', 'Save snippets'),
-        ('organize-your-library', 'Organize your library'), ('edit-an-item', 'Edit an item'),
+        ('organize-your-library', 'Organize your library'), ('edit-an-item', 'Edit an item'), ('color-items', 'Color items'),
         ('add-notes', 'Add notes'), ('use-templates', 'Use templates'), ('read-later', 'Read later'),
         ('shortcuts', 'Shortcuts'), ('work-with-other-apps', 'Work with other apps'),
         ('stay-up-to-date', 'Stay up to date'), ('settings', 'Settings'),
@@ -98,10 +98,18 @@ def render(page):
 <li><strong>Name and icon.</strong> Pick an SF Symbol or an emoji, or keep the site's favicon or the app's icon.</li>
 <li><strong>URL or Terminal Command</strong>, how a click opens it, and which browser to use.</li>
 <li><strong>Keywords</strong> help Quick Open and Spotlight find the item.</li>
-<li><strong>Color</strong> adds a dot in the menu and the Library window.</li>
+<li><strong>Color</strong> adds a dot to the item. See <a href="/guide/#color-items">Color items</a>.</li>
 <li><strong>Shortcuts</strong> can be added to any item.</li>
 <li><strong>Open When You Log In</strong> opens the item a few seconds after you log in.</li>
 </ul>'''),
+        ('color-items', 'Color items', '''<p>A color is a dot that helps you sort items at a glance. Use colors to organize your library, not to show status. Library has seven colors: red, orange, yellow, green, blue, purple, and gray.</p>
+<ul>
+<li><strong>Set a color.</strong> Select an item, press ⌘I to open Get Info, and choose a dot under <strong>Color</strong>. Choose the same dot again to clear it.</li>
+<li><strong>Set a color on several items.</strong> Select them and edit them together. The sheet has a <strong>Color</strong> menu. Choose <strong>None</strong> to clear the color on all of them.</li>
+<li><strong>See the color.</strong> The dot appears on the item's icon in the menu bar, in Quick Open, and in the Library window.</li>
+<li><strong>Find colored items.</strong> Type the color's name in Quick Open, such as <code>blue</code>. Spotlight finds them by color name too.</li>
+</ul>
+<p>The color is saved with the item in <code>bookmarks.json</code>. If you keep your library in iCloud Drive, the color syncs to your other Macs with the item.</p>'''),
         ('add-notes', 'Add notes', '''<p>Write a note on any item in Get Info. Quick Open shows the note under the item's name. Spotlight includes it in the description. Notes are plain text and stay in your library.</p>'''),
         ('use-templates', 'Use templates', '''<p>Put <code>{}</code> in a URL where a value goes. Library asks for the value when you open the bookmark.</p>
 <p>To name several values, use <code>{project}</code> or <code>{id:Issue number}</code>. Library asks for all of them in one sheet.</p>'''),
