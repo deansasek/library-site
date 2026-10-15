@@ -119,6 +119,21 @@ RELEASES = [
             ]),
         ],
     },
+    {
+        'id': '1-1-0', 'version': '1.1.0', 'tag': 'v1.1.0', 'date': 'October 14, 2026',
+        'summary': 'Library no longer runs commands from links, and it respects Reduce Motion.',
+        'intro': 'Library 1.1.0 makes your bookmarks safer and respects Reduce Motion.',
+        'sections': [
+            ('Improved', [
+                'Quick Open respects Reduce Motion.',
+                'App icons refresh when Library is updated.',
+            ]),
+            ('Fixed', [
+                'Library never runs commands from links.',
+                'Your bookmarks file stays safe.',
+            ]),
+        ],
+    },
 ]
 
 LATEST = RELEASES[0]['id'] if RELEASES else None
