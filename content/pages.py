@@ -142,6 +142,16 @@ def guide_pages(toc, sections, page):
 
 
 
+def _release_records():
+    """The published releases from content/releases.json, newest first. Empty when the file is missing."""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'releases.json')
+    try:
+        with open(path) as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
+
 def release_history(minor_ids):
     """Every published Library release, newest first, from content/releases.json (written by tools/sync_releases.py).
 
@@ -524,6 +534,20 @@ git push origin vX.Y.Z</code></pre></div>
         [], [], plain=True, extra=entries + '<p class="links"><a href="https://github.com/deansasek/library/releases" rel="noopener noreferrer">See all releases on GitHub</a></p>')
     for r in _wn.RELEASES:
         out['/whats-new/' + r['id'] + '/index.html'] = release_page(page, r)
+    # Patch releases have no curated entry. Each still gets a page, built from the release's own notes.
+    curated = set(r['id'] for r in _wn.RELEASES)
+    for release in _release_records():
+        wn_id = release['version'].replace('.', '-')
+        if wn_id in curated:
+            continue
+        date = datetime.date.fromisoformat(release['date']).strftime('%B %-d, %Y')
+        notes = release['notes'] or ['No changes are listed for this release.']
+        out['/whats-new/' + wn_id + '/index.html'] = release_page(page, {
+            'id': wn_id, 'version': release['version'], 'tag': release['tag'], 'date': date,
+            'summary': notes[0] if release['notes'] else 'A patch release of Library.',
+            'intro': f"Library {release['version']} is a patch release. It changes the items below.",
+            'sections': [('Changes', [_html.escape(n) for n in notes])],
+        })
 
     out['/releases/index.html'] = page('/releases/', 'Library releases: every version and what changed', 'Every Library release, newest first, with its date and changes, and links to the downloads on GitHub.',
         'Every version of Library, newest first. Patch releases are listed too.',
