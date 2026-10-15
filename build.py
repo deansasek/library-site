@@ -289,7 +289,7 @@ def write_search_index(rendered):
             sid, title, body = m.groups()
             text = ' '.join(H.unescape(re.sub(r'<[^>]+>', ' ', body)).split())
             text = re.sub(r'\s+([.,;:!?])', r'\1', text)
-            first = re.split(r'(?<=[.!?])\s', text)[0][:160]
+            first = re.split(r'(?<=[.!?])\s', text)[0][:120]
             items.append({'t': H.unescape(title), 'p': SEARCH_PAGES[pg],
                           'u': pg.strip('/') + '/index.html#' + sid, 's': first})
     data = json.dumps(items, ensure_ascii=False, separators=(',', ':'))
