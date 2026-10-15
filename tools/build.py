@@ -100,7 +100,7 @@ RELATED = {
 # ----------------------------------------------------------------------
 
 def search_box(path):
-    if path not in SEARCH_PAGES:
+    if path not in SEARCH_PAGES and not path.startswith('/guide/'):
         return ''
     return ('<div class="search" hidden><label class="visually-hidden" for="docs-search">Search the docs</label>'
             '<div class="search-field"><svg class="icon search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
@@ -113,7 +113,10 @@ def page(path, title, desc, lede, toc, sections, plain=False, extra='', released
     toc_items = nav or '<ol>' + ''.join(f'<li><a href="#{i}">{l}</a></li>' for i, l in toc) + '</ol>'
     body = ''.join(f'<section id="{i}"><h2>{h}</h2>{html}</section>'
                    for i, h, html in sections)
-    rel_items = RELATED.get(path, [('/whats-new/', "What's new"), ('/install/', 'Install'), ('/guide/', 'Guide')] if path.startswith('/whats-new/') else [])
+    default = [('/whats-new/', "What's new"), ('/install/', 'Install'), ('/guide/', 'Guide')] if path.startswith('/whats-new/') else []
+    if path.startswith('/guide/') and path != '/guide/':
+        default = [('/guide/', 'Guide overview'), ('/install/', 'Install'), ('/privacy/', 'Privacy'), ('/smart-features/', 'Smart features')]
+    rel_items = RELATED.get(path, default)
     related = ''.join(f'<li><a href="{h}">{l}</a></li>' for h, l in rel_items)
     back = f'<p class="back"><a href="/">{CHEV_L}Back to Library</a></p>'
     if plain:
@@ -248,10 +251,20 @@ def check_build_html(path, html):
 # file writers and generated files
 # ----------------------------------------------------------------------
 
+GUIDE_PATH_OF = {}  # guide section id -> its page, filled in by build_all
+
+
+def point_guide_links(html):
+    """Old links to a guide section, such as /guide/#clipboard, go to the group page that now holds it."""
+    return re.sub(r'href="(?:/|\./)guide/#([a-z0-9-]+)"',
+                  lambda m: f'href="{GUIDE_PATH_OF[m.group(1)]}#{m.group(1)}"' if m.group(1) in GUIDE_PATH_OF else m.group(0),
+                  html)
+
+
 def write(path, html):
     full = os.path.join(ROOT, path.lstrip('/'))
     os.makedirs(os.path.dirname(full), exist_ok=True)
-    out = code_bars(minify_html(relativize(html, path)))
+    out = code_bars(minify_html(relativize(point_guide_links(html), path)))
     check_build_html(path, out)
     with open(full, 'w') as f:
         f.write(out)
@@ -264,9 +277,16 @@ def update_landing():
     s = re.sub(r'<footer>.*?</footer>', lambda m: footer(), s, flags=re.S)
     s = re.sub(r'\s*<meta name="color-scheme"[^>]*>', '', s)
     s = re.sub(r'\s*<meta property="og:site_name"[^>]*>', '', s)
-    s = code_bars(minify_html(relativize(s, '/index.html')))
+    s = code_bars(minify_html(relativize(point_guide_links(s), '/index.html')))
     check_build_html('/index.html', s)
     open(p, 'w').write(s)
+
+
+def guide_redirect(paths):
+    """A small script for the guide index: a link with a section's anchor moves to that section's group page."""
+    table = json.dumps(paths, separators=(',', ':'))
+    return ('<script>(function(){var map=' + table + ';var id=location.hash.slice(1);'
+            'if(id&&map[id]){location.replace(map[id]+"#"+id);}})();</script>')
 
 
 def path_key(path):
@@ -293,14 +313,14 @@ def write_search_index(rendered, guide_groups):
     items = []
     for path, page_html in rendered.items():
         pg = path.replace('index.html', '')
-        if pg not in SEARCH_PAGES:
+        if pg == '/guide/' or not (pg in SEARCH_PAGES or pg.startswith('/guide/')):
             continue
         for m in re.finditer(r'<section id="([^"]+)"><h2>([^<]*)</h2>(.*?)</section>', page_html, re.S):
             sid, title, body = m.groups()
             text = ' '.join(H.unescape(re.sub(r'<[^>]+>', ' ', body)).split())
             text = re.sub(r'\s+([.,;:!?])', r'\1', text)
             first = re.split(r'(?<=[.!?])\s', text)[0][:100]
-            label = guide_groups.get(sid, SEARCH_PAGES[pg]) if pg == '/guide/' else SEARCH_PAGES[pg]
+            label = guide_groups[sid] if pg.startswith('/guide/') else SEARCH_PAGES[pg]
             items.append({'t': H.unescape(title), 'p': label,
                           'u': pg.strip('/') + '/index.html#' + sid, 's': first})
     data = json.dumps(items, ensure_ascii=False, separators=(',', ':'))
@@ -341,9 +361,13 @@ def build_all(check=False):
     reviewed_on = pages.REVIEWED_DATE or TODAY
     REVIEWED_LABEL = reviewed_on.strftime('%B %d, %Y').replace(' 0', ' ')
     rendered = pages.render(page)
+    GUIDE_PATH_OF.update(pages.GUIDE_PATH_OF)
     write_search_index(rendered, pages.GUIDE_GROUP_OF)
     for path, html in rendered.items():
         html = html.replace('__HEADER__', header()).replace('__FOOTER__', footer())
+        if path == '/guide/index.html':
+            # Old guide anchors, such as /guide/#clipboard-paste-queue, open the page that holds that section.
+            html = html.replace('</body>', guide_redirect(pages.GUIDE_PATH_OF) + '</body>', 1)
         html = html.replace('</main>', pager(path) + '</main>', 1) if path_key(path) in dict(PAGER_ORDER) else html
         write(path, html)
     update_landing()
@@ -354,7 +378,7 @@ def build_all(check=False):
     open(os.path.join(ROOT, 'assets', 'script.js'), 'w').write(js + '\n')
     release_paths = sorted(k.replace('index.html', '') for k in rendered if k.startswith('/whats-new/') and k != '/whats-new/index.html')
     urls = ''.join(f'  <url>\n    <loc>https://deansasek.github.io/library-site{u}</loc>\n    <lastmod>{TODAY.isoformat()}</lastmod>\n  </url>\n'
-                   for u in SITE_PATHS + release_paths)
+                   for u in SITE_PATHS + sorted(set(pages.GUIDE_PATH_OF.values())) + release_paths)
     open(os.path.join(ROOT, 'sitemap.xml'), 'w').write(
         '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '</urlset>\n')
     if check:
