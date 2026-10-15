@@ -821,3 +821,54 @@ footer {
     display: none;
   }
 }
+
+/* Higher contrast: stronger secondary text and borders. */
+@media (prefers-contrast: more) {
+  :root {
+    --text-2: #515154;
+    --border: #86868b;
+    --link: #0040dd;
+  }
+}
+
+@media (prefers-color-scheme: dark) and (prefers-contrast: more) {
+  :root:not([data-theme="light"]) {
+    --text-2: #c7c7cc;
+    --border: #98989d;
+    --link: #5ac8fa;
+  }
+}
+
+/* Forced colors: use system colors so controls and borders stay visible. */
+@media (forced-colors: active) {
+  .button {
+    border: 1px solid ButtonText;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  .toc,
+  .card,
+  .code-block,
+  .facts li,
+  .requirements > div,
+  .doc th,
+  .doc td,
+  .nav,
+  footer,
+  figure img,
+  .hero-media img {
+    border-color: CanvasText;
+  }
+
+  .card,
+  .toc,
+  .code-block {
+    border: 1px solid CanvasText;
+    background: Canvas;
+  }
+
+  :focus-visible {
+    outline-color: Highlight;
+  }
+}
