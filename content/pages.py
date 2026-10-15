@@ -309,7 +309,7 @@ git push origin vX.Y.Z</code></pre></div>
                         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
                         '<title>Page not found</title>\n<meta name="description" content="This page does not exist in Library.">\n'
                         '<meta name="robots" content="noindex">\n<link rel="canonical" href="https://deansasek.github.io/library-site/404.html">\n<meta property="og:title" content="Page not found">\n<meta property="og:url" content="https://deansasek.github.io/library-site/404.html">\n<meta property="og:description" content="This page does not exist in Library.">\n<meta property="og:image" content="https://deansasek.github.io/library-site/assets/icon.png">\n<meta property="og:image:alt" content="Library app icon">\n<meta name="twitter:card" content="summary">\n<link rel="icon" type="image/png" sizes="256x256" href="/assets/icon.png">\n'
-                        '<link rel="stylesheet" href="/styles.css">\n</head>\n<body>\n'
+                        '<link rel="stylesheet" href="/assets/styles.css">\n</head>\n<body>\n'
                         '<a class="skip-link" href="#main">Skip to content</a>\n'
                         + '__HEADER__' + '\n<main id="main" class="notfound"><h1>Page not found</h1>'
                         '<p class="subhead">This page doesn\'t exist.</p>'

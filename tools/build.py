@@ -76,8 +76,8 @@ def head(title, desc, path):
 <link rel="icon" type="image/png" sizes="256x256" href="/assets/icon.png">
 <link rel="apple-touch-icon" href="/assets/icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="stylesheet" href="/styles.css">
-<script src="/script.js" defer></script>
+<link rel="stylesheet" href="/assets/styles.css">
+<script src="/assets/script.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -240,7 +240,7 @@ def write_search_index(rendered):
             items.append({'t': H.unescape(title), 'p': SEARCH_PAGES[pg],
                           'u': pg.strip('/') + '/index.html#' + sid, 's': first})
     data = json.dumps(items, ensure_ascii=False, separators=(',', ':'))
-    with open(os.path.join(ROOT, 'search-index.json'), 'w') as f:
+    with open(os.path.join(ROOT, 'assets', 'search-index.json'), 'w') as f:
         f.write(data)
 
 
@@ -284,10 +284,10 @@ def build_all(check=False):
         write(path, html)
     update_landing()
     css = open(os.path.join(ROOT, 'src', 'styles.css')).read()
-    open(os.path.join(ROOT, 'styles.css'), 'w').write(minify_css(css))
+    open(os.path.join(ROOT, 'assets', 'styles.css'), 'w').write(minify_css(css))
     js = open(os.path.join(ROOT, 'src', 'script.js')).read()
     js = '\n'.join(l.strip() for l in js.splitlines() if l.strip() and not l.strip().startswith('//'))
-    open(os.path.join(ROOT, 'script.js'), 'w').write(js + '\n')
+    open(os.path.join(ROOT, 'assets', 'script.js'), 'w').write(js + '\n')
     release_paths = sorted(k.replace('index.html', '') for k in rendered if k.startswith('/whats-new/') and k != '/whats-new/index.html')
     urls = ''.join(f'  <url>\n    <loc>https://deansasek.github.io/library-site{u}</loc>\n    <lastmod>{TODAY.isoformat()}</lastmod>\n  </url>\n'
                    for u in SITE_PATHS + release_paths)
