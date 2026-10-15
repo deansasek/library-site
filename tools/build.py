@@ -6,6 +6,7 @@ The landing page (index.html) keeps its own body, but its nav and footer are
 rewritten from the same templates. Output is plain static HTML and CSS.
 """
 import datetime, html as H, json, os, re, sys, urllib.request
+from html.parser import HTMLParser
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TODAY = datetime.date.today()
@@ -185,14 +186,75 @@ def code_bars(html):
 
 
 # ----------------------------------------------------------------------
+# build checks
+# ----------------------------------------------------------------------
+
+EMPTY_CHECKED = {'li', 'p', 'div', 'section', 'td', 'dd'}
+MEDIA_TAGS = {'img', 'svg', 'picture', 'video', 'audio', 'canvas', 'iframe', 'input', 'textarea',
+              'select', 'button', 'object', 'embed', 'hr'}
+
+
+class EmptyCheck(HTMLParser):
+    """Collects checked elements that hold no text and no media, and adjacent lists."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.stack = []
+        self.problems = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag in MEDIA_TAGS:
+            for frame in self.stack:
+                frame['media'] = True
+            return
+        self.stack.append({'tag': tag, 'attrs': dict(attrs), 'text': False, 'media': False, 'pos': self.getpos()})
+
+    def handle_startendtag(self, tag, attrs):
+        if tag in MEDIA_TAGS:
+            for frame in self.stack:
+                frame['media'] = True
+
+    def handle_data(self, data):
+        if data.replace('\u00a0', ' ').strip():
+            for frame in self.stack:
+                frame['text'] = True
+
+    def handle_endtag(self, tag):
+        for i in range(len(self.stack) - 1, -1, -1):
+            if self.stack[i]['tag'] == tag:
+                frame = self.stack.pop(i)
+                if tag in EMPTY_CHECKED and not frame['text'] and not frame['media']:
+                    # Intended exceptions: a spacer with a class, and a hidden container that a script fills later.
+                    attrs = frame['attrs']
+                    if 'spacer' not in attrs.get('class', '') and 'hidden' not in attrs:
+                        self.problems.append('empty <%s> at line %d' % (tag, frame['pos'][0]))
+                del self.stack[i:]
+                return
+
+
+def check_build_html(path, html):
+    """Fail the build on empty list items, paragraphs, blocks, and table cells, and on back-to-back lists."""
+    parser = EmptyCheck()
+    parser.feed(html)
+    parser.close()
+    problems = list(parser.problems)
+    for m in re.finditer(r'</(ul|ol)><(ul|ol)\b', html):
+        problems.append('two lists in a row (merge them): ...' + html[max(0, m.start() - 40):m.end()] + '...')
+    if problems:
+        sys.exit('build check failed for %s:\n  %s' % (path, '\n  '.join(problems)))
+
+
+# ----------------------------------------------------------------------
 # file writers and generated files
 # ----------------------------------------------------------------------
 
 def write(path, html):
     full = os.path.join(ROOT, path.lstrip('/'))
     os.makedirs(os.path.dirname(full), exist_ok=True)
+    out = code_bars(minify_html(relativize(html, path)))
+    check_build_html(path, out)
     with open(full, 'w') as f:
-        f.write(code_bars(minify_html(relativize(html, path))))
+        f.write(out)
 
 
 def update_landing():
@@ -203,6 +265,7 @@ def update_landing():
     s = re.sub(r'\s*<meta name="color-scheme"[^>]*>', '', s)
     s = re.sub(r'\s*<meta property="og:site_name"[^>]*>', '', s)
     s = code_bars(minify_html(relativize(s, '/index.html')))
+    check_build_html('/index.html', s)
     open(p, 'w').write(s)
 
 
