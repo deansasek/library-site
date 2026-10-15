@@ -24,7 +24,7 @@ python3 tools/build.py
 python3 -m http.server 8000
 ```
 
-Then open http://localhost:8000. See [tools/README.md](tools/README.md) for details.
+Then open http://localhost:8000. The site uses clean folder URLs, so preview it through the server above; opening the files directly from disk is not supported. See [tools/README.md](tools/README.md) for details.
 
 ## Repository layout
 

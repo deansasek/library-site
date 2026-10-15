@@ -168,11 +168,9 @@ def relativize(html, path):
         if value.startswith('//'):
             return m.group(0)
         path, sep, frag = value.partition('#')
-        # A folder link points at its index.html, so it also opens from disk (file://).
-        if path == '/':
-            path = '/index.html'
-        elif path.endswith('/'):
-            path = path + 'index.html'
+        # Clean folder URLs: the home link is the folder root and folder links keep their trailing slash.
+        if path.endswith('index.html'):
+            path = path[:-len('index.html')]
         target = base + path[1:]
         if target == '':
             target = './'
@@ -204,9 +202,6 @@ def update_landing():
     s = re.sub(r'<footer>.*?</footer>', lambda m: footer(), s, flags=re.S)
     s = re.sub(r'\s*<meta name="color-scheme"[^>]*>', '', s)
     s = re.sub(r'\s*<meta property="og:site_name"[^>]*>', '', s)
-    # Hand-written links on the landing page use ./folder/ or ./; point them at index.html too.
-    s = re.sub(r'href="\./([a-z-]+/)(#[^"]*)?"', r'href="./\1index.html\2"', s)
-    s = s.replace('href="./"', 'href="./index.html"')
     s = code_bars(minify_html(relativize(s, '/index.html')))
     open(p, 'w').write(s)
 

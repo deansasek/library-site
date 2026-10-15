@@ -16,4 +16,4 @@ To check the latest release against the version the docs were reviewed for, add 
 python3 -m http.server 8000
 ```
 
-Then open http://localhost:8000. Because every internal link is relative, the site also works when you open `index.html` directly from disk.
+Then open http://localhost:8000. The server serves each folder's `index.html`, so links such as `guide/` work as clean URLs. Preview through the server; opening the files directly from disk is not supported.
