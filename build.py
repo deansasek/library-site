@@ -67,15 +67,31 @@ def head(title, desc, path):
 '''
 
 
+RELATED = {
+    '/guide/': [('/install/', 'Install'), ('/privacy/', 'Privacy'), ('/smart-features/', 'Smart features')],
+    '/privacy/': [('/guide/#settings', 'Settings'), ('/guide/', 'Guide'), ('/install/', 'Install')],
+    '/install/': [('/guide/', 'Guide'), ('/development/', 'Development'), ('/releases/', 'Releases')],
+    '/development/': [('/install/', 'Install'), ('/releases/', 'Releases'), ('/guide/', 'Guide')],
+    '/smart-features/': [('/guide/#keep-what-you-copy', 'Keep what you copy'), ('/guide/', 'Guide'), ('/privacy/', 'Privacy')],
+    '/releases/': [('/install/', 'Install'), ('/guide/', 'Guide'), ('/development/', 'Development')],
+}
+RELEASE = ('October 14, 2026', 'v1.5.0')
+
+
 def page(path, title, desc, lede, toc, sections):
     toc_items = ''.join(f'<li><a href="#{i}">{l}</a></li>' for i, l in toc)
-    body = ''.join(f'<section id="{i}" aria-labelledby="{i}-heading"><h2 id="{i}-heading">{h}</h2>{html}</section>'
+    body = ''.join(f'<section id="{i}"><h2>{h}</h2>{html}</section>'
                    for i, h, html in sections)
+    related = ''.join(f'<li><a href="{h}">{l}</a></li>' for h, l in RELATED.get(path, []))
     back = f'<p class="back"><a href="/">{CHEV_L}Back to Library</a></p>'
+    date, version = RELEASE
     return (head(title, desc, path) + header() +
             f'<main id="main" class="doc">{back}<h1>{title}</h1><p class="lede">{lede}</p>'
-            f'<nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ol>{toc_items}</ol></nav>'
-            f'{body}<p class="back bottom"><a href="/">{CHEV_L}Back to Library</a></p></main>'
+            f'<p class="updated">Last updated {date} for Library {version}.</p>'
+            f'<div class="article"><nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ol>{toc_items}</ol></nav>'
+            f'<div class="content">{body}'
+            f'<section class="related"><h2>Related</h2><ul>{related}</ul></section>'
+            '</div></div></main>'
             + footer() + '\n</body>\n</html>\n')
 
 
