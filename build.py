@@ -100,11 +100,30 @@ def minify_css(s):
     return s.strip() + '\n'
 
 
+def relativize(html, path):
+    """Make local href/src relative to the page's folder, so the site also works from disk (file://).
+
+    path is the page's URL path, such as '/guide/index.html' or '/404.html'. Absolute https URLs and
+    fragments (#...) are left as they are.
+    """
+    depth = path.strip('/').count('/')
+    base = '../' * depth
+
+    def fix(m):
+        attr, value = m.group(1), m.group(2)
+        if value.startswith('//'):
+            return m.group(0)
+        if value == '/':
+            return f'{attr}="{base or "./"}"'
+        return f'{attr}="{base}{value[1:]}"'
+    return re.sub(r'\b(href|src)="(/[^"]*)"', fix, html)
+
+
 def write(path, html):
     full = os.path.join(ROOT, path.lstrip('/'))
     os.makedirs(os.path.dirname(full), exist_ok=True)
     with open(full, 'w') as f:
-        f.write(minify_html(html))
+        f.write(minify_html(relativize(html, path)))
 
 
 def update_landing():
@@ -116,7 +135,7 @@ def update_landing():
     s = re.sub(r'\s*<meta property="og:site_name"[^>]*>', '', s)
     s = re.sub(r'\s*<meta property="og:image:(?:width|height|alt)"[^>]*>', '', s)
     s = re.sub(r'\s*<meta name="twitter:(?:title|description|image)"[^>]*>', '', s)
-    s = minify_html(s)
+    s = minify_html(relativize(s, '/index.html'))
     open(p, 'w').write(s)
 
 
