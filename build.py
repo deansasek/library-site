@@ -38,7 +38,7 @@ def header():
 
 def footer():
     return ('<footer><nav class="footer-cols" aria-label="Footer">'
-            f'<div><p class="ft">Project</p><a href="{REPO}" rel="noopener noreferrer">GitHub</a></div>'
+            f'<div><p class="ft">Project</p><a href="{REPO}" rel="noopener noreferrer">GitHub</a><a href="https://buymeacoffee.com/deansasek" rel="noopener noreferrer">Support</a></div>'
             '<div><p class="ft">Guide</p><a href="/guide/">Feature guide</a><a href="/accessibility/">Accessibility</a></div>'
             '<div><p class="ft">Privacy</p><a href="/privacy/">Privacy guide</a></div>'
             f'<div><p class="ft">Releases</p><a href="/whats-new/">What\'s new</a>'
