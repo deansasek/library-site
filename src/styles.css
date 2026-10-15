@@ -4,6 +4,7 @@
   --hairline: 1px;
   --control: #86868b;
   --accent-pressed: #0064d2;
+  --warning: #b25000;
   --radius-field: 10px;
   --tap: 44px;
   --radius-media: 18px;
@@ -52,9 +53,9 @@
 }
 }
 
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--control:#98989d;--accent-pressed:#0a7ae6;--bg:#000000;--band:#1d1d1f;--text:#f5f5f7;--text-2:#a1a1a6;--link:#2997ff;--accent:#0a84ff;--accent-hover:#409cff;--on-accent:#000000;--focus:#0a84ff;--border:#424245;--media-border:rgba(255,255,255,0.12);--code-bg:#000000;--link-hover:#7cbcff;--nav-bg:rgba(0,0,0,0.8);}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--control:#98989d;--accent-pressed:#0a7ae6;--warning:#ffb340;--bg:#000000;--band:#1d1d1f;--text:#f5f5f7;--text-2:#a1a1a6;--link:#2997ff;--accent:#0a84ff;--accent-hover:#409cff;--on-accent:#000000;--focus:#0a84ff;--border:#424245;--media-border:rgba(255,255,255,0.12);--code-bg:#000000;--link-hover:#7cbcff;--nav-bg:rgba(0,0,0,0.8);}}
 /* Explicit dark theme: a page sets data-theme="dark" to choose it regardless of the system setting. */
-:root[data-theme="dark"]{--control:#98989d;--accent-pressed:#0a7ae6;--bg:#000000;--band:#1d1d1f;--text:#f5f5f7;--text-2:#a1a1a6;--link:#2997ff;--accent:#0a84ff;--accent-hover:#409cff;--on-accent:#000000;--focus:#0a84ff;--border:#424245;--media-border:rgba(255,255,255,0.12);--code-bg:#000000;--link-hover:#7cbcff;--nav-bg:rgba(0,0,0,0.8);}
+:root[data-theme="dark"]{--control:#98989d;--accent-pressed:#0a7ae6;--warning:#ffb340;--bg:#000000;--band:#1d1d1f;--text:#f5f5f7;--text-2:#a1a1a6;--link:#2997ff;--accent:#0a84ff;--accent-hover:#409cff;--on-accent:#000000;--focus:#0a84ff;--border:#424245;--media-border:rgba(255,255,255,0.12);--code-bg:#000000;--link-hover:#7cbcff;--nav-bg:rgba(0,0,0,0.8);}
 /* ---- base ---- */
 *,*::before,*::after {
   box-sizing:border-box;
@@ -91,8 +92,13 @@ code {
   font-size:0.9em;
 }
 :focus-visible {
-  outline:2px solid var(--focus);
-  outline-offset: 2px;
+  outline:none;
+  box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--focus);
+}
+@media (forced-colors:active) {
+  :focus-visible {
+    outline:2px solid CanvasText;
+  }
 }
 .skip-link {
   position:absolute;
@@ -690,6 +696,13 @@ footer {
 .toc a.is-active {
   color:var(--text);
   font-weight:600;
+  background:var(--bg);
+  border-radius:8px;
+  padding-inline:var(--space-2);
+  margin-inline:calc(var(--space-2) * -1);
+}
+.toc-indicator {
+  display:none;
 }
 .guide-nav > details + details { margin-top:var(--space-2); }
 /* Group headings read like macOS sidebar section headers: small, semibold, secondary. */
@@ -702,7 +715,7 @@ footer {
   font-weight:600;
   color:var(--text-2);
 }
-.guide-nav details details summary { font-weight:400; color:var(--text-2); }
+.guide-nav details details summary { font-size:var(--type-small); font-weight:400; color:var(--text-2); }
 .guide-nav summary a { color:inherit; }
 .group-intro {
   margin:0 0 var(--space-1);
@@ -1034,3 +1047,49 @@ footer .footer-cols,footer .legal {
   color:var(--text);
 }
 
+
+/* Key caps: shortcut glyphs in running text, as on Apple's keyboard references. */
+kbd {
+  display:inline-block;
+  min-width:1.6em;
+  padding:0 0.35em;
+  border:var(--hairline) solid var(--border);
+  border-bottom-width:2px;
+  border-radius:6px;
+  background:var(--band);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;
+  font-size:0.86em;
+  line-height:1.5;
+  text-align:center;
+  vertical-align:0.05em;
+}
+
+/* Callouts: a note or warning in a rounded panel with an icon, as in Apple's developer documentation. */
+.callout {
+  display:flex;
+  gap:var(--space-3);
+  margin:var(--space-6) 0;
+  padding:var(--space-4);
+  border-radius:var(--radius-media);
+  background:var(--band);
+}
+.callout .icon {
+  margin-top:2px;
+  color:var(--accent);
+}
+.callout-warning .icon {
+  color:var(--warning);
+}
+.callout p + p {
+  margin-top:var(--space-2);
+}
+
+/* Reduced transparency: a solid navigation bar instead of a frosted one. */
+@media (prefers-reduced-transparency:reduce) {
+  .nav {
+    background:var(--bg);
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
+  }
+}

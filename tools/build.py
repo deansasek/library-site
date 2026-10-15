@@ -261,10 +261,36 @@ def point_guide_links(html):
                   html)
 
 
+KEY_GLYPHS = '⌘⇧⌥⌃'
+
+
+def _key_cap(m):
+    caps = ''.join(f'<kbd>{c}</kbd>' for c in m.group(1))
+    return caps + (f'<kbd>{m.group(2)}</kbd>' if m.group(2) else '')
+
+
+def key_caps(html):
+    """Shortcut glyphs in running text become key caps. Code, preformatted text, and existing key caps are left alone."""
+    parts = re.split(r'(<[^>]+>)', html)
+    out, skip = [], 0
+    for part in parts:
+        if part.startswith('<'):
+            if re.match(r'<(code|pre|kbd)[\s>]', part):
+                skip += 1
+            elif re.match(r'</(code|pre|kbd)>', part):
+                skip = max(0, skip - 1)
+            out.append(part)
+        elif skip:
+            out.append(part)
+        else:
+            out.append(re.sub(r'([⌘⇧⌥⌃]+)([A-Za-z0-9]+|[,./])?', _key_cap, part))
+    return ''.join(out)
+
+
 def write(path, html):
     full = os.path.join(ROOT, path.lstrip('/'))
     os.makedirs(os.path.dirname(full), exist_ok=True)
-    out = code_bars(minify_html(relativize(point_guide_links(html), path)))
+    out = code_bars(minify_html(relativize(key_caps(point_guide_links(html)), path)))
     check_build_html(path, out)
     with open(full, 'w') as f:
         f.write(out)
