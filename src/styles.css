@@ -52,6 +52,7 @@
 @media (min-width:735px) {
   :root{--gutter:22px;
 }
+}
 
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--control:#98989d;--accent-pressed:#0a7ae6;--bg:#000000;--band:#1d1d1f;--text:#f5f5f7;--text-2:#a1a1a6;--link:#2997ff;--accent:#0a84ff;--accent-hover:#409cff;--on-accent:#000000;--focus:#0a84ff;--border:#424245;--media-border:rgba(255,255,255,0.12);--code-bg:#000000;--link-hover:#7cbcff;--nav-bg:rgba(0,0,0,0.8);}}/* ---- base ---- */
 *,*::before,*::after {
@@ -425,15 +426,22 @@ footer {
 }
 
 @media (min-width:735px){.footer-cols{grid-template-columns:repeat(4,1fr);}}/* ---- hero ---- */
+@keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+@keyframes fade-in{from{opacity:0;}to{opacity:1;}}
+@keyframes fade-out{from{opacity:1;}to{opacity:0;}}
 @media (prefers-reduced-motion:no-preference) {
-  .hero>*{animation:rise 0.8s ease-out both;
-  }.hero>:nth-child(2){animation-delay:0.08s;
-  }.hero>:nth-child(3){animation-delay:0.16s;
-  }.hero>:nth-child(4){animation-delay:0.24s;
-  };
-}
-
-@keyframes rise{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:none;}}/* ---- sections ---- */
+  .results:not([hidden]){animation:fade-in 150ms ease-out both;}
+  .results.is-leaving{animation:fade-out 150ms ease-in both;}
+  .toc-indicator{transition:transform 200ms ease-out;}
+  @supports (animation-timeline:view()) {
+    .hero>*{animation:rise 400ms cubic-bezier(0.2,0.6,0.2,1) both;}
+    .hero>:nth-child(2){animation-delay:80ms;}
+    .hero>:nth-child(3){animation-delay:160ms;}
+    .hero>:nth-child(4){animation-delay:240ms;}
+    .block,.card{animation:rise linear both;animation-timeline:view();animation-range:entry 0% cover 30%;}
+    .block figure img{animation:fade-in linear both;animation-timeline:view();animation-range:entry 0% cover 30%;}
+  }
+}/* ---- sections ---- */
 @media (min-width:735px) {
   .split{grid-template-columns:1fr 1fr;
   }.split.reverse .copy{order:2;
@@ -633,15 +641,8 @@ footer {
 .toc a.is-active {
   color:var(--accent);
 }
-.toc a.is-active::before {
-  content:"";
-  position:absolute;
-  left:0;
-  top:var(--space-2);
-  bottom:var(--space-2);
-  width:var(--hairline);
-  background:var(--accent);
-}
+.toc{position:relative;}
+.toc-indicator{position:absolute;left:0;top:var(--space-2);width:var(--hairline);height:calc(var(--tap) - var(--space-4));background:var(--accent);}
 .back a {
   display:inline-flex;
   align-items:center;
