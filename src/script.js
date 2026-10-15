@@ -60,7 +60,7 @@ button.resetTimer = setTimeout(function () { label.textContent = "Copy"; }, 2000
 var box = document.querySelector(".search");
 if (box) {
 var input = box.querySelector("input");
-var list = box.querySelector(".results");
+var panel = box.querySelector(".results");
 var items = [];
 fetch(new URL("search-index.json", base).href)
 .then(function (r) { return r.ok ? r.json() : []; })
@@ -69,46 +69,68 @@ items = data;
 if (items.length) { box.hidden = false; }
 })
 .catch(function () { items = []; });
+function links() { return Array.prototype.slice.call(panel.querySelectorAll("a")); }
 function render() {
 var q = input.value.trim().toLowerCase();
-list.textContent = "";
-if (!q) { list.hidden = true; return; }
+panel.textContent = "";
+if (!q) { panel.hidden = true; return; }
 var hits = items.filter(function (it) {
 return (it.t + " " + it.p + " " + it.s).toLowerCase().indexOf(q) !== -1;
-}).slice(0, 8);
+}).slice(0, 12);
+var order = [];
+var groups = {};
 hits.forEach(function (it) {
+if (!groups[it.p]) { groups[it.p] = []; order.push(it.p); }
+groups[it.p].push(it);
+});
+order.forEach(function (page) {
+var head = document.createElement("p");
+head.className = "results-page";
+head.textContent = page;
+panel.appendChild(head);
+var ul = document.createElement("ul");
+groups[page].forEach(function (it) {
 var li = document.createElement("li");
 var a = document.createElement("a");
 a.href = new URL(it.u, base).href;
 a.textContent = it.t;
-var span = document.createElement("span");
-span.textContent = " \u00b7 " + it.p;
 li.appendChild(a);
-li.appendChild(span);
-list.appendChild(li);
+ul.appendChild(li);
 });
-list.hidden = false;
+panel.appendChild(ul);
+});
+if (!hits.length) {
+var none = document.createElement("p");
+none.className = "results-page";
+none.textContent = "No results";
+panel.appendChild(none);
+}
+panel.hidden = false;
 announce(hits.length ? hits.length + (hits.length === 1 ? " result" : " results") : "No results");
 }
 input.addEventListener("input", render);
 input.addEventListener("keydown", function (e) {
-if (e.key === "ArrowDown") {
-var first = list.querySelector("a");
-if (first) { e.preventDefault(); first.focus(); }
+var all = links();
+if (e.key === "ArrowDown" && all.length) {
+e.preventDefault();
+all[0].focus();
+} else if (e.key === "Enter" && all.length) {
+e.preventDefault();
+window.location.href = all[0].href;
 } else if (e.key === "Escape") {
 input.value = "";
 render();
 }
 });
-list.addEventListener("keydown", function (e) {
-var links = Array.prototype.slice.call(list.querySelectorAll("a"));
-var i = links.indexOf(document.activeElement);
+panel.addEventListener("keydown", function (e) {
+var all = links();
+var i = all.indexOf(document.activeElement);
 if (e.key === "ArrowDown") {
 e.preventDefault();
-if (links[i + 1]) { links[i + 1].focus(); }
+if (all[i + 1]) { all[i + 1].focus(); }
 } else if (e.key === "ArrowUp") {
 e.preventDefault();
-if (i > 0) { links[i - 1].focus(); } else { input.focus(); }
+if (i > 0) { all[i - 1].focus(); } else { input.focus(); }
 } else if (e.key === "Escape") {
 e.preventDefault();
 input.value = "";

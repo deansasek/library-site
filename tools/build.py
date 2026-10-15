@@ -102,8 +102,10 @@ def search_box(path):
     if path not in SEARCH_PAGES:
         return ''
     return ('<div class="search" hidden><label class="visually-hidden" for="docs-search">Search the docs</label>'
-            '<input id="docs-search" type="search" placeholder="Search the docs" autocomplete="off">'
-            '<ul class="results" hidden></ul></div>')
+            '<div class="search-field"><svg class="icon search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
+            '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>'
+            '<input id="docs-search" type="search" placeholder="Search" autocomplete="off"></div>'
+            '<div class="results" hidden></div></div>')
 
 
 def page(path, title, desc, lede, toc, sections, plain=False, extra='', released=None):
