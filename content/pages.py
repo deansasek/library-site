@@ -44,7 +44,7 @@ def render(page):
         ('organize-your-library', 'Organize your library'), ('edit-an-item', 'Edit an item'), ('color-items', 'Color items'),
         ('add-notes', 'Add notes'), ('use-templates', 'Use templates'), ('read-later', 'Read later'),
         ('shortcuts', 'Shortcuts'), ('work-with-other-apps', 'Work with other apps'),
-        ('stay-up-to-date', 'Stay up to date'), ('settings', 'Settings'),
+        ('stay-up-to-date', 'Stay up to date'), ('check-links', 'Check links'), ('settings', 'Settings'),
         ('permissions', 'Permissions'), ('troubleshooting', 'Troubleshooting'),
     ]
     guide = [
@@ -130,6 +130,14 @@ def render(page):
 </ul>'''),
         ('stay-up-to-date', 'Stay up to date', '''<p>While Library runs, it checks GitHub for a new release every hour. It also checks at launch if the last check was an hour or more ago.</p>
 <p>When a newer version exists, one item appears at the top of the menu. Nothing pops up. To turn checks off, use <strong>Settings &gt; General</strong>. Choose <strong>Check for Updates…</strong> at any time. It offers the newer version. If you choose to install it, Library opens Terminal, clones the release, and runs its installer. It does not install silently. See <a href="/privacy/#what-is-sent">what is sent</a>.</p>'''),
+        ('check-links', 'Check links', '''<p>Library can check that each bookmark's page is still there. It's off by default. To turn it on, use <strong>Settings &gt; General &gt; Check links periodically</strong>.</p>
+<ul>
+<li>Once a day while Library is open, Library quickly checks each bookmark. It doesn't download the page.</li>
+<li>If a site doesn't answer that quick check, Library loads the page and reads only its first 64 KB.</li>
+<li>Each bookmark is checked at most once a day.</li>
+<li>A bookmark whose page is missing or can't be reached shows a warning in <strong>Edit Library</strong>.</li>
+</ul>
+<p>To check now, choose <strong>File &gt; Check Links</strong>.</p>'''),
         ('settings', 'Settings', '''<p>Press ⌘, to open Settings.</p>
 <ul>
 <li><strong>General:</strong> startup, iCloud Drive, automatic update checks, link checks, names for new bookmarks, backup and restore, and link cleaning.</li>
