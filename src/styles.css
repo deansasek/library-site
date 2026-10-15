@@ -594,6 +594,10 @@ footer {
   font-size:var(--type-small);
   color:var(--text-2);
 }
+.doc th {
+  font-weight:600;
+  color:var(--text);
+}
 .doc th,.doc td {
   padding:var(--space-3) var(--space-4);
   border-bottom: var(--hairline) solid var(--border);
