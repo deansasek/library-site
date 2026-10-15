@@ -37,14 +37,12 @@ def header():
 
 
 def footer():
-    return (f'<footer><nav class="footer-cols" aria-label="Footer">'
-            '<div><p class="ft">Project</p>'
-            f'<a href="{REPO}" rel="noopener noreferrer">GitHub</a><a href="/install/">Install</a></div>'
-            '<div><p class="ft">Guide</p>'
-            '<a href="/guide/">Feature guide</a><a href="/smart-features/">Smart features</a></div>'
-            '<div><p class="ft">Privacy</p><a href="/privacy/">Privacy</a><a href="/accessibility/">Accessibility</a></div>'
-            '<div><p class="ft">Releases</p>'
-            f'<a href="/whats-new/">What\'s new</a><a href="/releases/">Latest version</a><a href="{REPO}/releases" rel="noopener noreferrer">All releases</a></div>'
+    return ('<footer><nav class="footer-cols" aria-label="Footer">'
+            f'<div><p class="ft">Project</p><a href="{REPO}" rel="noopener noreferrer">GitHub</a></div>'
+            '<div><p class="ft">Guide</p><a href="/guide/">Feature guide</a><a href="/accessibility/">Accessibility</a></div>'
+            '<div><p class="ft">Privacy</p><a href="/privacy/">Privacy guide</a></div>'
+            f'<div><p class="ft">Releases</p><a href="/whats-new/">What\'s new</a>'
+            f'<a href="{REPO}/releases" rel="noopener noreferrer">All releases</a></div>'
             f'</nav><p class="legal">Library is open source. &copy; {YEAR}</p></footer>')
 
 
@@ -336,6 +334,9 @@ def build_all(check=False):
     update_landing()
     css = open(os.path.join(ROOT, 'styles.css')).read()
     open(os.path.join(ROOT, 'styles.css'), 'w').write(minify_css(css))
+    js = open(os.path.join(ROOT, 'script.js')).read()
+    js = '\n'.join(l.strip() for l in js.splitlines() if l.strip() and not l.strip().startswith('//'))
+    open(os.path.join(ROOT, 'script.js'), 'w').write(js + '\n')
     urls = ''.join(f'  <url>\n    <loc>https://getlibrary.app{u}</loc>\n    <lastmod>{TODAY.isoformat()}</lastmod>\n  </url>\n'
                    for u in SITE_PATHS)
     open(os.path.join(ROOT, 'sitemap.xml'), 'w').write(
