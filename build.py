@@ -272,8 +272,9 @@ def build_all(check=False):
     js = open(os.path.join(ROOT, 'script.js')).read()
     js = '\n'.join(l.strip() for l in js.splitlines() if l.strip() and not l.strip().startswith('//'))
     open(os.path.join(ROOT, 'script.js'), 'w').write(js + '\n')
+    release_paths = sorted(k.replace('index.html', '') for k in rendered if k.startswith('/whats-new/') and k != '/whats-new/index.html')
     urls = ''.join(f'  <url>\n    <loc>https://getlibrary.app{u}</loc>\n    <lastmod>{TODAY.isoformat()}</lastmod>\n  </url>\n'
-                   for u in SITE_PATHS)
+                   for u in SITE_PATHS + release_paths)
     open(os.path.join(ROOT, 'sitemap.xml'), 'w').write(
         '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '</urlset>\n')
     if check:
