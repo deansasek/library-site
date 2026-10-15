@@ -32,17 +32,17 @@ def header():
             f'<a class="nav-extra" href="/privacy/">Privacy</a>'
             '<a href="/install/">Install</a>'
             '<a class="nav-extra" href="/releases/">Releases</a>'
-            f'<a class="nav-extra" href="{REPO}" rel="noopener noreferrer">GitHub</a>'
             '</nav></div></header>')
 
 
 def footer():
     return ('<footer><nav class="footer-cols" aria-label="Footer">'
-            f'<div><p class="ft">Project</p><a href="{REPO}" rel="noopener noreferrer">GitHub</a><a href="https://buymeacoffee.com/deansasek" rel="noopener noreferrer">Support</a></div>'
-            '<div><p class="ft">Guide</p><a href="/guide/">Feature guide</a><a href="/accessibility/">Accessibility</a></div>'
+            f'<div><p class="ft">Project</p><a href="{REPO}" rel="noopener noreferrer">GitHub</a>'
+            '<a href="https://buymeacoffee.com/deansasek" rel="noopener noreferrer">Support</a>'
+            '</div>'
+            '<div><p class="ft">Guide</p><a href="/guide/">Feature guide</a></div>'
             '<div><p class="ft">Privacy</p><a href="/privacy/">Privacy guide</a></div>'
-            f'<div><p class="ft">Releases</p><a href="/whats-new/">What\'s new</a>'
-            f'<a href="{REPO}/releases" rel="noopener noreferrer">All releases</a></div>'
+            '<div><p class="ft">Releases</p><a href="/whats-new/">What\'s new</a></div>'
             f'</nav><p class="legal">Library is open source. &copy; {YEAR}</p></footer>')
 
 
@@ -58,7 +58,6 @@ def head(title, desc, path):
 <meta name="description" content="{desc}">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
-<meta name="robots" content="index, follow">
 <link rel="canonical" href="{url}">
 <meta property="og:title" content="{t}">
 <meta property="og:description" content="{desc}">
@@ -287,7 +286,7 @@ def write_search_index(rendered):
             sid, title, body = m.groups()
             text = ' '.join(H.unescape(re.sub(r'<[^>]+>', ' ', body)).split())
             text = re.sub(r'\s+([.,;:!?])', r'\1', text)
-            first = re.split(r'(?<=[.!?])\s', text)[0][:120]
+            first = re.split(r'(?<=[.!?])\s', text)[0][:100]
             items.append({'t': H.unescape(title), 'p': SEARCH_PAGES[pg],
                           'u': pg.strip('/') + '/index.html#' + sid, 's': first})
     data = json.dumps(items, ensure_ascii=False, separators=(',', ':'))

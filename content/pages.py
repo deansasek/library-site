@@ -245,6 +245,7 @@ git push origin vX.Y.Z</code></pre></div>
         ('voiceover', 'VoiceOver', """<p>Main controls have VoiceOver labels. Examples include <strong>Search Library</strong> in Quick Open, <strong>Actions</strong>, <strong>Sort</strong>, <strong>Add</strong>, <strong>Share</strong>, <strong>Delete</strong>, and <strong>Get Info</strong> in Edit Library.</p>
 <p>Warnings about shortcuts that another app uses are labeled too.</p>
 <p>To organize your library, see <a href="/guide/#organize-your-library">Organize your library</a>.</p>"""),
+        ('report', 'Report a problem', """<p>If something in Library is hard to use with VoiceOver, the keyboard, or these settings, open an issue on the <a href="https://github.com/deansasek/library/issues" rel="noopener noreferrer">GitHub issues page</a>.</p>"""),
         ('vision-and-motion', 'Motion and contrast', """<ul>
 <li><strong>Reduce Motion.</strong> When Reduce Motion is on, Quick Open's appearance animation is turned off. The Welcome screen does not animate between pages either.</li>
 <li><strong>Increase Contrast.</strong> Quick Open uses system colors, which adapt to light and dark appearance and to Increase Contrast.</li>
