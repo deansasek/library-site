@@ -183,6 +183,11 @@ a.classList.toggle("is-active", on);
 if (on) { a.setAttribute("aria-current", "location"); active = a; } else { a.removeAttribute("aria-current"); }
 });
 if (active) {
+var folder = active.closest("details");
+while (folder) {
+folder.open = true;
+folder = folder.parentElement ? folder.parentElement.closest("details") : null;
+}
 var box = textBox(active);
 var origin = toc.getBoundingClientRect();
 indicator.style.height = box.height + "px";

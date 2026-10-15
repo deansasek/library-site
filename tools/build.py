@@ -109,8 +109,8 @@ def search_box(path):
             '<div class="results" hidden></div></div>')
 
 
-def page(path, title, desc, lede, toc, sections, plain=False, extra='', released=None):
-    toc_items = ''.join(f'<li><a href="#{i}">{l}</a></li>' for i, l in toc)
+def page(path, title, desc, lede, toc, sections, plain=False, extra='', released=None, nav=None):
+    toc_items = nav or '<ol>' + ''.join(f'<li><a href="#{i}">{l}</a></li>' for i, l in toc) + '</ol>'
     body = ''.join(f'<section id="{i}"><h2>{h}</h2>{html}</section>'
                    for i, h, html in sections)
     rel_items = RELATED.get(path, [('/whats-new/', "What's new"), ('/install/', 'Install'), ('/guide/', 'Guide')] if path.startswith('/whats-new/') else [])
@@ -123,7 +123,7 @@ def page(path, title, desc, lede, toc, sections, plain=False, extra='', released
     return (head(title, desc, path) + header() +
             f'<main id="main" class="doc">{back}<h1>{title}</h1><p class="lede">{lede}</p>'
             f'<p class="updated">' + (f'Released {released}. ' if released else 'Applies to the current release of Library. ') + f'Last reviewed {REVIEWED_LABEL}.</p>'
-            f'<div class="article"><nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p>{search_box(path)}<ol>{toc_items}</ol></nav>'
+            f'<div class="article"><nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p>{search_box(path)}{toc_items}</nav>'
             f'<div class="content">{body}'
             f'<section class="related"><h2>Related</h2><ul>{related}</ul></section>'
             '</div></div></main>'
@@ -285,8 +285,11 @@ def pager(path):
     return '<nav class="pager" aria-label="Previous and next pages">' + ''.join(parts) + '</nav>'
 
 
-def write_search_index(rendered):
-    """A small JSON index of each docs section's heading and first sentence, for script.js."""
+def write_search_index(rendered, guide_groups):
+    """A small JSON index of each docs section's heading and first sentence, for script.js.
+
+    Guide sections are labeled with their navigation group, such as "Find and open", not just "Guide".
+    """
     items = []
     for path, page_html in rendered.items():
         pg = path.replace('index.html', '')
@@ -297,7 +300,8 @@ def write_search_index(rendered):
             text = ' '.join(H.unescape(re.sub(r'<[^>]+>', ' ', body)).split())
             text = re.sub(r'\s+([.,;:!?])', r'\1', text)
             first = re.split(r'(?<=[.!?])\s', text)[0][:100]
-            items.append({'t': H.unescape(title), 'p': SEARCH_PAGES[pg],
+            label = guide_groups.get(sid, SEARCH_PAGES[pg]) if pg == '/guide/' else SEARCH_PAGES[pg]
+            items.append({'t': H.unescape(title), 'p': label,
                           'u': pg.strip('/') + '/index.html#' + sid, 's': first})
     data = json.dumps(items, ensure_ascii=False, separators=(',', ':'))
     with open(os.path.join(ROOT, 'assets', 'search-index.json'), 'w') as f:
@@ -337,7 +341,7 @@ def build_all(check=False):
     reviewed_on = pages.REVIEWED_DATE or TODAY
     REVIEWED_LABEL = reviewed_on.strftime('%B %d, %Y').replace(' 0', ' ')
     rendered = pages.render(page)
-    write_search_index(rendered)
+    write_search_index(rendered, pages.GUIDE_GROUP_OF)
     for path, html in rendered.items():
         html = html.replace('__HEADER__', header()).replace('__FOOTER__', footer())
         html = html.replace('</main>', pager(path) + '</main>', 1) if path_key(path) in dict(PAGER_ORDER) else html

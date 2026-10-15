@@ -34,8 +34,59 @@ def release_page(page, r):
                 released=r['date'])
 
 
+# The guide's side navigation: six groups by what people are trying to do. Each feature lists its sub-sections
+# under it, so a group shows a handful of entries at a time. Every guide section id belongs to exactly one group.
+GUIDE_GROUPS = [
+    ('Get started', 'Install Library, then learn the first steps.', ['get-started']),
+    ('Find and open', 'Open items from the menu bar, Quick Open, a shortcut, or the Library menu.',
+     ['open-anything', 'quick-open', 'the-library-menu', 'shortcuts']),
+    ('Copy and paste', 'The clipboard history, the paste queue, and the actions on copied items.', ['clipboard']),
+    ('Organize', 'Edit Library, colors, and notes.', ['manager', 'color-items', 'add-notes']),
+    ('Snippets and automation', 'Snippets, the URL scheme, Services, Spotlight, and the Shortcuts actions.',
+     ['save-snippets', 'integration']),
+    ('Settings, privacy, and help', 'Every setting, the permissions Library asks for, updates, and troubleshooting.',
+     ['settings', 'permissions', 'stay-up-to-date', 'help-menu', 'troubleshooting']),
+]
+
+# Section id -> group title, for every guide section. Filled in by render(); build.py uses it for search results.
+GUIDE_GROUP_OF = {}
+
+
+def guide_navigation(toc, sections):
+    """The guide's side navigation: the groups, each with its features and their sub-sections folded under them."""
+    # The features: the top-level sections named in GUIDE_GROUPS. Every other section is a sub-section of the
+    # feature before it in the table of contents.
+    tops = [i for _, _, ids in GUIDE_GROUPS for i in ids]
+    section_ids = {i for i, _, _ in sections}
+    if len(set(tops)) != len(tops) or not set(tops) <= section_ids:
+        raise SystemExit('GUIDE_GROUPS must name each top-level guide section once, and only real sections')
+    labels, subs, current = {}, {i: [] for i in tops}, None
+    for i, label in toc:
+        if i in tops:
+            labels[i], current = label, i
+        else:
+            subs[current].append((i, label.split(': ', 1)[-1]))
+    parts = []
+    for n, (title, intro, ids) in enumerate(GUIDE_GROUPS):
+        items = []
+        for t in ids:
+            GUIDE_GROUP_OF[t] = title
+            if subs[t]:
+                for i, _ in subs[t]:
+                    GUIDE_GROUP_OF[i] = title
+                inner = ''.join(f'<li><a href="#{i}">{l}</a></li>' for i, l in subs[t])
+                items.append(f'<li><details><summary><a href="#{t}">{labels[t]}</a></summary><ol>{inner}</ol></details></li>')
+            else:
+                items.append(f'<li><a href="#{t}">{labels[t]}</a></li>')
+        opened = ' open' if n == 0 else ''
+        parts.append(f'<details class="group"{opened}><summary>{title}</summary><p class="group-intro">{intro}</p>'
+                     f'<ol>{"".join(items)}</ol></details>')
+    return '<div class="guide-nav">' + ''.join(parts) + '</div>'
+
+
 def render(page):
     out = {}
+    GUIDE_GROUP_OF.clear()
 
     # ---------- Guide ----------
     guide_toc = [
@@ -216,7 +267,7 @@ def render(page):
     ]
     out['/guide/index.html'] = page('/guide/', 'Library guide: features, settings, and permissions', 'Every feature, setting, and permission in Library.',
                                     'Every feature, setting, and permission in Library, with the steps to use each one.',
-                                    guide_toc, guide)
+                                    guide_toc, guide, nav=guide_navigation(guide_toc, guide))
 
     # ---------- Privacy ----------
     privacy_toc = [('what-is-stored', 'What is stored'), ('your-files', 'Your files'), ('what-is-sent', 'What is sent'),
