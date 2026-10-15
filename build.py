@@ -47,7 +47,7 @@ def footer():
             '<div><p class="ft">Guide</p><a href="/guide/">Feature guide</a></div>'
             '<div><p class="ft">Privacy</p><a href="/privacy/">Privacy guide</a></div>'
             '<div><p class="ft">Releases</p><a href="/whats-new/">What\'s new</a></div>'
-            f'</nav><p class="legal">Library is open source. &copy; {YEAR}</p></footer>')
+            f'</nav><p class="legal">Library is open source. &copy; {YEAR}. Library is available under the <a href="https://github.com/deansasek/library/blob/main/LICENSE" rel="noopener noreferrer">MIT License</a>.</p></footer>')
 
 
 def head(title, desc, path):

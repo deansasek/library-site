@@ -875,3 +875,12 @@ footer .footer-cols,footer .legal {
 .hero .actions {
   align-items:baseline;
 }
+
+/* ---- footer legal line ---- */
+.legal a {
+  color:var(--text-2);
+  text-decoration:underline;
+}
+.legal a:hover {
+  color:var(--text);
+}
