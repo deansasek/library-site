@@ -12,6 +12,9 @@ TODAY = datetime.date.today()
 YEAR = TODAY.year
 REVIEWED_LABEL = TODAY.strftime('%B %d, %Y').replace(' 0', ' ')
 REPO_API = 'https://api.github.com/repos/deansasek/library/releases/latest'
+# Docs pages in reading order (the guide's order: start, features, then the reference pages).
+PAGER_ORDER = [('/install/', 'Install'), ('/guide/', 'Guide'), ('/smart-features/', 'Smart features'),
+               ('/privacy/', 'Privacy'), ('/development/', 'Development')]
 SEARCH_PAGES = {'/guide/': 'Guide', '/privacy/': 'Privacy', '/install/': 'Install', '/development/': 'Development', '/smart-features/': 'Smart features'}
 SITE_PATHS = ['/', '/guide/', '/privacy/', '/install/', '/development/', '/smart-features/', '/releases/', '/whats-new/', '/accessibility/']
 RELEASES_API = 'https://api.github.com/repos/deansasek/library/releases'
@@ -253,6 +256,22 @@ def release_sections():
     return sections
 
 
+def path_key(path):
+    return path.replace('index.html', '')
+
+
+def pager(path):
+    """Previous and next links between the docs pages, in PAGER_ORDER."""
+    keys = [k for k, _ in PAGER_ORDER]
+    i = keys.index(path_key(path))
+    parts = []
+    if i > 0:
+        parts.append(f'<a class="prev" href="{keys[i-1]}">Previous: {PAGER_ORDER[i-1][1]}</a>')
+    if i < len(keys) - 1:
+        parts.append(f'<a class="next" href="{keys[i+1]}">Next: {PAGER_ORDER[i+1][1]}</a>')
+    return '<nav class="pager" aria-label="Previous and next pages">' + ''.join(parts) + '</nav>'
+
+
 def write_search_index(rendered):
     """A small JSON index of each docs section's heading and first sentence, for script.js."""
     items = []
@@ -306,6 +325,7 @@ def build_all(check=False):
     write_search_index(rendered)
     for path, html in rendered.items():
         html = html.replace('__HEADER__', header()).replace('__FOOTER__', footer())
+        html = html.replace('</main>', pager(path) + '</main>', 1) if path_key(path) in dict(PAGER_ORDER) else html
         write(path, html)
     update_landing()
     css = open(os.path.join(ROOT, 'styles.css')).read()
