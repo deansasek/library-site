@@ -6,11 +6,11 @@
 
 <p><strong>Everything you open and copy, one shortcut away.</strong></p>
 
-<p><a href="https://getlibrary.app">getlibrary.app</a> · <a href="https://github.com/deansasek/library">Library on GitHub</a></p>
+<p><a href="https://deansasek.github.io/library-site">deansasek.github.io/library-site</a> · <a href="https://github.com/deansasek/library">Library on GitHub</a></p>
 
 </div>
 
-This is the website for Library, a menu bar app for macOS. It is live at [getlibrary.app](https://getlibrary.app).
+This is the website for Library, a menu bar app for macOS. It is live at [deansasek.github.io/library-site](https://deansasek.github.io/library-site).
 
 The app, its source code, and its releases live in the [library repository](https://github.com/deansasek/library).
 
@@ -62,7 +62,7 @@ The "Last reviewed" date and the version the docs were reviewed for are set at t
 
 ## Deployment
 
-GitHub Pages serves this repository from the `main` branch, from the root folder. The `CNAME` file sets the custom domain to `getlibrary.app`. Point the domain's DNS records at GitHub Pages as described in GitHub's documentation.
+GitHub Pages serves this repository from the `main` branch, from the root folder. The `CNAME` file sets the custom domain to `deansasek.github.io/library-site`. Point the domain's DNS records at GitHub Pages as described in GitHub's documentation.
 
 `_headers` sets security headers for hosts that read that file, such as Netlify and Cloudflare Pages. GitHub Pages does not read it.
 

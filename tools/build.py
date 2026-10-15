@@ -51,7 +51,7 @@ def footer():
 
 
 def head(title, desc, path):
-    url = 'https://getlibrary.app' + path
+    url = 'https://deansasek.github.io/library-site' + path
     t = title if 'Library' in title else f'{title} · Library'
     return f'''<!doctype html>
 <html lang="en" dir="ltr">
@@ -67,12 +67,12 @@ def head(title, desc, path):
 <meta property="og:description" content="{desc}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{url}">
-<meta property="og:image" content="https://getlibrary.app/assets/icon.png">
+<meta property="og:image" content="https://deansasek.github.io/library-site/assets/icon.png">
 <meta property="og:image:alt" content="Library app icon">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="{t}">
 <meta name="twitter:description" content="{desc}">
-<meta name="twitter:image" content="https://getlibrary.app/assets/icon.png">
+<meta name="twitter:image" content="https://deansasek.github.io/library-site/assets/icon.png">
 <link rel="icon" type="image/png" sizes="256x256" href="/assets/icon.png">
 <link rel="apple-touch-icon" href="/assets/icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
@@ -289,7 +289,7 @@ def build_all(check=False):
     js = '\n'.join(l.strip() for l in js.splitlines() if l.strip() and not l.strip().startswith('//'))
     open(os.path.join(ROOT, 'script.js'), 'w').write(js + '\n')
     release_paths = sorted(k.replace('index.html', '') for k in rendered if k.startswith('/whats-new/') and k != '/whats-new/index.html')
-    urls = ''.join(f'  <url>\n    <loc>https://getlibrary.app{u}</loc>\n    <lastmod>{TODAY.isoformat()}</lastmod>\n  </url>\n'
+    urls = ''.join(f'  <url>\n    <loc>https://deansasek.github.io/library-site{u}</loc>\n    <lastmod>{TODAY.isoformat()}</lastmod>\n  </url>\n'
                    for u in SITE_PATHS + release_paths)
     open(os.path.join(ROOT, 'sitemap.xml'), 'w').write(
         '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '</urlset>\n')

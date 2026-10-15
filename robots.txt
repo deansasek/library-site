@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://getlibrary.app/sitemap.xml
+Sitemap: https://deansasek.github.io/library-site/sitemap.xml
