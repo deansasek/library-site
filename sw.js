@@ -18,14 +18,17 @@ self.addEventListener("fetch", function (event) {
   var request = event.request;
   if (request.method !== "GET" || new URL(request.url).origin !== location.origin) { return; }
   if (request.mode === "navigate") {
+    // Pages are cached without their query string, so the cache holds one entry per page, not per URL.
+    var key = new URL(request.url);
+    key.search = "";
     event.respondWith(fetch(request).then(function (response) {
       if (!response.ok) { return response; }
       var copy = response.clone();
-      return caches.open(VERSION).then(function (cache) { return cache.put(request, copy); })
+      return caches.open(VERSION).then(function (cache) { return cache.put(key.href, copy); })
         .catch(function () {}).then(function () { return response; });
     }).catch(function () {
       return caches.open(VERSION).then(function (cache) {
-        return cache.match(request).then(function (hit) {
+        return cache.match(key.href).then(function (hit) {
           return hit || cache.match(new URL("404.html", self.registration.scope).href);
         });
       });
