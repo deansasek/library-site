@@ -30,7 +30,7 @@ def release_page(page, r):
     download = (f'<p>Download Library {r["version"]} from the <a href="https://github.com/deansasek/library/releases/tag/{tag}" '
                 'rel="noopener noreferrer">GitHub release page</a>, or install it with the command on the <a href="/install/">install page</a>.</p>')
     sections.append(('download', 'Download', download))
-    return page('/whats-new/' + r['id'] + '/', f"What's new in Library {r['version']}", r['summary'], r['intro'], toc, sections,
+    return page('/whats-new/' + r['id'] + '/', f"What's new in Library {r['version']}", f"{r['summary']} Released {r['date']}.", r['intro'], toc, sections,
                 released=r['date'])
 
 
@@ -123,11 +123,16 @@ def guide_pages(toc, sections, page):
         feats = ''.join(f'<li><a href="{path}#{t}">{labels[t]}</a></li>' for t in ids)
         index_toc.append((f'group-{slug}', title))
         index_sections.append((f'group-{slug}', title, f'<p>{intro}</p><ol>{feats}</ol>'))
-        out[path + 'index.html'] = page(path, f'{title}: Library guide', intro, intro,
+        desc = f'{intro} Covers {", ".join(labels[t] for t in ids)}.'
+        if len(desc) > 160:
+            desc = f'{intro} Covers {", ".join(labels[t] for t in ids[:3])}, and more.'
+        if len(desc) < 70:
+            desc += ' Part of the Library guide.'
+        out[path + 'index.html'] = page(path, f'{title}: Library guide', desc, intro,
                                         [(i, h) for i, h, _ in body], body,
                                         nav=guide_navigation(labels, subs, title))
     out['/guide/index.html'] = page('/guide/', 'Library guide: features, settings, and permissions',
-                                    'Every feature, setting, and permission in Library.',
+                                    'Every feature, setting, and permission in Library, grouped by what you want to do: open, copy, organize, automate, and configure.',
                                     'Every feature, setting, and permission in Library, with the steps to use each one.',
                                     index_toc, index_sections)
     return out
@@ -420,7 +425,7 @@ git push origin vX.Y.Z</code></pre></div>
 <p>Write each user-facing string as <code>Text("…", bundle: L10n.bundle)</code>, or as <code>String(localized: "…", bundle: L10n.bundle)</code> where a <code>String</code> is needed. To add a string, add a line such as <code>"key" = "value";</code> with a <code>/* comment */</code> above it.</p>
 <p>Dynamic text, such as file names, counts, and clipboard contents, isn't localized.</p>'''),
     ]
-    out['/development/index.html'] = page('/development/', 'Building, testing, and releasing Library', 'Build, test, and release Library, and add languages.',
+    out['/development/index.html'] = page('/development/', 'Building, testing, and releasing Library', 'Build, test, and release Library from source, and add languages to the app’s interface.',
                                           'How to build, test, and release Library, and how text is localized.',
                                           dev_toc, dev)
 
@@ -440,7 +445,7 @@ git push origin vX.Y.Z</code></pre></div>
 
     # ---------- Releases ----------
     # No version or date here: the links always show the current release on GitHub.
-    out['/releases/index.html'] = page('/releases/', 'Library releases: latest version and downloads', 'Download and read the notes for every Library release on GitHub.',
+    out['/releases/index.html'] = page('/releases/', 'Library releases: latest version and downloads', 'Download and read the release notes for every version of Library, all published on GitHub.',
         'Release notes and downloads for every version of Library are on GitHub.',
         [], [], plain=True, extra=(
             '<ul class="links">'
@@ -489,8 +494,8 @@ git push origin vX.Y.Z</code></pre></div>
     if not _wn.RELEASES:
         entries = '<p>No release notes yet.</p>'
     out['/whats-new/index.html'] = page('/whats-new/', "What's new in Library: release notes",
-        'What each major and minor release of Library brings, newest first.',
-        "What each major and minor release of Library brings, newest first.",
+        'What each major and minor release of Library brings, newest first, with a page for each version.',
+        "What each major and minor release of Library brings, newest first, with a page for each version.",
         [], [], plain=True, extra=entries + '<p class="links"><a href="https://github.com/deansasek/library/releases" rel="noopener noreferrer">See all releases on GitHub</a></p>')
     for r in _wn.RELEASES:
         out['/whats-new/' + r['id'] + '/index.html'] = release_page(page, r)
@@ -498,8 +503,8 @@ git push origin vX.Y.Z</code></pre></div>
     # ---------- 404 ----------
     out['/404.html'] = ('<!doctype html>\n<html lang="en" dir="ltr">\n<head>\n<meta charset="utf-8">\n'
                         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-                        '<title>Page not found</title>\n<meta name="description" content="This page does not exist in Library.">\n'
-                        '<meta name="robots" content="noindex">\n<link rel="canonical" href="https://deansasek.github.io/library-site/404.html">\n<meta property="og:title" content="Page not found">\n<meta property="og:url" content="https://deansasek.github.io/library-site/404.html">\n<meta property="og:description" content="This page does not exist in Library.">\n<meta property="og:image" content="https://deansasek.github.io/library-site/assets/icon.png">\n<meta property="og:image:alt" content="Library app icon">\n<meta name="twitter:card" content="summary">\n<link rel="icon" type="image/png" sizes="256x256" href="/assets/icon.png">\n'
+                        '<title>Page not found</title>\n<meta name="description" content="The page you are looking for is not on the Library site. Go back to the home page or open the guide.">\n'
+                        '<meta name="robots" content="noindex">\n<link rel="canonical" href="https://deansasek.github.io/library-site/404.html">\n<meta property="og:title" content="Page not found">\n<meta property="og:url" content="https://deansasek.github.io/library-site/404.html">\n<meta property="og:description" content="The page you are looking for is not on the Library site. Go back to the home page or open the guide.">\n<meta property="og:image" content="https://deansasek.github.io/library-site/assets/icon.png">\n<meta property="og:image:alt" content="Library app icon">\n<meta name="twitter:card" content="summary">\n<link rel="icon" type="image/png" sizes="256x256" href="/assets/icon.png">\n'
                         '<link rel="stylesheet" href="/assets/styles.css">\n</head>\n<body>\n'
                         '<a class="skip-link" href="#main">Skip to content</a>\n'
                         + '__HEADER__' + '\n<main id="main" class="notfound"><h1>Page not found</h1>'

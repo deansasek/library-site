@@ -366,6 +366,14 @@ def build_all(check=False):
     write_search_index(rendered, pages.GUIDE_GROUP_OF)
     for path, html in rendered.items():
         html = html.replace('__HEADER__', header()).replace('__FOOTER__', footer())
+        if path.startswith('/guide/') and path != '/guide/index.html' and path.endswith('/index.html'):
+            # Breadcrumbs for each guide group page, so search results show the path to it.
+            crumbs = {'@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
+                {'@type': 'ListItem', 'position': 1, 'name': 'Library', 'item': 'https://deansasek.github.io/library-site/'},
+                {'@type': 'ListItem', 'position': 2, 'name': 'Guide', 'item': 'https://deansasek.github.io/library-site/guide/'},
+                {'@type': 'ListItem', 'position': 3, 'name': H.unescape(re.search(r'<h1>(.*?)</h1>', html).group(1)).replace(': Library guide', ''),
+                 'item': 'https://deansasek.github.io/library-site' + path.replace('index.html', '')}]}
+            html = html.replace('</head>', '<script type="application/ld+json">' + json.dumps(crumbs, ensure_ascii=False) + '</script></head>', 1)
         if path == '/guide/index.html':
             # Old guide anchors, such as /guide/#clipboard-paste-queue, open the page that holds that section.
             html = html.replace('</body>', guide_redirect(pages.GUIDE_PATH_OF) + '</body>', 1)
