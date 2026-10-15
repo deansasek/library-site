@@ -221,8 +221,8 @@ git push origin vX.Y.Z</code></pre></div>
         'Release notes and downloads for every version of Library are on GitHub.',
         [], [], plain=True, extra=(
             '<ul class="links">'
-            '<li><a href="https://github.com/deansasek/library/releases/latest" rel="noopener noreferrer">Latest release</a></li>'
-            '<li><a href="https://github.com/deansasek/library/releases" rel="noopener noreferrer">All releases</a></li>'
+            '<li><a href="https://github.com/deansasek/library/releases/latest" rel="noopener noreferrer">Get the Latest Release</a></li>'
+            '<li><a href="https://github.com/deansasek/library/releases" rel="noopener noreferrer">See All Releases</a></li>'
             '</ul>'))
 
     # ---------- 404 ----------
