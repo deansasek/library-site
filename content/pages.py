@@ -289,7 +289,7 @@ def render(page):
 <li><strong>Check for updates automatically</strong>. On by default. See <a href="/guide/#stay-up-to-date">Stay up to date</a>.</li>
 <li><strong>Check links periodically</strong>. Off by default. See <a href="/guide/#manager-check-links">Check links</a>.</li>
 <li><strong>Export…</strong> and <strong>Restore…</strong> save and restore your library. See <a href="/guide/#manager-export-and-restore">Back up and restore</a>.</li>
-<li><strong>Show…</strong> opens the welcome screen, which explains Library, lists your shortcuts, and asks for access.</li>
+<li><strong>Show…</strong> opens the welcome screen. It walks through finding things, your shortcuts, copying and pasting, organizing, working with other apps, and setting up access.</li>
 <li><strong>Remove tracking parameters when copying links</strong>. On by default. Library removes tracking codes such as <code>utm_source</code>, <code>fbclid</code>, and <code>gclid</code> from a link you copy. The rest of the link stays the same, and the saved link is not changed.</li>
 </ul>
 <h3>Shortcuts</h3>
@@ -330,14 +330,15 @@ def render(page):
 <li>Keyboard shortcuts, hot corners, Quick Open, and the menus don't need any permission.</li>
 <li>Click, scroll, pinch, and swipe shortcuts, pasting into text fields, and suggesting a selected link need Accessibility access. Turn it on in <strong>System Settings &gt; Privacy &amp; Security &gt; Accessibility</strong>. Library reads your selection only when you open one of its menus, and it doesn't keep it.</li>
 </ul>'''),
-        ('help-menu', 'Help menu', '''<p>The Help menu is in the menu bar at the top of the screen.</p>
+        ('help-menu', 'Help menu', '''<p>Help is at the bottom of the Library menu, the menu bar icon's menu. Open that menu, then choose <strong>Help</strong>. The Help menu also appears in the menu bar while the Edit Library window is active.</p>
 <ul>
 <li><strong>Library Help</strong> opens the Library README on GitHub.</li>
 <li><strong>Keyboard Shortcuts</strong> opens the shortcuts section of the README on GitHub.</li>
 <li><strong>Welcome Tour…</strong> opens the welcome screen. It is the same as <strong>Settings &gt; General &gt; Show…</strong>.</li>
 <li><strong>Report an Issue…</strong> opens a new issue on GitHub.</li>
+<li><strong>Support Library…</strong> opens the support page, which is the only place Library asks for support.</li>
 </ul>
-<p>The GitHub links open in your default browser. Library does not load them.</p>'''),
+<p>The GitHub and support links open in your default browser. Library does not load them.</p>'''),
         ('troubleshooting', 'Troubleshooting', '''<ul>
 <li><strong>A shortcut doesn't work.</strong> Another app may use the same keys. Check <strong>Settings &gt; Shortcuts</strong>. If the shortcut conflicts, see <a href="#shortcuts-conflicts">Conflicts</a>.</li>
 <li><strong>Clicks stop working after a macOS update.</strong> Remove Library from Accessibility, then add it again.</li>
