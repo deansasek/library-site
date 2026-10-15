@@ -165,6 +165,9 @@ def update_landing():
     s = re.sub(r'\s*<meta property="og:site_name"[^>]*>', '', s)
     s = re.sub(r'\s*<meta property="og:image:(?:width|height|alt)"[^>]*>', '', s)
     s = re.sub(r'\s*<meta name="twitter:(?:title|description|image)"[^>]*>', '', s)
+    # Hand-written links on the landing page use ./folder/ or ./; point them at index.html too.
+    s = re.sub(r'href="\./([a-z-]+/)(#[^"]*)?"', r'href="./\1index.html\2"', s)
+    s = s.replace('href="./"', 'href="./index.html"')
     s = minify_html(relativize(s, '/index.html'))
     open(p, 'w').write(s)
 
