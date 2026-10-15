@@ -516,16 +516,11 @@ git push origin vX.Y.Z</code></pre></div>
     _spec = _ilu.spec_from_file_location('whats_new', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'whats_new.py'))
     _wn = _ilu.module_from_spec(_spec)
     _spec.loader.exec_module(_wn)
-    entries = ''
-    for i, r in enumerate(_wn.RELEASES):
-        badge = '<span class="badge">Latest</span>' if i == 0 else ''
-        entries += (f'<section class="release"><h2><a href="/whats-new/{r["id"]}/">Library {r["version"]}</a></h2>'
-                    f'<p class="updated">{r["date"]} {badge}</p><p>{r["summary"]}</p></section>')
-    if not _wn.RELEASES:
-        entries = '<p>No release notes yet.</p>'
+    # Every release, patch releases included, from the same list as the Releases page.
+    entries = release_history(set(r['id'] for r in _wn.RELEASES))
     out['/whats-new/index.html'] = page('/whats-new/', "What's new in Library: release notes",
-        'What each major and minor release of Library brings, newest first, with a page for each version.',
-        "What each major and minor release of Library brings, newest first, with a page for each version.",
+        'Every release of Library, newest first, with what changed in each. Major and minor releases also have their own page.',
+        "Every release of Library, newest first, with what changed in each. Major and minor releases also have their own page.",
         [], [], plain=True, extra=entries + '<p class="links"><a href="https://github.com/deansasek/library/releases" rel="noopener noreferrer">See all releases on GitHub</a></p>')
     for r in _wn.RELEASES:
         out['/whats-new/' + r['id'] + '/index.html'] = release_page(page, r)
