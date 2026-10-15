@@ -68,6 +68,7 @@ def head(title, desc, path):
 <link rel="apple-touch-icon" href="/assets/icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="stylesheet" href="/styles.css">
+<script src="/script.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
