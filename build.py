@@ -164,11 +164,17 @@ def relativize(html, path):
     return re.sub(r'\b(href|src)="(/[^"]*)"', fix, html)
 
 
+def code_bars(html):
+    """Give each code block a header bar. The label is static text; script.js adds the Copy button to the bar."""
+    return html.replace('<div class="code-block"><pre>',
+                        '<div class="code-block"><div class="code-head"><span class="code-label">Terminal</span></div><pre>')
+
+
 def write(path, html):
     full = os.path.join(ROOT, path.lstrip('/'))
     os.makedirs(os.path.dirname(full), exist_ok=True)
     with open(full, 'w') as f:
-        f.write(minify_html(relativize(html, path)))
+        f.write(code_bars(minify_html(relativize(html, path))))
 
 
 def update_landing():
@@ -183,7 +189,7 @@ def update_landing():
     # Hand-written links on the landing page use ./folder/ or ./; point them at index.html too.
     s = re.sub(r'href="\./([a-z-]+/)(#[^"]*)?"', r'href="./\1index.html\2"', s)
     s = s.replace('href="./"', 'href="./index.html"')
-    s = minify_html(relativize(s, '/index.html'))
+    s = code_bars(minify_html(relativize(s, '/index.html')))
     open(p, 'w').write(s)
 
 

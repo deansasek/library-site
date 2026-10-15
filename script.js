@@ -41,20 +41,29 @@
     return Promise.resolve(copyWithTextarea(text));
   }
 
+  var COPY_ICON = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+    '<rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M5.5 15.5h-1a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"/></svg>';
+
   document.querySelectorAll(".code-block pre").forEach(function (pre) {
     var box = pre.parentNode;
+    var bar = box.querySelector(".code-head");
+    if (!bar) {
+      bar = document.createElement("div");
+      bar.className = "code-head";
+      box.insertBefore(bar, pre);
+    }
     var button = document.createElement("button");
     button.type = "button";
     button.className = "copy-button";
-    button.textContent = "Copy";
-    box.classList.add("has-copy");
-    box.appendChild(button);
+    button.innerHTML = COPY_ICON + "<span>Copy</span>";
+    bar.appendChild(button);
+    var label = button.querySelector("span");
     button.addEventListener("click", function () {
       copyText(pre.textContent).then(function (ok) {
-        button.textContent = ok ? "Copied" : "Copy failed";
+        label.textContent = ok ? "Copied" : "Copy failed";
         announce(ok ? "Copied to the clipboard." : "Copy failed. Select the command and copy it.");
         clearTimeout(button.resetTimer);
-        button.resetTimer = setTimeout(function () { button.textContent = "Copy"; }, 2000);
+        button.resetTimer = setTimeout(function () { label.textContent = "Copy"; }, 2000);
       });
     });
   });
