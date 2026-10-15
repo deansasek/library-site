@@ -71,7 +71,7 @@ def render(page):
         ('edit-an-item', 'Edit an item', '''<p>Select an item and press ⌘I. You can also choose <strong>Edit…</strong> from the toolbar or a right-click menu.</p>
 <ul>
 <li><strong>Name and icon.</strong> Pick an SF Symbol or an emoji, or keep the site's favicon or the app's icon.</li>
-<li><strong>URL or command</strong>, how a click opens it, and which browser to use.</li>
+<li><strong>URL or Terminal Command</strong>, how a click opens it, and which browser to use.</li>
 <li><strong>Keywords</strong> help Quick Open and Spotlight find the item.</li>
 <li><strong>Color</strong> adds a dot in the menu and the Library window.</li>
 <li><strong>Shortcuts</strong> can be added to any item.</li>
