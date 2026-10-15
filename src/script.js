@@ -220,3 +220,9 @@ window.addEventListener("scroll", markCurrent, { passive: true });
 markCurrent();
 }
 })();
+
+// Offline reading: register the service worker that sw.js describes, at the site root, from any page served over HTTP(S).
+if ("serviceWorker" in navigator && /^https?:/.test(location.protocol)) {
+var scriptTag = document.querySelector('script[src$="script.js"]');
+navigator.serviceWorker.register(new URL("../sw.js", scriptTag ? scriptTag.src : location.href).href).catch(function () {});
+}
