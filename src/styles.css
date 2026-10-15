@@ -615,6 +615,53 @@ footer {
 .doc tr:last-child th,.doc tr:last-child td {
   border-bottom:0;
 }
+/* Tables read like System Settings lists: a quiet header row, a row per setting, no hover fill. */
+.doc thead th {
+  padding-top:var(--space-2);
+  padding-bottom:var(--space-2);
+  background:var(--band);
+  font-size:12px;
+  font-weight:500;
+  color:var(--text-2);
+}
+.doc tbody th {
+  width:34%;
+}
+.doc td code {
+  white-space:nowrap;
+}
+@media (max-width:639px) {
+  /* On a phone each row becomes a stacked block, so long tables stay readable without sideways scrolling. */
+  .doc table,.doc tbody,.doc tr,.doc th,.doc td {
+    display:block;
+    width:100%;
+  }
+  .doc thead {
+    display:none;
+  }
+  .doc tbody th {
+    width:100%;
+    padding-bottom:0;
+  }
+  .doc tbody td {
+    padding-top:var(--space-1);
+  }
+  .doc tr {
+    border-bottom:var(--hairline) solid var(--border);
+  }
+  .doc tr:last-child {
+    border-bottom:0;
+  }
+  .doc tr:last-child td {
+    border-bottom:0;
+  }
+  .doc td {
+    border-bottom:0;
+  }
+  .doc td code {
+    white-space:normal;
+  }
+}
 .toc {
   margin-top:var(--space-12);
   padding:var(--space-6);
