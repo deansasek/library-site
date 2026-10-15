@@ -64,6 +64,25 @@ RELEASES = [
             ]),
         ],
     },
+    {
+        'id': '1-4-0', 'version': '1.4.0', 'tag': 'v1.4.0', 'date': 'October 14, 2026',
+        'summary': 'Pinned clipboard items are encrypted, and Quick Open responds more quickly.',
+        'intro': 'Library 1.4.0 encrypts pinned clipboard items and makes Quick Open faster and steadier.',
+        'sections': [
+            ('New', [
+                'Pinned clipboard items are encrypted with a key kept in your Keychain.',
+            ]),
+            ('Improved', [
+                'Quick Open narrows its results as you type, more quickly.',
+                'Quick Open stays open while you use a Quick Look preview.',
+                'Settings, Quick Open, and Edit Library follow Apple\'s interface guidelines more closely.',
+            ]),
+            ('Fixed', [
+                'Site icons load within a fixed size, and Library stops retrying sites whose icons fail.',
+                'Renaming an item no longer repeats its icon and shortcut work.',
+            ]),
+        ],
+    },
 ]
 
 LATEST = RELEASES[0]['id'] if RELEASES else None
