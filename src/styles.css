@@ -556,7 +556,11 @@ footer {
 /* ---- docs layout ---- */
 .doc table {
   width:100%;
-  border-collapse:collapse;
+  border:var(--hairline) solid var(--border);
+  border-radius:var(--radius-media);
+  border-collapse:separate;
+  border-spacing:0;
+  overflow:hidden;
   font-size:var(--type-small);
 }
 .doc caption {
@@ -566,10 +570,13 @@ footer {
   color:var(--text-2);
 }
 .doc th,.doc td {
-  padding:var(--space-3) var(--space-3) var(--space-3) 0;
+  padding:var(--space-3) var(--space-4);
   border-bottom: var(--hairline) solid var(--border);
   text-align:left;
   vertical-align:top;
+}
+.doc tr:last-child th,.doc tr:last-child td {
+  border-bottom:0;
 }
 .toc {
   margin-top:var(--space-12);
