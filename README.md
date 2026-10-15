@@ -1,6 +1,14 @@
-# Library
+<div align="center">
 
-Everything you open and copy, one shortcut away.
+<img src="assets/icon.png" width="128" height="128" alt="Library app icon">
+
+<h1>Library</h1>
+
+<p><strong>Everything you open and copy, one shortcut away.</strong></p>
+
+<p><a href="https://getlibrary.app">getlibrary.app</a> · <a href="https://github.com/deansasek/library">Library on GitHub</a></p>
+
+</div>
 
 This is the website for Library, a menu bar app for macOS. It is live at [getlibrary.app](https://getlibrary.app).
 
