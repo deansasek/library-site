@@ -58,4 +58,68 @@
       });
     });
   });
+
+  // Docs search: filters search-index.json as the user types. Hidden until the index loads.
+  var box = document.querySelector(".search");
+  if (box) {
+    var input = box.querySelector("input");
+    var list = box.querySelector(".results");
+    var items = [];
+    fetch(new URL("search-index.json", base).href)
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (data) {
+        items = data;
+        if (items.length) { box.hidden = false; }
+      })
+      .catch(function () { items = []; });
+
+    function render() {
+      var q = input.value.trim().toLowerCase();
+      list.textContent = "";
+      if (!q) { list.hidden = true; return; }
+      var hits = items.filter(function (it) {
+        return (it.t + " " + it.p + " " + it.s).toLowerCase().indexOf(q) !== -1;
+      }).slice(0, 8);
+      hits.forEach(function (it) {
+        var li = document.createElement("li");
+        var a = document.createElement("a");
+        a.href = new URL(it.u, base).href;
+        a.textContent = it.t;
+        var span = document.createElement("span");
+        span.textContent = " \u00b7 " + it.p;
+        li.appendChild(a);
+        li.appendChild(span);
+        list.appendChild(li);
+      });
+      list.hidden = false;
+      announce(hits.length ? hits.length + (hits.length === 1 ? " result" : " results") : "No results");
+    }
+
+    input.addEventListener("input", render);
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowDown") {
+        var first = list.querySelector("a");
+        if (first) { e.preventDefault(); first.focus(); }
+      } else if (e.key === "Escape") {
+        input.value = "";
+        render();
+      }
+    });
+    list.addEventListener("keydown", function (e) {
+      var links = Array.prototype.slice.call(list.querySelectorAll("a"));
+      var i = links.indexOf(document.activeElement);
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (links[i + 1]) { links[i + 1].focus(); }
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (i > 0) { links[i - 1].focus(); } else { input.focus(); }
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        input.value = "";
+        render();
+        input.focus();
+      }
+    });
+  }
 })();

@@ -12,6 +12,7 @@ TODAY = datetime.date.today()
 YEAR = TODAY.year
 REVIEWED_LABEL = TODAY.strftime('%B %d, %Y').replace(' 0', ' ')
 REPO_API = 'https://api.github.com/repos/deansasek/library/releases/latest'
+SEARCH_PAGES = {'/guide/': 'Guide', '/privacy/': 'Privacy', '/install/': 'Install', '/development/': 'Development', '/smart-features/': 'Smart features'}
 SITE_PATHS = ['/', '/guide/', '/privacy/', '/install/', '/development/', '/smart-features/', '/releases/', '/whats-new/', '/accessibility/']
 RELEASES_API = 'https://api.github.com/repos/deansasek/library/releases'
 MAX_RELEASES = 10
@@ -85,6 +86,14 @@ RELATED = {
 }
 
 
+def search_box(path):
+    if path not in SEARCH_PAGES:
+        return ''
+    return ('<div class="search" hidden><label class="visually-hidden" for="docs-search">Search the docs</label>'
+            '<input id="docs-search" type="search" placeholder="Search the docs" autocomplete="off">'
+            '<ul class="results" hidden></ul></div>')
+
+
 def page(path, title, desc, lede, toc, sections, plain=False, extra=''):
     toc_items = ''.join(f'<li><a href="#{i}">{l}</a></li>' for i, l in toc)
     body = ''.join(f'<section id="{i}"><h2>{h}</h2>{html}</section>'
@@ -98,7 +107,7 @@ def page(path, title, desc, lede, toc, sections, plain=False, extra=''):
     return (head(title, desc, path) + header() +
             f'<main id="main" class="doc">{back}<h1>{title}</h1><p class="lede">{lede}</p>'
             f'<p class="updated">Applies to the current release of Library. Last reviewed {REVIEWED_LABEL}.</p>'
-            f'<div class="article"><nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ol>{toc_items}</ol></nav>'
+            f'<div class="article"><nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p>{search_box(path)}<ol>{toc_items}</ol></nav>'
             f'<div class="content">{body}'
             f'<section class="related"><h2>Related</h2><ul>{related}</ul></section>'
             '</div></div></main>'
@@ -244,6 +253,25 @@ def release_sections():
     return sections
 
 
+def write_search_index(rendered):
+    """A small JSON index of each docs section's heading and first sentence, for script.js."""
+    items = []
+    for path, page_html in rendered.items():
+        pg = path.replace('index.html', '')
+        if pg not in SEARCH_PAGES:
+            continue
+        for m in re.finditer(r'<section id="([^"]+)"><h2>([^<]*)</h2>(.*?)</section>', page_html, re.S):
+            sid, title, body = m.groups()
+            text = ' '.join(H.unescape(re.sub(r'<[^>]+>', ' ', body)).split())
+            text = re.sub(r'\s+([.,;:!?])', r'\1', text)
+            first = re.split(r'(?<=[.!?])\s', text)[0][:160]
+            items.append({'t': H.unescape(title), 'p': SEARCH_PAGES[pg],
+                          'u': pg.strip('/') + '/index.html#' + sid, 's': first})
+    data = json.dumps(items, ensure_ascii=False, separators=(',', ':'))
+    with open(os.path.join(ROOT, 'search-index.json'), 'w') as f:
+        f.write(data)
+
+
 def check_release(reviewed):
     """Warn if the latest GitHub release is newer than the version the docs were reviewed against.
 
@@ -274,7 +302,9 @@ def build_all(check=False):
     pages.to_html = markdown_to_html
     reviewed_on = pages.REVIEWED_DATE or TODAY
     REVIEWED_LABEL = reviewed_on.strftime('%B %d, %Y').replace(' 0', ' ')
-    for path, html in pages.render(page).items():
+    rendered = pages.render(page)
+    write_search_index(rendered)
+    for path, html in rendered.items():
         html = html.replace('__HEADER__', header()).replace('__FOOTER__', footer())
         write(path, html)
     update_landing()
