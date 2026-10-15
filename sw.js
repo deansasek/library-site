@@ -19,9 +19,10 @@ self.addEventListener("fetch", function (event) {
   if (request.method !== "GET" || new URL(request.url).origin !== location.origin) { return; }
   if (request.mode === "navigate") {
     event.respondWith(fetch(request).then(function (response) {
+      if (!response.ok) { return response; }
       var copy = response.clone();
-      caches.open(VERSION).then(function (cache) { cache.put(request, copy); });
-      return response;
+      return caches.open(VERSION).then(function (cache) { return cache.put(request, copy); })
+        .catch(function () {}).then(function () { return response; });
     }).catch(function () {
       return caches.open(VERSION).then(function (cache) {
         return cache.match(request).then(function (hit) {
