@@ -308,9 +308,14 @@ def update_landing():
     open(p, 'w').write(s)
 
 
+def script_json(data):
+    """JSON that is safe inside a <script> element: <, >, and & are written as \\u escapes, so no value can end the element."""
+    return json.dumps(data, separators=(',', ':')).replace('<', '\\u003c').replace('>', '\\u003e').replace('&', '\\u0026')
+
+
 def guide_redirect(paths):
     """A small script for the guide index: a link with a section's anchor moves to that section's group page."""
-    table = json.dumps(paths, separators=(',', ':'))
+    table = script_json(paths)
     return ('<script>(function(){var map=' + table + ';var id=location.hash.slice(1);'
             'if(id&&map[id]){location.replace(map[id]+"#"+id);}})();</script>')
 
@@ -475,7 +480,7 @@ def build_all(check=False):
                 {'@type': 'ListItem', 'position': 2, 'name': 'Guide', 'item': 'https://deansasek.github.io/library-site/guide/'},
                 {'@type': 'ListItem', 'position': 3, 'name': H.unescape(re.search(r'<h1>(.*?)</h1>', html).group(1)).replace(': Library guide', ''),
                  'item': 'https://deansasek.github.io/library-site' + path.replace('index.html', '')}]}
-            html = html.replace('</head>', '<script type="application/ld+json">' + json.dumps(crumbs, ensure_ascii=False) + '</script></head>', 1)
+            html = html.replace('</head>', '<script type="application/ld+json">' + script_json(crumbs) + '</script></head>', 1)
         if path == '/guide/index.html':
             # Old guide anchors, such as /guide/#clipboard-paste-queue, open the page that holds that section.
             html = html.replace('</body>', guide_redirect(pages.GUIDE_PATH_OF) + '</body>', 1)
