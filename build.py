@@ -17,8 +17,6 @@ PAGER_ORDER = [('/install/', 'Install'), ('/guide/', 'Guide'), ('/smart-features
                ('/privacy/', 'Privacy'), ('/development/', 'Development')]
 SEARCH_PAGES = {'/guide/': 'Guide', '/privacy/': 'Privacy', '/install/': 'Install', '/development/': 'Development', '/smart-features/': 'Smart features'}
 SITE_PATHS = ['/', '/guide/', '/privacy/', '/install/', '/development/', '/smart-features/', '/releases/', '/whats-new/', '/accessibility/']
-RELEASES_API = 'https://api.github.com/repos/deansasek/library/releases'
-MAX_RELEASES = 10
 REPO = 'https://github.com/deansasek/library'
 CHEV_R = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 6 6 6-6 6"/></svg>'
 CHEV_L = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 6-6 6 6 6"/></svg>'
@@ -97,11 +95,12 @@ def search_box(path):
             '<ul class="results" hidden></ul></div>')
 
 
-def page(path, title, desc, lede, toc, sections, plain=False, extra=''):
+def page(path, title, desc, lede, toc, sections, plain=False, extra='', released=None):
     toc_items = ''.join(f'<li><a href="#{i}">{l}</a></li>' for i, l in toc)
     body = ''.join(f'<section id="{i}"><h2>{h}</h2>{html}</section>'
                    for i, h, html in sections)
-    related = ''.join(f'<li><a href="{h}">{l}</a></li>' for h, l in RELATED.get(path, []))
+    rel_items = RELATED.get(path, [('/whats-new/', "What's new"), ('/install/', 'Install'), ('/guide/', 'Guide')] if path.startswith('/whats-new/') else [])
+    related = ''.join(f'<li><a href="{h}">{l}</a></li>' for h, l in rel_items)
     back = f'<p class="back"><a href="/">{CHEV_L}Back to Library</a></p>'
     if plain:
         return (head(title, desc, path) + header() +
@@ -109,7 +108,7 @@ def page(path, title, desc, lede, toc, sections, plain=False, extra=''):
                 + footer() + '\n</body>\n</html>\n')
     return (head(title, desc, path) + header() +
             f'<main id="main" class="doc">{back}<h1>{title}</h1><p class="lede">{lede}</p>'
-            f'<p class="updated">Applies to the current release of Library. Last reviewed {REVIEWED_LABEL}.</p>'
+            f'<p class="updated">' + (f'Released {released}. ' if released else 'Applies to the current release of Library. ') + f'Last reviewed {REVIEWED_LABEL}.</p>'
             f'<div class="article"><nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p>{search_box(path)}<ol>{toc_items}</ol></nav>'
             f'<div class="content">{body}'
             f'<section class="related"><h2>Related</h2><ul>{related}</ul></section>'
@@ -193,78 +192,15 @@ def update_landing():
     open(p, 'w').write(s)
 
 
-def fetch_releases():
-    """The latest releases from GitHub, newest first, or None when the network is unavailable."""
-    req = urllib.request.Request(RELEASES_API, headers={'User-Agent': 'library-site-build',
-                                                        'Accept': 'application/vnd.github+json'})
-    try:
-        with urllib.request.urlopen(req, timeout=10) as r:
-            data = json.load(r)
-    except Exception as e:
-        print(f"release notes skipped: {e}")
-        return None
-    out = []
-    for rel in data[:MAX_RELEASES]:
-        if rel.get('draft'):
-            continue
-        out.append({'tag': rel.get('tag_name', ''), 'name': rel.get('name') or rel.get('tag_name', ''),
-                    'published': rel.get('published_at') or '', 'body': rel.get('body') or ''})
-    return out
-
-
-def markdown_to_html(text):
-    """Plain paragraphs and lists. Everything is escaped, so no HTML from release notes is kept."""
-    text = re.sub(r'!\[[^\]]*\]\([^)]*\)', '', text)
-    text = re.sub(r'\[([^\]]+)\]\([^)]*\)', r'\1', text)
-    text = re.sub(r'\*\*(.+?)\*\*|__(.+?)__', lambda m: m.group(1) or m.group(2), text)
-    text = re.sub(r'`([^`]*)`', r'\1', text)
-    out, para, items = [], [], []
-
-    def flush():
-        if para:
-            out.append('<p>' + H.escape(' '.join(para)) + '</p>')
-            para.clear()
-        if items:
-            out.append('<ul>' + ''.join('<li>' + H.escape(i) + '</li>' for i in items) + '</ul>')
-            items.clear()
-    for line in text.splitlines():
-        stripped = line.strip()
-        if not stripped:
-            flush()
-        elif re.match(r'^[-*+]\s+', stripped):
-            if para:
-                flush()
-            items.append(re.sub(r'^[-*+]\s+', '', stripped))
-        elif re.match(r'^#{1,6}\s+', stripped):
-            flush()
-            out.append('<p><strong>' + H.escape(re.sub(r'^#{1,6}\s+', '', stripped)) + '</strong></p>')
-        else:
-            if items:
-                flush()
-            para.append(stripped)
-    flush()
-    return ''.join(out)[:6000]
-
-
-def release_sections():
-    """Turn the fetched releases into page sections, or None if they could not be fetched."""
-    releases = fetch_releases()
-    if releases is None:
-        return None
-    sections = []
-    for r in releases:
-        try:
-            date = datetime.datetime.strptime(r['published'][:10], '%Y-%m-%d').strftime('%B %d, %Y').replace(' 0', ' ')
-        except ValueError:
-            date = ''
-        sections.append({'id': re.sub(r'[^a-z0-9]+', '-', r['tag'].lower()).strip('-') or 'release',
-                         'title': H.escape(r['name']), 'date': date, 'notes': markdown_to_html(r['body'])})
-    return sections
-
+def search_box(path):
+    if path not in SEARCH_PAGES:
+        return ''
+    return ('<div class="search" hidden><label class="visually-hidden" for="docs-search">Search the docs</label>'
+            '<input id="docs-search" type="search" placeholder="Search the docs" autocomplete="off">'
+            '<ul class="results" hidden></ul></div>')
 
 def path_key(path):
     return path.replace('index.html', '')
-
 
 def pager(path):
     """Previous and next links between the docs pages, in PAGER_ORDER."""
@@ -276,7 +212,6 @@ def pager(path):
     if i < len(keys) - 1:
         parts.append(f'<a class="next" href="{keys[i+1]}">Next: {PAGER_ORDER[i+1][1]}</a>')
     return '<nav class="pager" aria-label="Previous and next pages">' + ''.join(parts) + '</nav>'
-
 
 def write_search_index(rendered):
     """A small JSON index of each docs section's heading and first sentence, for script.js."""
@@ -323,8 +258,6 @@ def build_all(check=False):
     spec = importlib.util.spec_from_file_location('pages', os.path.join(ROOT, 'content', 'pages.py'))
     pages = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(pages)
-    pages.RELEASES = release_sections()
-    pages.to_html = markdown_to_html
     reviewed_on = pages.REVIEWED_DATE or TODAY
     REVIEWED_LABEL = reviewed_on.strftime('%B %d, %Y').replace(' 0', ' ')
     rendered = pages.render(page)

@@ -1,3 +1,5 @@
+import re
+import os
 """Page copy for the site. Setting and menu names match the app's own labels.
 
 Values to bump at each release (the only place they live):
@@ -14,6 +16,21 @@ RELEASES = None
 to_html = None
 
 LEFT = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 6-6 6 6 6"/></svg>'
+
+
+def release_page(page, r):
+    """One page per large release: summary, sidebar contents, sections, download line, Related."""
+    toc = [(re.sub(r'[^a-z0-9]+', '-', h.lower()).strip('-'), h) for h, _ in r['sections']]
+    sections = []
+    for h, items in r['sections']:
+        sid = re.sub(r'[^a-z0-9]+', '-', h.lower()).strip('-')
+        sections.append((sid, h, '<ul>' + ''.join(f'<li>{i}</li>' for i in items) + '</ul>'))
+    tag = r['tag']
+    download = (f'<p>Download Library {r["version"]} from the <a href="https://github.com/deansasek/library/releases/tag/{tag}" '
+                'rel="noopener noreferrer">GitHub release page</a>, or install it with the command on the <a href="/install/">install page</a>.</p>')
+    sections.append(('download', 'Download', download))
+    return page('/whats-new/' + r['id'] + '/', f'Library {r["version"]}', r['summary'], r['intro'], toc, sections,
+                released=r['date'])
 
 
 def render(page):
@@ -267,21 +284,24 @@ git push origin vX.Y.Z</code></pre></div>
         acc_toc, acc)
 
     # ---------- What's new ----------
-    if RELEASES is None:
-        extra = ('<p>The release list could not be loaded when this page was built. '
-                 'See the releases on GitHub.</p>')
-    else:
-        extra = ''
-        for r in RELEASES:
-            extra += (f'<section id="{r["id"]}"><h2>{r["title"]}</h2>'
-                      f'<p class="updated">{r["date"]}</p>{r["notes"]}</section>')
+    # Major and minor feature releases only. Data lives in content/whats_new.py.
+    import importlib.util as _ilu
+    _spec = _ilu.spec_from_file_location('whats_new', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'whats_new.py'))
+    _wn = _ilu.module_from_spec(_spec)
+    _spec.loader.exec_module(_wn)
+    entries = ''
+    for i, r in enumerate(_wn.RELEASES):
+        badge = '<span class="badge">Latest</span>' if i == 0 else ''
+        entries += (f'<section class="release"><h2><a href="/whats-new/{r["id"]}/">Library {r["version"]}</a></h2>'
+                    f'<p class="updated">{r["date"]} {badge}</p><p>{r["summary"]}</p></section>')
+    if not _wn.RELEASES:
+        entries = '<p>No release notes yet.</p>'
     out['/whats-new/index.html'] = page('/whats-new/', "What's new",
-        'Release notes for each version of Library, newest first.',
-        "Release notes for each version of Library, newest first.",
-        [], [], plain=True, extra=(
-            extra +
-            '<ul class="links"><li><a href="https://github.com/deansasek/library/releases" rel="noopener noreferrer">'
-            'See All Releases</a></li></ul>'))
+        'What each major and minor release of Library brings, newest first.',
+        "What each major and minor release of Library brings, newest first.",
+        [], [], plain=True, extra=entries + '<p class="links"><a href="https://github.com/deansasek/library/releases" rel="noopener noreferrer">See all releases on GitHub</a></p>')
+    for r in _wn.RELEASES:
+        out['/whats-new/' + r['id'] + '/index.html'] = release_page(page, r)
 
     # ---------- 404 ----------
     out['/404.html'] = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
