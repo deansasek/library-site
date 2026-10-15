@@ -44,7 +44,7 @@ def render(page):
         ('organize-your-library', 'Organize your library'), ('edit-an-item', 'Edit an item'), ('color-items', 'Color items'),
         ('add-notes', 'Add notes'), ('use-templates', 'Use templates'), ('read-later', 'Read later'),
         ('shortcuts', 'Shortcuts'), ('work-with-other-apps', 'Work with other apps'),
-        ('stay-up-to-date', 'Stay up to date'), ('check-links', 'Check links'), ('settings', 'Settings'),
+        ('stay-up-to-date', 'Stay up to date'), ('check-links', 'Check links'), ('back-up-and-restore', 'Back up and restore'), ('settings', 'Settings'),
         ('permissions', 'Permissions'), ('troubleshooting', 'Troubleshooting'),
     ]
     guide = [
@@ -138,6 +138,13 @@ def render(page):
 <li>A bookmark whose page is missing or can't be reached shows a warning in <strong>Edit Library</strong>.</li>
 </ul>
 <p>To check now, choose <strong>File &gt; Check Links</strong>.</p>'''),
+        ('back-up-and-restore', 'Back up and restore', '''<p>Export saves your library to one file, and Restore brings it back. Both are in <strong>Settings &gt; General</strong>. You can also choose <strong>File &gt; Export Library…</strong>.</p>
+<ul>
+<li><strong>Export…</strong> saves your bookmarks, folders, shortcuts, icons, keywords, colors, templates, and Open at login settings to a JSON file named <code>Library Backup</code> with the date.</li>
+<li><strong>Restore…</strong> opens a backup. Library shows how many items your library has and how many the backup has, then asks you to confirm. Choose <strong>Replace Library</strong> to continue. Cancel is the default button.</li>
+<li><strong>Undo</strong> brings back the library you had before the restore.</li>
+</ul>
+<p>Clipboard items are not in a backup. Pinned clipboard items are encrypted with a key that stays on this Mac. Recently Deleted items in a backup stay deleted after a restore.</p>'''),
         ('settings', 'Settings', '''<p>Press ⌘, to open Settings.</p>
 <ul>
 <li><strong>General:</strong> startup, iCloud Drive, automatic update checks, link checks, names for new bookmarks, backup and restore, and link cleaning.</li>
