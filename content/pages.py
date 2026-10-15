@@ -30,7 +30,7 @@ def release_page(page, r):
     download = (f'<p>Download Library {r["version"]} from the <a href="https://github.com/deansasek/library/releases/tag/{tag}" '
                 'rel="noopener noreferrer">GitHub release page</a>, or install it with the command on the <a href="/install/">install page</a>.</p>')
     sections.append(('download', 'Download', download))
-    return page('/whats-new/' + r['id'] + '/', f'Library {r["version"]}', r['summary'], r['intro'], toc, sections,
+    return page('/whats-new/' + r['id'] + '/', f"What's new in Library {r['version']}", r['summary'], r['intro'], toc, sections,
                 released=r['date'])
 
 
@@ -139,7 +139,7 @@ def render(page):
 <li><strong>Services don't appear.</strong> Log out and back in, or run <code>/System/Library/CoreServices/pbs -update</code>.</li>
 </ul>'''),
     ]
-    out['/guide/index.html'] = page('/guide/', 'Guide', 'Every feature, setting, and permission in Library.',
+    out['/guide/index.html'] = page('/guide/', 'Library guide: features, settings, and permissions', 'Every feature, setting, and permission in Library.',
                                     'Every feature, setting, and permission in Library, with the steps to use each one.',
                                     guide_toc, guide)
 
@@ -181,7 +181,7 @@ def render(page):
 <h3>Temporary files</h3>
 <p>Some files are written briefly to the system's temporary folder and then removed. A copy of a clip is written while you preview it in Quick Look. A terminal command is written as a script that deletes itself when Terminal runs it. A calendar event is written as an <code>.ics</code> file for Calendar. <strong>Export</strong> writes a backup file to the place you choose. It does not include clipboard items.</p>'''),
     ]
-    out['/privacy/index.html'] = page('/privacy/', 'Privacy', 'What Library stores, where it stores it, and what it sends over the network.',
+    out['/privacy/index.html'] = page('/privacy/', 'Privacy in Library: what is stored and sent', 'What Library stores, where it stores it, and what it sends over the network.',
                                       'What Library stores, where it stores it, and what it sends over the network.',
                                       privacy_toc, privacy)
 
@@ -210,7 +210,7 @@ def render(page):
 </ol>
 <p>Your library and clipboard history stay in <code>~/.library</code>. Removing the app doesn't remove that folder. Move it to the Trash too if you want to delete your data.</p>'''),
     ]
-    out['/install/index.html'] = page('/install/', 'Install', 'Requirements, the one-command install, updates, and how to uninstall Library.',
+    out['/install/index.html'] = page('/install/', 'Install Library on macOS with one command', 'Requirements, the one-command install, updates, and how to uninstall Library.',
                                       'Install Library with one command in Terminal. Requires macOS 26 or later.',
                                       install_toc, install)
 
@@ -229,7 +229,7 @@ git push origin vX.Y.Z</code></pre></div>
 <p>Write each user-facing string as <code>Text("…", bundle: L10n.bundle)</code>, or as <code>String(localized: "…", bundle: L10n.bundle)</code> where a <code>String</code> is needed. To add a string, add a line such as <code>"key" = "value";</code> with a <code>/* comment */</code> above it.</p>
 <p>Dynamic text, such as file names, counts, and clipboard contents, isn't localized.</p>'''),
     ]
-    out['/development/index.html'] = page('/development/', 'Development', 'Build, test, and release Library, and add languages.',
+    out['/development/index.html'] = page('/development/', 'Building, testing, and releasing Library', 'Build, test, and release Library, and add languages.',
                                           'How to build, test, and release Library, and how text is localized.',
                                           dev_toc, dev)
 
@@ -243,13 +243,13 @@ git push origin vX.Y.Z</code></pre></div>
 <p>Library reads only the start of the page, and it requests each new bookmark's page once.</p>'''),
         ('smart-sorting', 'Smart sorting', '''<p>In the Edit Library window, open the sort menu in the header. Choose <strong>Most Used</strong> or <strong>Recently Opened</strong>.</p>'''),
     ]
-    out['/smart-features/index.html'] = page('/smart-features/', 'Smart features', 'Smart actions, Smart Punctuation, smart titles, and smart sorting in Library.',
+    out['/smart-features/index.html'] = page('/smart-features/', 'Smart actions and smart titles in Library', 'Smart actions, Smart Punctuation, smart titles, and smart sorting in Library.',
                                              'Library works out what you copied and what you are doing. The next step is one choice away.',
                                              smart_toc, smart)
 
     # ---------- Releases ----------
     # No version or date here: the links always show the current release on GitHub.
-    out['/releases/index.html'] = page('/releases/', 'Releases', 'Download and read the notes for every Library release on GitHub.',
+    out['/releases/index.html'] = page('/releases/', 'Library releases: latest version and downloads', 'Download and read the notes for every Library release on GitHub.',
         'Release notes and downloads for every version of Library are on GitHub.',
         [], [], plain=True, extra=(
             '<ul class="links">'
@@ -279,7 +279,7 @@ git push origin vX.Y.Z</code></pre></div>
 </ul>
 <p>Turn these on in <strong>System Settings</strong>. Library follows them.</p>"""),
     ]
-    out['/accessibility/index.html'] = page('/accessibility/', 'Accessibility',
+    out['/accessibility/index.html'] = page('/accessibility/', 'Accessibility in Library: VoiceOver, keyboard, and motion',
         'How Library works with VoiceOver, the keyboard, Reduce Motion, and Increase Contrast.',
         'Library supports VoiceOver, keyboard use, Reduce Motion, and Increase Contrast. This page lists what the app does.',
         acc_toc, acc)
@@ -297,7 +297,7 @@ git push origin vX.Y.Z</code></pre></div>
                     f'<p class="updated">{r["date"]} {badge}</p><p>{r["summary"]}</p></section>')
     if not _wn.RELEASES:
         entries = '<p>No release notes yet.</p>'
-    out['/whats-new/index.html'] = page('/whats-new/', "What's new",
+    out['/whats-new/index.html'] = page('/whats-new/', "What's new in Library: release notes",
         'What each major and minor release of Library brings, newest first.',
         "What each major and minor release of Library brings, newest first.",
         [], [], plain=True, extra=entries + '<p class="links"><a href="https://github.com/deansasek/library/releases" rel="noopener noreferrer">See all releases on GitHub</a></p>')
@@ -308,7 +308,7 @@ git push origin vX.Y.Z</code></pre></div>
     out['/404.html'] = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
                         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
                         '<title>Page not found</title>\n<meta name="description" content="This page does not exist in Library.">\n'
-                        '<meta name="robots" content="noindex">\n<link rel="icon" type="image/png" sizes="256x256" href="/assets/icon.png">\n'
+                        '<meta name="robots" content="noindex">\n<link rel="canonical" href="https://getlibrary.app/404.html">\n<meta property="og:title" content="Page not found">\n<meta property="og:url" content="https://getlibrary.app/404.html">\n<meta property="og:description" content="This page does not exist in Library.">\n<meta property="og:image" content="https://getlibrary.app/assets/icon.png">\n<meta property="og:image:alt" content="Library app icon">\n<meta name="twitter:card" content="summary">\n<link rel="icon" type="image/png" sizes="256x256" href="/assets/icon.png">\n'
                         '<link rel="stylesheet" href="/styles.css">\n</head>\n<body>\n'
                         '<a class="skip-link" href="#main">Skip to content</a>\n'
                         + '__HEADER__' + '\n<main id="main" class="notfound"><h1>Page not found</h1>'

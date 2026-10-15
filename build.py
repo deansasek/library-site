@@ -41,10 +41,10 @@ def header():
 
 def footer():
     return ('<footer><nav class="footer-cols" aria-label="Footer">'
-            f'<div><p class="ft">Project</p><a href="{REPO}" rel="noopener noreferrer">GitHub</a>'
+            f'<div><p class="ft">Project</p><a href="{REPO}" rel="noopener noreferrer">GitHub</a><a href="/development/">Development</a>'
             '<a href="https://buymeacoffee.com/deansasek" rel="noopener noreferrer">Support</a>'
             '</div>'
-            '<div><p class="ft">Guide</p><a href="/guide/">Feature guide</a></div>'
+            '<div><p class="ft">Guide</p><a href="/guide/">Feature guide</a><a href="/smart-features/">Smart features</a></div>'
             '<div><p class="ft">Privacy</p><a href="/privacy/">Privacy guide</a></div>'
             '<div><p class="ft">Releases</p><a href="/whats-new/">What\'s new</a></div>'
             f'</nav><p class="legal">Library is open source. &copy; {YEAR}. Library is available under the <a href="https://github.com/deansasek/library/blob/main/LICENSE" rel="noopener noreferrer">MIT License</a>.</p></footer>')
@@ -52,7 +52,7 @@ def footer():
 
 def head(title, desc, path):
     url = 'https://getlibrary.app' + path
-    t = 'Library' if title == 'Library' else f'{title} · Library'
+    t = title if 'Library' in title else f'{title} · Library'
     return f'''<!doctype html>
 <html lang="en">
 <head>
@@ -68,7 +68,11 @@ def head(title, desc, path):
 <meta property="og:type" content="website">
 <meta property="og:url" content="{url}">
 <meta property="og:image" content="https://getlibrary.app/assets/icon.png">
+<meta property="og:image:alt" content="Library app icon">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="{t}">
+<meta name="twitter:description" content="{desc}">
+<meta name="twitter:image" content="https://getlibrary.app/assets/icon.png">
 <link rel="icon" type="image/png" sizes="256x256" href="/assets/icon.png">
 <link rel="apple-touch-icon" href="/assets/icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
@@ -198,8 +202,6 @@ def update_landing():
     s = re.sub(r'<footer>.*?</footer>', lambda m: footer(), s, flags=re.S)
     s = re.sub(r'\s*<meta name="color-scheme"[^>]*>', '', s)
     s = re.sub(r'\s*<meta property="og:site_name"[^>]*>', '', s)
-    s = re.sub(r'\s*<meta property="og:image:(?:width|height|alt)"[^>]*>', '', s)
-    s = re.sub(r'\s*<meta name="twitter:(?:title|description|image)"[^>]*>', '', s)
     # Hand-written links on the landing page use ./folder/ or ./; point them at index.html too.
     s = re.sub(r'href="\./([a-z-]+/)(#[^"]*)?"', r'href="./\1index.html\2"', s)
     s = s.replace('href="./"', 'href="./index.html"')
