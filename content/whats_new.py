@@ -58,7 +58,7 @@ RELEASES = [
             ('Fixed', [
                 'Your bookmarks file stays private.',
                 'Terminal command files are private from the moment they are created.',
-                'Services accept only web links.',
+                'Services accept only web links from text selections.',
                 'Leftover Quick Look copies are cleared when Library launches.',
                 'Merging duplicates keeps the shortcuts of the copies.',
             ]),
