@@ -136,9 +136,16 @@ def relativize(html, path):
         attr, value = m.group(1), m.group(2)
         if value.startswith('//'):
             return m.group(0)
-        if value == '/':
-            return f'{attr}="{base or "./"}"'
-        return f'{attr}="{base}{value[1:]}"'
+        path, sep, frag = value.partition('#')
+        # A folder link points at its index.html, so it also opens from disk (file://).
+        if path == '/':
+            path = '/index.html'
+        elif path.endswith('/'):
+            path = path + 'index.html'
+        target = base + path[1:]
+        if target == '':
+            target = './'
+        return f'{attr}="{target}{sep}{frag}"'
     return re.sub(r'\b(href|src)="(/[^"]*)"', fix, html)
 
 
