@@ -5,14 +5,16 @@ Shared head, nav, and footer markup lives here, so every page stays in sync.
 The landing page (index.html) keeps its own body, but its nav and footer are
 rewritten from the same templates. Output is plain static HTML and CSS.
 """
-import datetime, json, os, re, sys, urllib.request
+import datetime, html as H, json, os, re, sys, urllib.request
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 TODAY = datetime.date.today()
 YEAR = TODAY.year
 REVIEWED_LABEL = TODAY.strftime('%B %d, %Y').replace(' 0', ' ')
 REPO_API = 'https://api.github.com/repos/deansasek/library/releases/latest'
-SITE_PATHS = ['/', '/guide/', '/privacy/', '/install/', '/development/', '/smart-features/', '/releases/']
+SITE_PATHS = ['/', '/guide/', '/privacy/', '/install/', '/development/', '/smart-features/', '/releases/', '/whats-new/', '/accessibility/']
+RELEASES_API = 'https://api.github.com/repos/deansasek/library/releases'
+MAX_RELEASES = 10
 REPO = 'https://github.com/deansasek/library'
 CHEV_R = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 6 6 6-6 6"/></svg>'
 CHEV_L = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 6-6 6 6 6"/></svg>'
@@ -36,9 +38,9 @@ def footer():
             f'<a href="{REPO}" rel="noopener noreferrer">GitHub</a><a href="/install/">Install</a></div>'
             '<div><p class="ft">Guide</p>'
             '<a href="/guide/">Feature guide</a><a href="/smart-features/">Smart features</a></div>'
-            '<div><p class="ft">Privacy</p><a href="/privacy/">Privacy</a></div>'
+            '<div><p class="ft">Privacy</p><a href="/privacy/">Privacy</a><a href="/accessibility/">Accessibility</a></div>'
             '<div><p class="ft">Releases</p>'
-            f'<a href="/releases/">Latest version</a><a href="{REPO}/releases" rel="noopener noreferrer">All releases</a></div>'
+            f'<a href="/whats-new/">What\'s new</a><a href="/releases/">Latest version</a><a href="{REPO}/releases" rel="noopener noreferrer">All releases</a></div>'
             f'</nav><p class="legal">Library is open source. &copy; {YEAR}</p></footer>')
 
 
@@ -172,6 +174,75 @@ def update_landing():
     open(p, 'w').write(s)
 
 
+def fetch_releases():
+    """The latest releases from GitHub, newest first, or None when the network is unavailable."""
+    req = urllib.request.Request(RELEASES_API, headers={'User-Agent': 'library-site-build',
+                                                        'Accept': 'application/vnd.github+json'})
+    try:
+        with urllib.request.urlopen(req, timeout=10) as r:
+            data = json.load(r)
+    except Exception as e:
+        print(f"release notes skipped: {e}")
+        return None
+    out = []
+    for rel in data[:MAX_RELEASES]:
+        if rel.get('draft'):
+            continue
+        out.append({'tag': rel.get('tag_name', ''), 'name': rel.get('name') or rel.get('tag_name', ''),
+                    'published': rel.get('published_at') or '', 'body': rel.get('body') or ''})
+    return out
+
+
+def markdown_to_html(text):
+    """Plain paragraphs and lists. Everything is escaped, so no HTML from release notes is kept."""
+    text = re.sub(r'!\[[^\]]*\]\([^)]*\)', '', text)
+    text = re.sub(r'\[([^\]]+)\]\([^)]*\)', r'\1', text)
+    text = re.sub(r'\*\*(.+?)\*\*|__(.+?)__', lambda m: m.group(1) or m.group(2), text)
+    text = re.sub(r'`([^`]*)`', r'\1', text)
+    out, para, items = [], [], []
+
+    def flush():
+        if para:
+            out.append('<p>' + H.escape(' '.join(para)) + '</p>')
+            para.clear()
+        if items:
+            out.append('<ul>' + ''.join('<li>' + H.escape(i) + '</li>' for i in items) + '</ul>')
+            items.clear()
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            flush()
+        elif re.match(r'^[-*+]\s+', stripped):
+            if para:
+                flush()
+            items.append(re.sub(r'^[-*+]\s+', '', stripped))
+        elif re.match(r'^#{1,6}\s+', stripped):
+            flush()
+            out.append('<p><strong>' + H.escape(re.sub(r'^#{1,6}\s+', '', stripped)) + '</strong></p>')
+        else:
+            if items:
+                flush()
+            para.append(stripped)
+    flush()
+    return ''.join(out)[:6000]
+
+
+def release_sections():
+    """Turn the fetched releases into page sections, or None if they could not be fetched."""
+    releases = fetch_releases()
+    if releases is None:
+        return None
+    sections = []
+    for r in releases:
+        try:
+            date = datetime.datetime.strptime(r['published'][:10], '%Y-%m-%d').strftime('%B %d, %Y').replace(' 0', ' ')
+        except ValueError:
+            date = ''
+        sections.append({'id': re.sub(r'[^a-z0-9]+', '-', r['tag'].lower()).strip('-') or 'release',
+                         'title': H.escape(r['name']), 'date': date, 'notes': markdown_to_html(r['body'])})
+    return sections
+
+
 def check_release(reviewed):
     """Warn if the latest GitHub release is newer than the version the docs were reviewed against.
 
@@ -198,6 +269,8 @@ def build_all(check=False):
     spec = importlib.util.spec_from_file_location('pages', os.path.join(ROOT, 'content', 'pages.py'))
     pages = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(pages)
+    pages.RELEASES = release_sections()
+    pages.to_html = markdown_to_html
     reviewed_on = pages.REVIEWED_DATE or TODAY
     REVIEWED_LABEL = reviewed_on.strftime('%B %d, %Y').replace(' 0', ' ')
     for path, html in pages.render(page).items():

@@ -9,6 +9,10 @@ import datetime
 REVIEWED_VERSION = '1.6.1'
 REVIEWED_DATE = None
 
+# Set by build.py at build time: the latest releases from GitHub (or None when offline) and the Markdown converter.
+RELEASES = None
+to_html = None
+
 LEFT = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 6-6 6 6 6"/></svg>'
 
 
@@ -225,6 +229,49 @@ git push origin vX.Y.Z</code></pre></div>
             '<li><a href="https://github.com/deansasek/library/releases/latest" rel="noopener noreferrer">Get the Latest Release</a></li>'
             '<li><a href="https://github.com/deansasek/library/releases" rel="noopener noreferrer">See All Releases</a></li>'
             '</ul>'))
+
+    # ---------- Accessibility ----------
+    acc_toc = [('vision-and-motion', 'Motion and contrast'), ('keyboard', 'Keyboard'), ('voiceover', 'VoiceOver')]
+    acc = [
+        ('keyboard', 'Keyboard', """<p>Library works from the keyboard.</p>
+<ul>
+<li><strong>Control-Space</strong> opens Quick Open. Type to search, press <strong>↑</strong> or <strong>↓</strong> to move, and press <strong>Return</strong> to open the result. See <a href="/guide/#find-it-with-quick-open">Find it with Quick Open</a>.</li>
+<li><strong>Tab</strong> opens a result the other way, or shows its other options.</li>
+<li><strong>Space</strong> previews the selected item in Quick Look.</li>
+<li><strong>Escape</strong> closes Quick Open.</li>
+<li>In dialogs and sheets, <strong>Return</strong> confirms the default button, and <strong>Escape</strong> cancels.</li>
+</ul>
+<p>You can change the global keys in <a href="/guide/#shortcuts">Shortcuts</a>.</p>"""),
+        ('voiceover', 'VoiceOver', """<p>Main controls have VoiceOver labels. Examples include <strong>Search Library</strong> in Quick Open, <strong>Actions</strong>, <strong>Sort</strong>, <strong>Add</strong>, <strong>Share</strong>, <strong>Delete</strong>, and <strong>Get Info</strong> in Edit Library.</p>
+<p>Warnings about shortcuts that another app uses are labeled too.</p>
+<p>To organize your library, see <a href="/guide/#organize-your-library">Organize your library</a>.</p>"""),
+        ('vision-and-motion', 'Motion and contrast', """<ul>
+<li><strong>Reduce Motion.</strong> When Reduce Motion is on, Quick Open's appearance animation is turned off. The Welcome screen does not animate between pages either.</li>
+<li><strong>Increase Contrast.</strong> Quick Open uses system colors, which adapt to light and dark appearance and to Increase Contrast.</li>
+</ul>
+<p>Turn these on in <strong>System Settings</strong>. Library follows them.</p>"""),
+    ]
+    out['/accessibility/index.html'] = page('/accessibility/', 'Accessibility',
+        'How Library works with VoiceOver, the keyboard, Reduce Motion, and Increase Contrast.',
+        'Library supports VoiceOver, keyboard use, Reduce Motion, and Increase Contrast. This page lists what the app does.',
+        acc_toc, acc)
+
+    # ---------- What's new ----------
+    if RELEASES is None:
+        extra = ('<p>The release list could not be loaded when this page was built. '
+                 'See the releases on GitHub.</p>')
+    else:
+        extra = ''
+        for r in RELEASES:
+            extra += (f'<section id="{r["id"]}"><h2>{r["title"]}</h2>'
+                      f'<p class="updated">{r["date"]}</p>{r["notes"]}</section>')
+    out['/whats-new/index.html'] = page('/whats-new/', "What's new",
+        'Release notes for each version of Library, newest first.',
+        "Release notes for each version of Library, newest first.",
+        [], [], plain=True, extra=(
+            extra +
+            '<ul class="links"><li><a href="https://github.com/deansasek/library/releases" rel="noopener noreferrer">'
+            'See All Releases</a></li></ul>'))
 
     # ---------- 404 ----------
     out['/404.html'] = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
