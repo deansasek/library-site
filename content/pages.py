@@ -331,13 +331,13 @@ def render(page):
 </ul>'''),
         ('help-menu', 'Help menu', '''<p>Help is at the bottom of the Library menu, the menu bar icon's menu. Open that menu, then choose <strong>Help</strong>. The Help menu also appears in the menu bar while the Edit Library window is active.</p>
 <ul>
-<li><strong>Library Help</strong> opens the Library README on GitHub.</li>
-<li><strong>Keyboard Shortcuts</strong> opens the shortcuts section of the README on GitHub.</li>
+<li><strong>Library Help</strong> opens this guide on the website.</li>
+<li><strong>Keyboard Shortcuts</strong> opens the shortcuts section of this guide.</li>
 <li><strong>Welcome Tour…</strong> opens the welcome screen. It is the same as <strong>Settings &gt; General &gt; Show…</strong>.</li>
 <li><strong>Report an Issue…</strong> opens a new issue on GitHub.</li>
 <li><strong>Support Library…</strong> opens the support page, which is the only place Library asks for support.</li>
 </ul>
-<p>The GitHub and support links open in your default browser. Library does not load them.</p>'''),
+<p>Help, support, and issue links open in your default browser. Library does not load them.</p>'''),
         ('troubleshooting', 'Troubleshooting', '''<ul>
 <li><strong>A shortcut doesn't work.</strong> Another app may use the same keys. Check <strong>Settings &gt; Shortcuts</strong>. If the shortcut conflicts, see <a href="#shortcuts-conflicts">Conflicts</a>.</li>
 <li><strong>Clicks stop working after a macOS update.</strong> Remove Library from Accessibility, then add it again.</li>
