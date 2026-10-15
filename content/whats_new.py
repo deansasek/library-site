@@ -99,6 +99,26 @@ RELEASES = [
             ]),
         ],
     },
+    {
+        'id': '1-2-0', 'version': '1.2.0', 'tag': 'v1.2.0', 'date': 'October 14, 2026',
+        'summary': 'Import bookmarks from Safari and Chrome, preview clipboard items with Space, and add apps and folders from Finder.',
+        'intro': 'Library 1.2.0 imports bookmarks from Safari and Chrome, adds Quick Look for clipboard items, and lets you add apps and folders from Finder.',
+        'sections': [
+            ('New', [
+                'Import bookmarks from Safari and Chrome with <strong>File &gt; Import Bookmarks…</strong>. They go into one folder.',
+                'Preview a clipboard item in Quick Look with Space.',
+                'Add apps and folders from Finder with Services.',
+                'Shortcuts app actions for bookmarks, search, and the clipboard. These appear only in builds that include App Intents metadata.',
+            ]),
+            ('Improved', [
+                'The Edit Library window has a toolbar, search, and an empty state.',
+                'The menu item for editing an item is <strong>Edit…</strong>, instead of Get Info.',
+            ]),
+            ('Fixed', [
+                'Quick Open and the tag ring use the system secondary colors.',
+            ]),
+        ],
+    },
 ]
 
 LATEST = RELEASES[0]['id'] if RELEASES else None
