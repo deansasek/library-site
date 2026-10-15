@@ -289,7 +289,6 @@ def render(page):
 <li><strong>Check links periodically</strong>. Off by default. See <a href="/guide/#manager-check-links">Check links</a>.</li>
 <li><strong>Export…</strong> and <strong>Restore…</strong> save and restore your library. See <a href="/guide/#manager-export-and-restore">Back up and restore</a>.</li>
 <li><strong>Show…</strong> opens the welcome screen. It walks through finding things, your shortcuts, copying and pasting, organizing, working with other apps, and setting up access.</li>
-<li><strong>Remove tracking parameters when copying links</strong>. On by default. Library removes tracking codes such as <code>utm_source</code>, <code>fbclid</code>, and <code>gclid</code> from a link you copy. The rest of the link stays the same, and the saved link is not changed.</li>
 </ul>
 <h3>Shortcuts</h3>
 <ul>
@@ -307,6 +306,7 @@ def render(page):
 <li><strong>Keep clipboard history across restarts</strong>. Off by default. See <a href="/guide/#clipboard">Keep what you copy</a>.</li>
 <li><strong>Put the Latest Item on the Clipboard When Library Opens</strong>. Off by default. The newest saved item is copied when Library opens, so you can paste it right away. Clipboard history and its restart setting are covered in <a href="#clipboard-keep-clipboard-history-across-restarts">Keep clipboard history across restarts</a>.</li>
 <li><strong>Require Touch ID or password to show pinned items</strong>. Off by default. See <a href="/privacy/#touch-id-lock">Touch ID or password lock</a>.</li>
+<li><strong>Remove tracking parameters when copying links</strong>. On by default. Copy a link back from the history to use it. Library removes tracking codes such as <code>utm_source</code>, <code>fbclid</code>, and <code>gclid</code> from a link you copy. The rest of the link stays the same, and the saved link is not changed.</li>
 </ul>'''),
         ('storage', 'Storage and sync', '''<p>This is the one place that says where each kind of data is kept and whether it syncs. Other sections link here.</p>
 <table><thead><tr><th scope="col">Data</th><th scope="col">Where it is kept</th><th scope="col">Syncs</th></tr></thead><tbody>
