@@ -4,11 +4,45 @@
 Every published release is listed, patch releases included. Drafts and pre-releases are left out. The build reads
 this file, so it never needs the network. The sync workflow runs this and then the build.
 """
-import datetime, json, os, re, urllib.request
+import datetime, json, os, re, sys, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 API = 'https://api.github.com/repos/deansasek/library/releases?per_page=100'
 OUT = os.path.join(ROOT, 'content', 'releases.json')
+HEADERS = {'User-Agent': 'library-site-sync', 'Accept': 'application/vnd.github+json'}
+
+
+def next_page(link):
+    """The URL of the next page, from a GitHub Link header, or None on the last page."""
+    for part in (link or '').split(','):
+        m = re.match(r'\s*<([^>]+)>\s*;\s*rel="next"', part)
+        if m:
+            return m.group(1)
+    return None
+
+
+def fetch_releases():
+    """Every page of the releases, following the Link header. GitHub returns at most 100 per page."""
+    releases, url = [], API
+    while url:
+        with urllib.request.urlopen(urllib.request.Request(url, headers=HEADERS), timeout=30) as r:
+            releases.extend(json.load(r))
+            url = next_page(r.headers.get('Link'))
+    return releases
+
+
+def version_key(version):
+    """The numbers in a version, in order, so 1.10.0 sorts after 1.9.0. A version with no numbers sorts last."""
+    return [int(p) for p in re.findall(r'\d+', version)]
+
+
+def existing_count():
+    """How many releases the current file lists. A missing or unreadable file counts as none."""
+    try:
+        with open(OUT) as f:
+            return len(json.load(f))
+    except (OSError, ValueError):
+        return 0
 
 
 def notes(body):
@@ -26,18 +60,19 @@ def notes(body):
 
 
 def main():
-    req = urllib.request.Request(API, headers={'User-Agent': 'library-site-sync', 'Accept': 'application/vnd.github+json'})
-    with urllib.request.urlopen(req, timeout=30) as r:
-        releases = json.load(r)
     out = []
-    for r in releases:
+    for r in fetch_releases():
         if r.get('draft') or r.get('prerelease'):
             continue
         tag = r['tag_name']
         published = datetime.datetime.strptime(r['published_at'], '%Y-%m-%dT%H:%M:%SZ').date()
         out.append({'tag': tag, 'version': tag.lstrip('v'), 'date': published.isoformat(),
                     'url': r['html_url'], 'notes': notes(r.get('body'))})
-    out.sort(key=lambda x: [int(p) for p in x['version'].split('.')], reverse=True)
+    # Never shrink the list: a short or partial response would drop releases from the Releases page.
+    existing = existing_count()
+    if len(out) < existing:
+        sys.exit(f'refusing to write {len(out)} releases over the {existing} in {os.path.relpath(OUT, ROOT)}')
+    out.sort(key=lambda x: version_key(x['version']), reverse=True)
     with open(OUT, 'w') as f:
         json.dump(out, f, indent=2, ensure_ascii=False)
         f.write('\n')
