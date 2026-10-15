@@ -5,9 +5,14 @@ Shared head, nav, and footer markup lives here, so every page stays in sync.
 The landing page (index.html) keeps its own body, but its nav and footer are
 rewritten from the same templates. Output is plain static HTML and CSS.
 """
-import os, re
+import datetime, json, os, re, sys, urllib.request
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
+TODAY = datetime.date.today()
+YEAR = TODAY.year
+REVIEWED_LABEL = TODAY.strftime('%B %d, %Y').replace(' 0', ' ')
+REPO_API = 'https://api.github.com/repos/deansasek/library/releases/latest'
+SITE_PATHS = ['/', '/guide/', '/privacy/', '/install/', '/development/', '/smart-features/', '/releases/']
 REPO = 'https://github.com/deansasek/library'
 CHEV_R = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 6 6 6-6 6"/></svg>'
 CHEV_L = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 6-6 6 6 6"/></svg>'
@@ -26,7 +31,7 @@ def header():
 
 
 def footer():
-    return ('<footer><nav class="footer-cols" aria-label="Footer">'
+    return (f'<footer><nav class="footer-cols" aria-label="Footer">'
             '<div><p class="ft">Project</p>'
             f'<a href="{REPO}" rel="noopener noreferrer">GitHub</a><a href="/install/">Install</a></div>'
             '<div><p class="ft">Guide</p>'
@@ -34,7 +39,7 @@ def footer():
             '<div><p class="ft">Privacy</p><a href="/privacy/">Privacy</a></div>'
             '<div><p class="ft">Releases</p>'
             f'<a href="/releases/">Latest version</a><a href="{REPO}/releases" rel="noopener noreferrer">All releases</a></div>'
-            '</nav><p class="legal">Library is open source. &copy; 2026</p></footer>')
+            f'</nav><p class="legal">Library is open source. &copy; {YEAR}</p></footer>')
 
 
 def head(title, desc, path):
@@ -75,19 +80,21 @@ RELATED = {
     '/smart-features/': [('/guide/#keep-what-you-copy', 'Keep what you copy'), ('/guide/', 'Guide'), ('/privacy/', 'Privacy')],
     '/releases/': [('/install/', 'Install'), ('/guide/', 'Guide'), ('/development/', 'Development')],
 }
-RELEASE = ('October 14, 2026', 'v1.5.0')
 
 
-def page(path, title, desc, lede, toc, sections):
+def page(path, title, desc, lede, toc, sections, plain=False, extra=''):
     toc_items = ''.join(f'<li><a href="#{i}">{l}</a></li>' for i, l in toc)
     body = ''.join(f'<section id="{i}"><h2>{h}</h2>{html}</section>'
                    for i, h, html in sections)
     related = ''.join(f'<li><a href="{h}">{l}</a></li>' for h, l in RELATED.get(path, []))
     back = f'<p class="back"><a href="/">{CHEV_L}Back to Library</a></p>'
-    date, version = RELEASE
+    if plain:
+        return (head(title, desc, path) + header() +
+                f'<main id="main" class="doc">{back}<h1>{title}</h1><p class="lede">{lede}</p>{extra}</main>'
+                + footer() + '\n</body>\n</html>\n')
     return (head(title, desc, path) + header() +
             f'<main id="main" class="doc">{back}<h1>{title}</h1><p class="lede">{lede}</p>'
-            f'<p class="updated">Last updated {date} for Library {version}.</p>'
+            f'<p class="updated">Applies to the current release of Library. Last reviewed {REVIEWED_LABEL}.</p>'
             f'<div class="article"><nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ol>{toc_items}</ol></nav>'
             f'<div class="content">{body}'
             f'<section class="related"><h2>Related</h2><ul>{related}</ul></section>'
@@ -155,19 +162,48 @@ def update_landing():
     open(p, 'w').write(s)
 
 
-def build_all():
+def check_release(reviewed):
+    """Warn if the latest GitHub release is newer than the version the docs were reviewed against.
+
+    Never fails the build: a network error or timeout only prints a note.
+    """
+    req = urllib.request.Request(REPO_API, headers={'User-Agent': 'library-site-build',
+                                                    'Accept': 'application/vnd.github+json'})
+    try:
+        with urllib.request.urlopen(req, timeout=10) as r:
+            tag = json.load(r).get('tag_name', '')
+    except Exception as e:  # network down, rate limited, or no release yet
+        print(f'release check skipped: {e}')
+        return
+    if tag.lstrip('v') != reviewed:
+        print(f'WARNING: latest release is {tag}, but the docs were last reviewed against {reviewed}. '
+              'Review the docs, then set REVIEWED_VERSION in content/pages.py.')
+    else:
+        print(f'release check: the docs were reviewed against {reviewed}, the latest release.')
+
+
+def build_all(check=False):
+    global REVIEWED_LABEL
     import importlib.util
     spec = importlib.util.spec_from_file_location('pages', os.path.join(ROOT, 'content', 'pages.py'))
     pages = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(pages)
+    reviewed_on = pages.REVIEWED_DATE or TODAY
+    REVIEWED_LABEL = reviewed_on.strftime('%B %d, %Y').replace(' 0', ' ')
     for path, html in pages.render(page).items():
         html = html.replace('__HEADER__', header()).replace('__FOOTER__', footer())
         write(path, html)
     update_landing()
     css = open(os.path.join(ROOT, 'styles.css')).read()
     open(os.path.join(ROOT, 'styles.css'), 'w').write(minify_css(css))
+    urls = ''.join(f'  <url>\n    <loc>https://getlibrary.app{u}</loc>\n    <lastmod>{TODAY.isoformat()}</lastmod>\n  </url>\n'
+                   for u in SITE_PATHS)
+    open(os.path.join(ROOT, 'sitemap.xml'), 'w').write(
+        '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '</urlset>\n')
+    if check:
+        check_release(pages.REVIEWED_VERSION)
 
 
 if __name__ == '__main__':
-    build_all()
+    build_all(check='--check-release' in sys.argv)
     print('built')

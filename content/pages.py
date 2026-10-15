@@ -1,4 +1,13 @@
-"""Page copy for the site. Setting and menu names match the app's own labels."""
+"""Page copy for the site. Setting and menu names match the app's own labels.
+
+Values to bump at each release (the only place they live):
+  REVIEWED_VERSION  the Library release the docs were last checked against
+  REVIEWED_DATE     the "Last reviewed" date; None uses the build date
+"""
+import datetime
+
+REVIEWED_VERSION = '1.6.1'
+REVIEWED_DATE = None
 
 LEFT = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 6-6 6 6 6"/></svg>'
 
@@ -179,10 +188,10 @@ def render(page):
         ('build', 'Build', '''<p>Run <code>./build.sh</code> to build the app.</p>
 <p>Every pull request and every push to <code>main</code> builds the app and runs the checks on GitHub Actions.</p>'''),
         ('test', 'Test', '''<p>Run <code>./test.sh</code> to run the checks in <code>Tests/</code>. The checks use private pasteboards and temporary files. They never touch your clipboard or your library.</p>'''),
-        ('releasing', 'Releasing', '''<p>To publish a release, push a tag:</p>
-<div class="code-block"><pre><code>git tag v1.2.0
-git push origin v1.2.0</code></pre></div>
-<p>Or run the <strong>Release</strong> workflow by hand and enter a version. Either way, GitHub Actions builds and checks the app, then publishes <code>Library-1.2.0.zip</code>. The zip holds only the source needed to build the app. Tests, workflows, docs, and the icon script are left out.</p>
+        ('releasing', 'Releasing', '''<p>To publish a release, push a tag such as <code>vX.Y.Z</code>:</p>
+<div class="code-block"><pre><code>git tag vX.Y.Z
+git push origin vX.Y.Z</code></pre></div>
+<p>Or run the <strong>Release</strong> workflow by hand and enter a version. Either way, GitHub Actions builds and checks the app, then publishes <code>Library-X.Y.Z.zip</code>. The zip holds only the source needed to build the app. Tests, workflows, docs, and the icon script are left out.</p>
 <p>If publishing fails with a server error, the workflow retries up to four times. Running it again is safe. It skips a release that already exists.</p>'''),
         ('languages', 'Languages', '''<p>Library is in English. The text lives in <code>Sources/Library/Resources/en.lproj/Localizable.strings</code>.</p>
 <p>Write each user-facing string as <code>Text("…", bundle: L10n.bundle)</code>, or as <code>String(localized: "…", bundle: L10n.bundle)</code> where a <code>String</code> is needed. To add a string, add a line such as <code>"key" = "value";</code> with a <code>/* comment */</code> above it.</p>
@@ -207,18 +216,14 @@ git push origin v1.2.0</code></pre></div>
                                              smart_toc, smart)
 
     # ---------- Releases ----------
-    rel = [
-        ('latest', 'Latest version', '''<p class="version">Latest version: <strong>v1.5.0</strong>, published October 14, 2026.</p>
-<ul class="links">
-<li><a href="https://github.com/deansasek/library/releases/latest" rel="noopener noreferrer">Latest release on GitHub</a></li>
-<li><a href="https://github.com/deansasek/library/releases" rel="noopener noreferrer">All releases on GitHub</a></li>
-</ul>'''),
-        ('about-releases', 'About releases', '''<p>Each release is a zip named <code>Library-&lt;version&gt;.zip</code>. It holds the source, with only what's needed to build the app.</p>
-<p>To install a release, see <a href="/install/">Install</a>. Library checks for new releases itself. Choose <strong>Check for Updates…</strong> to install one.</p>'''),
-    ]
-    out['/releases/index.html'] = page('/releases/', 'Releases', 'The latest Library release and where to find every release.',
-                                       'The latest version of Library, and where to find every release on GitHub.',
-                                       [('latest', 'Latest version'), ('about-releases', 'About releases')], rel)
+    # No version or date here: the links always show the current release on GitHub.
+    out['/releases/index.html'] = page('/releases/', 'Releases', 'Download and read the notes for every Library release on GitHub.',
+        'Release notes and downloads for every version of Library are on GitHub.',
+        [], [], plain=True, extra=(
+            '<ul class="links">'
+            '<li><a href="https://github.com/deansasek/library/releases/latest" rel="noopener noreferrer">Latest release</a></li>'
+            '<li><a href="https://github.com/deansasek/library/releases" rel="noopener noreferrer">All releases</a></li>'
+            '</ul>'))
 
     # ---------- 404 ----------
     out['/404.html'] = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
