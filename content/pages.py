@@ -351,8 +351,8 @@ def render(page):
 <table><thead><tr><th scope="col">Data</th><th scope="col">Where it is kept</th><th scope="col">Syncs</th></tr></thead><tbody>
 <tr><th scope="row">The library: bookmarks, folders, colors, notes, Recently Deleted, the Reading List, and link check results</th><td><code>bookmarks.json</code> in the <code>.library</code> folder in your home folder</td><td>With <strong>Keep Library in iCloud Drive</strong> on, it is kept in iCloud Drive and syncs to your other Macs.</td></tr>
 <tr><th scope="row">Item shortcuts</th><td><code>bookmarks.json</code>, with the item</td><td>When the library is in iCloud Drive.</td></tr>
-<tr><th scope="row">Global shortcuts</th><td>Preferences on this Mac</td><td>No.</td></tr>
-<tr><th scope="row">Open counts and when each item was last opened</th><td>Preferences on this Mac</td><td>No. They drive Most Used and Recently Opened.</td></tr>
+<tr><th scope="row">Global shortcuts</th><td>App settings on this Mac</td><td>No.</td></tr>
+<tr><th scope="row">Open counts and when each item was last opened</th><td>App settings on this Mac</td><td>No. They drive Most Used and Recently Opened.</td></tr>
 <tr><th scope="row">Screenshots added to clipboard history</th><td>In clipboard history, like a copied image. Recordings are a link to the file, which stays where macOS saved it.</td><td>No. Stays on this Mac.</td></tr><tr><th scope="row">Pinned clipboard items</th><td><code>~/.library/clipboard.json</code></td><td>No. Stays on this Mac.</td></tr>
 <tr><th scope="row">Unpinned clipboard history, when <strong>Keep clipboard history across restarts</strong> is on</th><td><code>~/.library/clipboard-history.json</code></td><td>No. Stays on this Mac.</td></tr>
 </tbody></table>
