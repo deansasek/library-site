@@ -90,7 +90,7 @@ RELATED = {
     '/privacy/': [('/guide/#settings', 'Settings'), ('/guide/', 'Guide'), ('/install/', 'Install')],
     '/install/': [('/guide/', 'Guide'), ('/development/', 'Development'), ('/releases/', 'Releases')],
     '/development/': [('/install/', 'Install'), ('/releases/', 'Releases'), ('/guide/', 'Guide')],
-    '/smart-features/': [('/guide/#keep-what-you-copy', 'Keep what you copy'), ('/guide/', 'Guide'), ('/privacy/', 'Privacy')],
+    '/smart-features/': [('/guide/#clipboard', 'Clipboard'), ('/guide/', 'Guide'), ('/privacy/', 'Privacy')],
     '/releases/': [('/install/', 'Install'), ('/guide/', 'Guide'), ('/development/', 'Development')],
 }
 
