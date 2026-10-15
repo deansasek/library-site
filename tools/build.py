@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Writes the static site. Run: python3 build.py
+"""Writes the static site. Run from the repository root: python3 tools/build.py
 
 Shared head, nav, and footer markup lives here, so every page stays in sync.
 The landing page (index.html) keeps its own body, but its nav and footer are
@@ -7,7 +7,7 @@ rewritten from the same templates. Output is plain static HTML and CSS.
 """
 import datetime, html as H, json, os, re, sys, urllib.request
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TODAY = datetime.date.today()
 YEAR = TODAY.year
 REVIEWED_LABEL = TODAY.strftime('%B %d, %Y').replace(' 0', ' ')
