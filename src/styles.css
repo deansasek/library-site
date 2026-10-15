@@ -857,9 +857,12 @@ footer {
   border-radius: var(--radius-field);
   background: var(--bg);
 }
-.results-page {
+/* Group headings in the results read like the sidebar's section headers. The selector is specific so the
+   paragraph rules in the page's content do not override its size. */
+.results .results-page {
   margin: var(--space-3) 0 var(--space-1);
-  font-size: var(--type-small);
+  font-size: 12px;
+  font-weight: 600;
   color: var(--text-2);
 }
 .results ul {
