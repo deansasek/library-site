@@ -63,7 +63,7 @@ The guide is split into one page per task group. The groups and the features in 
 
 Release notes live in `content/whats_new.py`. Each large release has one entry in `RELEASES`, newest first. An entry has an `id` (the version with dashes, such as `1-6-0`), the `version`, the `tag`, the release `date`, a one-sentence `summary`, an `intro`, and sections of plain-language items. Add the entry at the top of the list and rebuild. The release page, its index entry, and its sitemap line are created from it.
 
-Patch releases do not get a page.
+Every release gets a page, patch releases included. The build stops if a published release has no entry, so write the entry before the release is published.
 
 The "Last reviewed" date and the version the docs were reviewed for are set at the top of `content/pages.py`.
 

@@ -6,6 +6,61 @@ Newest first. The first entry is marked Latest.
 
 RELEASES = [
     {
+        'id': '1-6-4', 'version': '1.6.4', 'tag': 'v1.6.4', 'date': 'October 15, 2026',
+        'summary': 'Help moves into the Library menu, and the welcome tour covers every feature.',
+        'intro': 'Library 1.6.4 puts Help at the bottom of the Library menu, and the welcome tour now covers each part of Library.',
+        'sections': [
+            ('Improved', [
+                'Help is in the Library menu, under <strong>Help</strong>. It has Library Help, Keyboard Shortcuts, Welcome Tour, Report an Issue, and Support Library.',
+                'The welcome tour has pages for finding things, copying and pasting, organizing, and working with other apps.',
+            ]),
+        ],
+    },
+    {
+        'id': '1-6-3', 'version': '1.6.3', 'tag': 'v1.6.3', 'date': 'October 15, 2026',
+        'summary': 'Screenshots and recordings join your clipboard history, and terminal commands can ask first.',
+        'intro': 'Library 1.6.3 adds screenshots and recordings to clipboard history, a setting to confirm terminal commands, and a way to install the Command Line Tools.',
+        'sections': [
+            ('New', [
+                'Screenshots and recordings are added to clipboard history as you take them. Turn this off in <strong>Settings &gt; Clipboard</strong>.',
+                'Confirm Terminal Commands asks before a terminal command runs. It is off by default.',
+                'Support Library in the Help menu opens the support page.',
+                'The install command installs the Command Line Tools if they are missing.',
+            ]),
+            ('Fixed', [
+                'Copying an item back from the clipboard menu keeps its source app.',
+            ]),
+        ],
+    },
+    {
+        'id': '1-6-2', 'version': '1.6.2', 'tag': 'v1.6.2', 'date': 'October 15, 2026',
+        'summary': 'Each folder can show or hide Open All, and link checks are described in plain language.',
+        'intro': 'Library 1.6.2 lets each folder show or hide Open All, and describes link checks in plain language. Library is now open source under the MIT License.',
+        'sections': [
+            ('New', [
+                'Each folder can show or hide <strong>Open All</strong>.',
+            ]),
+            ('Improved', [
+                'Link check results are described in plain language.',
+            ]),
+            ('Other', [
+                'Library is licensed under the MIT License.',
+                'The documentation matches the app, and the README links to the website.',
+            ]),
+        ],
+    },
+    {
+        'id': '1-6-1', 'version': '1.6.1', 'tag': 'v1.6.1', 'date': 'October 15, 2026',
+        'summary': 'Update in Terminal builds the new version, and new labels follow Apple capitalization.',
+        'intro': 'Library 1.6.1 fixes how Check for Updates installs a new version, and uses Apple capitalization in new labels.',
+        'sections': [
+            ('Improved', [
+                'Update in Terminal downloads, builds, and installs the new version, then removes the download. Your library is kept.',
+                'New labels use Apple capitalization.',
+            ]),
+        ],
+    },
+    {
         'id': '1-6-0', 'version': '1.6.0', 'tag': 'v1.6.0', 'date': 'October 15, 2026',
         'summary': 'Keep clipboard history across restarts, smart actions for detected text, notes, and a Reading List.',
         'intro': 'Library 1.6.0 keeps your clipboard history when you quit, if you turn that on, and adds smart actions, notes, and a Reading List.',
@@ -131,6 +186,18 @@ RELEASES = [
             ('Fixed', [
                 'Library never runs commands from links.',
                 'Your bookmarks file stays safe.',
+            ]),
+        ],
+    },
+    {
+        'id': '1-0-0', 'version': '1.0.0', 'tag': 'v1.0.0', 'date': 'October 13, 2026',
+        'summary': 'The first release of Library, a menu bar app for bookmarks, apps, and commands.',
+        'intro': 'Library 1.0.0 is the first release. It keeps your bookmarks, apps, and commands in the menu bar, and was published as source.',
+        'sections': [
+            ('New', [
+                'Bookmarks, apps, folders, and terminal commands in the menu bar, opened with a click or a shortcut.',
+                'Quick Open, which searches your library from anywhere.',
+                'Services, so you can add a selected link from other apps.',
             ]),
         ],
     },
