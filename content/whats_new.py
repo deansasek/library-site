@@ -6,6 +6,17 @@ Newest first. The first entry is marked Latest.
 
 RELEASES = [
     {
+        'id': '1-6-7', 'version': '1.6.7', 'tag': 'v1.6.7', 'date': 'October 16, 2026',
+        'summary': 'The selected row in Quick Open is readable in light mode.',
+        'intro': 'Library 1.6.7 fixes the selected row in Quick Open, which showed black text in light mode. It now uses the same white text as other selected rows on the Mac.',
+        'sections': [
+            ('Fixed', [
+                'In light mode, the selected result in Quick Open shows white text, as other selected rows on the Mac do.',
+                'The selected action in Quick Open\'s actions menu uses the same selected-text color.',
+            ]),
+        ],
+    },
+    {
         'id': '1-6-6', 'version': '1.6.6', 'tag': 'v1.6.6', 'date': 'October 16, 2026',
         'summary': 'Option-click to edit an item from the menu, Find in the Edit menu, and a cleaner Quick Open.',
         'intro': 'Library 1.6.6 adds a quicker way to edit items, Find in the Edit menu, and a number of refinements to Quick Open and Edit Library. It also brings the menus and alerts closer to the conventions of macOS.',
