@@ -6,6 +6,30 @@ Newest first. The first entry is marked Latest.
 
 RELEASES = [
     {
+        'id': '1-6-6', 'version': '1.6.6', 'tag': 'v1.6.6', 'date': 'October 16, 2026',
+        'summary': 'Option-click to edit an item from the menu, Find in the Edit menu, and a cleaner Quick Open.',
+        'intro': 'Library 1.6.6 adds a quicker way to edit items, Find in the Edit menu, and a number of refinements to Quick Open and Edit Library. It also brings the menus and alerts closer to the conventions of macOS.',
+        'sections': [
+            ('New', [
+                'Hold Option and click a bookmark, command, or app in the Library menu to see <strong>Edit…</strong>, which opens its Get Info.',
+                'Find is in the Edit menu, with ⌘F, and moves to the search field.',
+            ]),
+            ('Improved', [
+                'Quick Open shows its actions in an ellipsis menu, and its results are a standard list.',
+                'Quick Open\'s placeholder reads Search Library, and its panel uses the system shadow.',
+                'Edit Library has a single Get Info button, and its list highlights while a link or app is dragged over it.',
+                'The sync footer shows a spinner while iCloud is working.',
+                'Alerts put Cancel on the left, and the Library menu lists About and Settings first.',
+                'Clearing clipboard history asks you to confirm first.',
+                'Shortcut glyphs on the Welcome page use the standard text style.',
+                'The iCloud Drive storage note is written in plainer language.',
+            ]),
+            ('Fixed', [
+                'The file preview spinner and the shortcut options tooltip are clearer for VoiceOver and for everyone else.',
+            ]),
+        ],
+    },
+    {
         'id': '1-6-5', 'version': '1.6.5', 'tag': 'v1.6.5', 'date': 'October 16, 2026',
         'summary': 'Custom item colors, file previews in Quick Open, and search scopes in Edit Library.',
         'intro': 'Library 1.6.5 lets you choose a custom color for an item, preview files in Quick Open, and search by scope in Edit Library. It also fixes a number of data-safety, iCloud, and security issues, and it makes the app more responsive.',
