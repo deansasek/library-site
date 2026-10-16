@@ -436,8 +436,8 @@ def render(page):
 <div><dt>Operating system</dt><dd>macOS 26 or later</dd></div>
 <div><dt>Developer tools</dt><dd>Command Line Tools for Xcode, installed for you if missing</dd></div>
 </dl>'''),
-        ('install', 'Install', '''<p>Paste this into Terminal. It installs the Command Line Tools for Xcode if they are missing, builds Library, and puts <code>Library.app</code> in your Applications folder. It downloads the source to a temporary folder, so it needs nothing installed beforehand.</p>
-<div class="code-block"><pre><code>cd "$(mktemp -d)" &amp;&amp; curl -fsSL https://github.com/deansasek/library/archive/refs/heads/main.zip -o library.zip &amp;&amp; unzip -q library.zip &amp;&amp; ./library-main/install.sh</code></pre></div>
+        ('install', 'Install', '''<p>Paste this into Terminal. It downloads the latest release, checks its SHA-256 checksum, and builds and installs <code>Library.app</code> in your Applications folder. It installs the Command Line Tools for Xcode first if they are missing, and it needs nothing else installed beforehand.</p>
+<div class="code-block"><pre><code>cd "$(mktemp -d)" &amp;&amp; tag="$(curl -fsSIL -o /dev/null -w '%{url_effective}' https://github.com/deansasek/library/releases/latest | sed 's#.*/tag/##')" &amp;&amp; ver="${tag#v}" &amp;&amp; curl -fsSL -O "https://github.com/deansasek/library/releases/download/$tag/Library-$ver.zip" -O "https://github.com/deansasek/library/releases/download/$tag/Library-$ver.zip.sha256" &amp;&amp; shasum -a 256 -c "Library-$ver.zip.sha256" &amp;&amp; unzip -q "Library-$ver.zip" &amp;&amp; "./Library-$ver/install.sh"</code></pre></div>
 <p>Installing the Command Line Tools may open a window, and it can ask for your Mac password. Finish the window, and the install continues on its own.</p>'''),
         ('first-steps', 'First steps', '''<ol>
 <li>Press Control-Space to open Quick Open. Type a name and press Return.</li>
