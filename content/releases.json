@@ -1,5 +1,32 @@
 [
   {
+    "tag": "v1.6.6",
+    "version": "1.6.6",
+    "date": "2026-10-16",
+    "url": "https://github.com/deansasek/library/releases/tag/v1.6.6",
+    "notes": [
+      "Install the latest release with its checksum verified",
+      "Remove the duplicate Edit toolbar button",
+      "Put Cancel on the left of alerts",
+      "Show Quick Open actions in an ellipsis menu",
+      "Use a native List for Quick Open results",
+      "Add Find to the Edit menu with ⌘F",
+      "Confirm before clearing clipboard history",
+      "Set the Quick Open search placeholder to Search Library",
+      "Highlight the Edit Library list while a drop hovers over it",
+      "Use the system shadow for the Quick Open panel",
+      "Show a spinner in the sync footer while iCloud is working",
+      "Add Edit… alternate to bookmark items in the Library menu",
+      "Put About and Settings first in the Library menu",
+      "Label the file preview spinner for VoiceOver",
+      "Name the action in the shortcut options tooltip",
+      "Use the standard body font for shortcut glyphs on the welcome page",
+      "Rewrite the iCloud Drive storage footer in plain language",
+      "Give the history checks a 60-second limit instead of 5",
+      "Split the Return-to-rename check so the compiler accepts it"
+    ]
+  },
+  {
     "tag": "v1.6.5",
     "version": "1.6.5",
     "date": "2026-10-16",
