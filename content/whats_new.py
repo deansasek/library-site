@@ -6,6 +6,46 @@ Newest first. The first entry is marked Latest.
 
 RELEASES = [
     {
+        'id': '1-6-5', 'version': '1.6.5', 'tag': 'v1.6.5', 'date': 'October 16, 2026',
+        'summary': 'Custom item colors, file previews in Quick Open, and search scopes in Edit Library.',
+        'intro': 'Library 1.6.5 lets you choose a custom color for an item, preview files in Quick Open, and search by scope in Edit Library. It also fixes a number of data-safety, iCloud, and security issues, and it makes the app more responsive.',
+        'sections': [
+            ('New', [
+                'Choose a custom color for an item in <strong>Get Info</strong>, with the system color picker.',
+                'Preview files in Quick Open. Documents and images appear in Quick Look, and CSV and TSV files appear as a table.',
+                'Search scopes and suggestions in Edit Library: All, Bookmarks, Apps, Commands, and Folders.',
+                'Customize the toolbar in Edit Library.',
+                'Reset Clipboard Key in <strong>Settings &gt; Clipboard</strong>, if the clipboard key is damaged.',
+            ]),
+            ('Improved', [
+                'Edit Library remembers its sort order, sort direction, and search between launches.',
+                '<strong>Open at Login</strong> shows whether approval is needed, and reports an error if it cannot be turned on.',
+                'Welcome and the snippet editor open in their own windows.',
+                'File panels and alerts attach to the Library window.',
+                'Support for Increase Contrast and Differentiate Without Color in the pickers.',
+                'Quick Open drags links, files, text, and pictures.',
+                'Pasting from the clipboard menu goes into the app you were typing in.',
+                'Screenshot capture is off by default. Turn it on in <strong>Settings &gt; Clipboard</strong>.',
+                'Pinned clips are limited to 200 MB in total.',
+                'Spotlight indexes an item\'s name and host only, not its command text.',
+                'The Quick Look preview, the Manage window, and the menus update faster.',
+            ]),
+            ('Fixed', [
+                'Restoring a backup that has Recently Deleted items works.',
+                'Saving no longer overwrites a newer change from iCloud.',
+                'Conflicts between three or more Macs are reviewed one version at a time, so no edits are lost.',
+                'Damaged files are kept under a new name and never overwritten.',
+                'Unpinning a locked clip requires Touch ID or your password.',
+                'Delete no longer removes items the search has hidden.',
+                'Undoing a rename no longer removes changes made on another Mac.',
+                'Terminal commands restored from a backup no longer run at login.',
+                'Backups and snippets are saved so only you can read them.',
+                'Web requests no longer reach local or private network addresses.',
+                'Installing checks the download before it runs, and replaces the app more safely.',
+            ]),
+        ],
+    },
+    {
         'id': '1-6-4', 'version': '1.6.4', 'tag': 'v1.6.4', 'date': 'October 15, 2026',
         'summary': 'Help moves into the Library menu, and the welcome tour covers every feature.',
         'intro': 'Library 1.6.4 puts Help at the bottom of the Library menu, and the welcome tour now covers each part of Library.',
