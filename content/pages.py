@@ -152,7 +152,7 @@ def _release_records():
         return []
 
 
-def release_history(minor_ids, limit=None):
+def release_history(minor_ids, limit=None, curated=None):
     """Every published Library release, newest first, from content/releases.json (written by tools/sync_releases.py).
 
     Each release gets its date, its changes, and a link to the GitHub release. Releases with a What's new page
@@ -168,13 +168,14 @@ def release_history(minor_ids, limit=None):
     for r in releases:
         date = datetime.date.fromisoformat(r['date']).strftime('%B %-d, %Y')
         wn_id = r['version'].replace('.', '-')
-        shown = r['notes'] if limit is None else r['notes'][:limit]
+        # The changes shown and counted are the ones on the release's What's new page, so the two always agree.
+        notes = curated[r['version']] if curated and r['version'] in curated else r['notes']
+        shown = notes if limit is None else notes[:limit]
         items = ''.join(f'<li>{_html.escape(n)}</li>' for n in shown)
         changes = f'<ul>{items}</ul>' if items else '<p>No changes listed.</p>'
         # A long release shows only its first changes here; the What's new page has all of them.
-        more = len(r['notes']) - len(shown)
-        if more > 0:
-            changes += f'<p><a href="/whats-new/{wn_id}/">See all {len(r["notes"])} changes in What\'s new</a></p>'
+        if len(notes) > len(shown):
+            changes += f'<p><a href="/whats-new/{wn_id}/">See all {len(notes)} changes in What\'s new</a></p>'
         whats_new = f' <a href="/whats-new/{wn_id}/">What\'s new</a>.' if wn_id in minor_ids else ''
         out.append(f'<section class="release" id="{_html.escape(r["tag"])}">'
                    f'<h2><a href="{_html.escape(r["url"])}" rel="noopener noreferrer">Library {_html.escape(r["version"])}</a></h2>'
@@ -532,7 +533,8 @@ git push origin vX.Y.Z</code></pre></div>
     _wn = _ilu.module_from_spec(_spec)
     _spec.loader.exec_module(_wn)
     # Every release, patch releases included, from the same list as the Releases page.
-    entries = release_history(set(r['id'] for r in _wn.RELEASES), limit=3)
+    curated_items = {r['version']: [item for _, items in r['sections'] for item in items] for r in _wn.RELEASES}
+    entries = release_history(set(r['id'] for r in _wn.RELEASES), limit=3, curated=curated_items)
     out['/whats-new/index.html'] = page('/whats-new/', "What's new in Library: release notes",
         'Every release of Library, newest first, with what changed in each. Major and minor releases also have their own page.',
         "Every release of Library, newest first, with what changed in each. Major and minor releases also have their own page.",
@@ -551,7 +553,7 @@ git push origin vX.Y.Z</code></pre></div>
         'Every version of Library, newest first. Patch releases are listed too.',
         [], [], plain=True, extra=(
             '<p class="links"><a href="https://github.com/deansasek/library/releases/latest" rel="noopener noreferrer">Get the Latest Release</a></p>'
-            + release_history(set(r['id'] for r in _wn.RELEASES), limit=3)))
+            + release_history(set(r['id'] for r in _wn.RELEASES), limit=3, curated=curated_items)))
 
     # ---------- 404 ----------
     out['/404.html'] = ('<!doctype html>\n<html lang="en" dir="ltr">\n<head>\n<meta charset="utf-8">\n'
