@@ -6,6 +6,16 @@ Newest first. The first entry is marked Latest.
 
 RELEASES = [
     {
+        'id': '1-6-8', 'version': '1.6.8', 'tag': 'v1.6.8', 'date': 'October 16, 2026',
+        'summary': 'The source download includes its build scripts, so installing from it works.',
+        'intro': 'Library 1.6.8 fixes installing from the source download. The download was missing a script the build needs, and it could not tell which version it was.',
+        'sections': [
+            ('Fixed', [
+                'Installing from the source download no longer stops with a missing script, and it builds the version it was released as.',
+            ]),
+        ],
+    },
+    {
         'id': '1-6-7', 'version': '1.6.7', 'tag': 'v1.6.7', 'date': 'October 16, 2026',
         'summary': 'The selected row in Quick Open is readable in light mode.',
         'intro': 'Library 1.6.7 fixes the selected row in Quick Open, which showed black text in light mode. It now uses the same white text as other selected rows on the Mac.',
