@@ -10,7 +10,7 @@ Values to bump at each release (the only place they live):
 """
 import datetime
 
-REVIEWED_VERSION = '1.6.4'
+REVIEWED_VERSION = '1.6.5'
 REVIEWED_DATE = datetime.date(2026, 10, 15)  # set when the docs are reviewed, so a daily build does not change it
 
 # Set by build.py at build time: the latest releases from GitHub (or None when offline) and the Markdown converter.
@@ -397,7 +397,7 @@ def render(page):
 <caption>Files in ~/.library</caption>
 <thead><tr><th scope="col">File</th><th scope="col">Contents</th></tr></thead>
 <tbody>
-<tr><th scope="row"><code>bookmarks.json</code></th><td>Your items, folders, shortcuts, and order</td></tr>
+<tr><th scope="row"><code>bookmarks.json</code></th><td>Your items, folders, shortcuts, and order. With <strong>Keep Library in iCloud Drive</strong> on, the file is kept in iCloud Drive, and this entry links to it.</td></tr>
 <tr><th scope="row"><code>clipboard.json</code></th><td>Pinned clipboard items, encrypted with a key kept in your Keychain</td></tr>
 <tr><th scope="row"><code>clipboard-history.json</code></th><td>Unpinned clipboard history, encrypted the same way. This file exists only when <strong>Keep clipboard history across restarts</strong> is on. It is off by default.</td></tr>
 <tr><th scope="row"><code>bookmarks-before-iCloud.json</code>, <code>bookmarks-iCloud-replaced.json</code></th><td>Backups kept when <strong>Keep Library in iCloud Drive</strong> is turned on, so no library is lost.</td></tr>
