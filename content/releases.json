@@ -1,5 +1,14 @@
 [
   {
+    "tag": "v1.6.8",
+    "version": "1.6.8",
+    "date": "2026-10-16",
+    "url": "https://github.com/deansasek/library/releases/tag/v1.6.8",
+    "notes": [
+      "Keep scripts in the source zip and carry its version in a VERSION file"
+    ]
+  },
+  {
     "tag": "v1.6.7",
     "version": "1.6.7",
     "date": "2026-10-16",
