@@ -269,6 +269,25 @@ def _key_cap(m):
     return caps + (f'<kbd>{m.group(2)}</kbd>' if m.group(2) else '')
 
 
+# Key names written out in running text, such as Command-Z, Control-Space, or "press Return", are set as key caps too,
+# as Apple sets them. "Option-click" is a key with a mouse action, so only the key is set as a key cap.
+_KEY_COMBO = re.compile(r'\b(?:Command|Control|Option|Shift)(?:-(?:Command|Control|Option|Shift|Return|Escape|Tab|Space|Delete|[A-Z]|[0-9]+)\b)+')
+_KEY_AFTER_VERB = re.compile(r'(?<=[Pp]ress )(Return|Escape|Tab|Space|Delete)\b|(?<=[Hh]old )(Option|Command|Control|Shift)\b')
+
+
+def _combo_caps(m):
+    return ''.join(f'<kbd>{part}</kbd>' for part in m.group(0).split('-'))
+
+
+_KEY_CLICK = re.compile(r'\b(Command|Control|Option|Shift)-([Cc]lick)\b')
+
+
+def _word_keys(text):
+    text = _KEY_CLICK.sub(lambda m: f'<kbd>{m.group(1)}</kbd>-{m.group(2)}', text)
+    text = _KEY_COMBO.sub(_combo_caps, text)
+    return _KEY_AFTER_VERB.sub(lambda m: f'<kbd>{m.group(0)}</kbd>', text)
+
+
 def key_caps(html):
     """Shortcut glyphs in running text become key caps. Code, preformatted text, and existing key caps are left alone."""
     parts = re.split(r'(<[^>]+>)', html)
@@ -283,7 +302,7 @@ def key_caps(html):
         elif skip:
             out.append(part)
         else:
-            out.append(re.sub(r'([⌘⇧⌥⌃]+)([A-Za-z0-9]+|[,./])?', _key_cap, part))
+            out.append(_word_keys(re.sub(r'([⌘⇧⌥⌃]+)([A-Za-z0-9]+|[,./])?', _key_cap, part)))
     return ''.join(out)
 
 
@@ -303,7 +322,7 @@ def update_landing():
     s = re.sub(r'<footer>.*?</footer>', lambda m: footer(), s, flags=re.S)
     s = re.sub(r'\s*<meta name="color-scheme"[^>]*>', '', s)
     s = re.sub(r'\s*<meta property="og:site_name"[^>]*>', '', s)
-    s = code_bars(minify_html(relativize(point_guide_links(s), '/index.html')))
+    s = code_bars(minify_html(relativize(key_caps(point_guide_links(s)), '/index.html')))
     check_build_html('/index.html', s)
     open(p, 'w').write(s)
 
