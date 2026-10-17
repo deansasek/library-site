@@ -12,6 +12,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TODAY = datetime.date.today()
 YEAR = TODAY.year
 REVIEWED_LABEL = TODAY.strftime('%B %d, %Y').replace(' 0', ' ')
+REVIEWED_VERSION = ''
+REVIEWED_ISO = TODAY.isoformat()
 # Docs pages in reading order (the guide's order: start, features, then the reference pages).
 PAGER_ORDER = [('/install/', 'Install'), ('/guide/', 'Guide'), ('/smart-features/', 'Smart features'),
                ('/privacy/', 'Privacy'), ('/development/', 'Development')]
@@ -113,7 +115,13 @@ RELATED = {
 # page templates and related links
 # ----------------------------------------------------------------------
 
-def page(path, title, desc, lede, toc, sections, plain=False, extra='', released=None, nav=None):
+def reviewed_line(version, verb, label, iso):
+    """One metadata line under the page title, like the quiet date line on an Apple page."""
+    date = f'<time datetime="{iso}">{label}</time>' if iso else label
+    return f'<p class="updated">Version {version} · {verb} {date}</p>'
+
+
+def page(path, title, desc, lede, toc, sections, plain=False, extra='', released=None, released_version=None, released_iso=None, nav=None):
     toc_items = nav or '<ol>' + ''.join(f'<li><a href="#{i}">{l}</a></li>' for i, l in toc) + '</ol>'
     body = ''.join(f'<section id="{i}"><h2>{h}</h2>{html}</section>'
                    for i, h, html in sections)
@@ -127,10 +135,11 @@ def page(path, title, desc, lede, toc, sections, plain=False, extra='', released
         return (head(title, desc, path) + header() +
                 f'<main id="main" class="doc">{back}<h1>{title}</h1><p class="lede">{lede}</p>{extra}</main>'
                 + footer() + '\n</body>\n</html>\n')
+    line = (reviewed_line(released_version, 'Released', released, released_iso) if released
+            else reviewed_line(REVIEWED_VERSION, 'Updated', REVIEWED_LABEL, REVIEWED_ISO))
     return (head(title, desc, path) + header() +
-            f'<main id="main" class="doc">{back}<h1>{title}</h1><p class="lede">{lede}</p>'
+            f'<main id="main" class="doc">{back}<h1>{title}</h1>{line}<p class="lede">{lede}</p>'
             f'<p class="updated">' + (f'Released {released}. ' if released else 'Applies to the current release of Library. ') + f'Last reviewed {REVIEWED_LABEL}.</p>'
-            f'<div class="article"><nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p>{toc_items}</nav>'
             f'<div class="content">{body}'
             f'<section class="related"><h2>Related</h2><ul>{related}</ul></section>'
             '</div></div></main>'
@@ -700,7 +709,7 @@ def write_service_worker():
 
 
 def build_all(check=False):
-    global REVIEWED_LABEL
+    global REVIEWED_LABEL, REVIEWED_VERSION, REVIEWED_ISO
     check_pages_reachable()
     check_accent_contrast(open(os.path.join(ROOT, 'src', 'styles.css')).read())
     import importlib.util
@@ -709,6 +718,8 @@ def build_all(check=False):
     spec.loader.exec_module(pages)
     reviewed_on = pages.REVIEWED_DATE or TODAY
     REVIEWED_LABEL = reviewed_on.strftime('%B %d, %Y').replace(' 0', ' ')
+    REVIEWED_VERSION = pages.REVIEWED_VERSION
+    REVIEWED_ISO = reviewed_on.isoformat()
     rendered = pages.render(page)
     GUIDE_PATH_OF.update(pages.GUIDE_PATH_OF)
     write_search_index(rendered, pages.GUIDE_GROUP_OF)

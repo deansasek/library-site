@@ -6,7 +6,7 @@ import html as _html
 
 Values to bump at each release (the only place they live):
   REVIEWED_VERSION  the Library release the docs were last checked against
-  REVIEWED_DATE     the "Last reviewed" date; None uses the build date
+  REVIEWED_DATE     the date the docs were last reviewed; None uses the build date
 """
 import datetime
 
@@ -38,7 +38,7 @@ def release_page(page, r):
                 'rel="noopener noreferrer">GitHub release page</a>, or install it with the command on the <a href="/install/">install page</a>.</p>')
     sections.append(('download', 'Download', download))
     return page('/whats-new/' + r['id'] + '/', f"What's new in Library {r['version']}", f"{r['summary']} Released {r['date']}.", r['intro'], toc, sections,
-                released=r['date'])
+                released=r['date'], released_version=r['version'], released_iso=r.get('iso_date'))
 
 
 # The guide's side navigation: six groups by what people are trying to do. Each feature lists its sub-sections
@@ -578,8 +578,9 @@ git push origin vX.Y.Z</code></pre></div>
     if missing:
         raise SystemExit('Hand-written release notes are missing in content/whats_new.py for: ' + ', '.join(missing))
     dates = {r['version']: datetime.date.fromisoformat(r['date']).strftime('%B %-d, %Y') for r in published}
+    iso_dates = {r['version']: r['date'] for r in published}
     for r in _wn.RELEASES:
-        out['/whats-new/' + r['id'] + '/index.html'] = release_page(page, dict(r, date=dates.get(r['version'], r['date'])))
+        out['/whats-new/' + r['id'] + '/index.html'] = release_page(page, dict(r, date=dates.get(r['version'], r['date']), iso_date=iso_dates.get(r['version'])))
     out['/releases/index.html'] = page('/releases/', 'Library releases: every version and what changed', 'Every Library release, newest first, with its date and changes, and links to the downloads on GitHub.',
         'Every version of Library, newest first. Patch releases are listed too.',
         [], [], plain=True, extra=(
