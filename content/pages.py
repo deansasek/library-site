@@ -425,6 +425,7 @@ def render(page):
 <tr><th scope="row"><code>favicons/</code></th><td>Cached site icons. Library downloads them again if you delete the folder.</td></tr>
 </tbody>
 </table>
+<p>The backup and damaged-copy file names above may change in a future update.</p>
 <p>Updates don't change your data.</p>'''),
         ('what-is-sent', 'What is sent', '''<p>Library connects to the internet only for these things.</p>
 <ul>
