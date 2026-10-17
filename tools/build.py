@@ -413,8 +413,10 @@ var VERSION = "%(version)s";
 var PRECACHE = %(precache)s;
 
 self.addEventListener("install", function (event) {
-  event.waitUntil(caches.open(VERSION).then(function (cache) { return cache.addAll(PRECACHE); })
-    .then(function () { return self.skipWaiting(); }));
+  // Reload bypasses the browser's HTTP cache, so each new version precaches the files from the current deploy.
+  event.waitUntil(caches.open(VERSION).then(function (cache) {
+    return cache.addAll(PRECACHE.map(function (u) { return new Request(u, { cache: "reload" }); }));
+  }).then(function () { return self.skipWaiting(); }));
 });
 
 self.addEventListener("activate", function (event) {
@@ -475,6 +477,9 @@ def write_service_worker():
     version = digest.hexdigest()[:12]
     urls = ['./' if r == '' else r for r in precache]
     body = SW_TEMPLATE % {'version': version, 'precache': json.dumps(urls)}
+    if 'cache: "reload"' not in body:
+        sys.exit('build check failed: sw.js must precache with cache: "reload" so a new version cannot pin '
+                 'stale files from the HTTP cache')
     with open(os.path.join(ROOT, 'sw.js'), 'w') as f:
         f.write(body)
 
