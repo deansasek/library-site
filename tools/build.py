@@ -209,6 +209,41 @@ def code_bars(html):
                   '<div class="code-block"><div class="code-head"><span class="code-label">Terminal</span></div><pre>', html)
 
 
+def table_labels(html):
+    """Copy each table's column headers onto its data cells as data-label.
+
+    On a phone the header row goes off screen, so each data cell repeats its column name (see the
+    phone rule in styles.css). Labels come from the matching th scope="col" cell, by position: the
+    first cell in a row is its row header (th scope="row"), and each data cell after it takes the
+    next column header.
+    """
+    def label_table(m):
+        table = m.group(0)
+        head = re.search(r'<thead>(.*?)</thead>', table, re.S)
+        if not head:
+            return table
+        labels = [' '.join(re.sub(r'<[^>]+>', ' ', th).split())
+                  for th in re.findall(r'<th\b[^>]*>(.*?)</th>', head.group(1), re.S)]
+        if not labels:
+            return table
+
+        def label_row(rm):
+            row = rm.group(0)
+            out, end, i = [], 0, 0
+            for cell in re.finditer(r'<(th|td)\b[^>]*>', row):
+                if cell.group(1) == 'td' and 'data-label' not in cell.group(0) and i < len(labels):
+                    label = labels[i].replace('"', '&quot;')
+                    out.append(row[end:cell.end() - 1] + f' data-label="{label}">')
+                    end = cell.end()
+                i += 1
+            out.append(row[end:])
+            return ''.join(out)
+
+        return table[:head.end()] + re.sub(r'<tr\b.*?</tr>', label_row, table[head.end():], flags=re.S)
+
+    return re.sub(r'<table>.*?</table>', label_table, html, flags=re.S)
+
+
 # ----------------------------------------------------------------------
 # build checks
 # ----------------------------------------------------------------------
@@ -402,7 +437,7 @@ def write(path, html):
     # /404.html is served at whatever address was missing, so relative links would resolve under that
     # missing path. Its links are written under the site's full base path instead, so they work at any depth.
     html = absolutize(html, BASE_PATH) if path == '/404.html' else relativize(html, path)
-    out = code_bars(minify_html(html))
+    out = code_bars(minify_html(table_labels(html)))
     check_build_html(path, out)
     if path == '/404.html':
         check_absolute_links(path, out)
