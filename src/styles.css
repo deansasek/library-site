@@ -836,6 +836,10 @@ footer {
   color:var(--text-2);
   font-variant-numeric:tabular-nums;
 }
+/* Title-area metadata line: the same quiet secondary style as Apple's date line, with no extra margin. */
+.doc > .updated {
+  margin:0;
+}
 .related {
   margin-top:var(--space-16);
   padding-top:var(--space-6);
