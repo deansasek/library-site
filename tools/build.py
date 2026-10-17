@@ -321,8 +321,9 @@ def _key_cap(m):
     return caps + (f'<kbd>{m.group(2)}</kbd>' if m.group(2) else '')
 
 
-# Key names written out in running text, such as Command-Z, Control-Space, or "press Return", are set as key caps too,
-# as Apple sets them. "Option-click" is a key with a mouse action, so only the key is set as a key cap.
+# Copy writes shortcuts with Apple's key symbols, per the notation rule in content/pages.py, so most key caps come from
+# the glyphs above. A key name written out in running text, such as "press Return", and any older word form such as
+# Command-Z, are set as key caps too. "Option-click" is a key with a mouse action, so only the key becomes a key cap.
 _KEY_COMBO = re.compile(r'\b(?:Command|Control|Option|Shift)(?:-(?:Command|Control|Option|Shift|Return|Escape|Tab|Space|Delete|[A-Z]|[0-9]+)\b)+')
 _KEY_AFTER_VERB = re.compile(r'(?<=[Pp]ress )(Return|Escape|Tab|Space|Delete)\b|(?<=[Hh]old )(Option|Command|Control|Shift)\b')
 
