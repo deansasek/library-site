@@ -44,9 +44,10 @@ def footer():
             f'<div><p class="ft">Project</p><a href="{REPO}" rel="noopener noreferrer">GitHub</a><a href="/development/">Development</a>'
             '<a href="https://buymeacoffee.com/deansasek" rel="noopener noreferrer">Support</a>'
             '</div>'
-            '<div><p class="ft">Guide</p><a href="/guide/">Feature guide</a><a href="/smart-features/">Smart features</a></div>'
+            '<div><p class="ft">Guide</p><a href="/guide/">Feature guide</a><a href="/smart-features/">Smart features</a>'
+            '<a href="/install/">Install</a><a href="/accessibility/">Accessibility</a></div>'
             '<div><p class="ft">Privacy</p><a href="/privacy/">Privacy guide</a></div>'
-            '<div><p class="ft">Releases</p><a href="/whats-new/">What\'s new</a></div>'
+            '<div><p class="ft">Releases</p><a href="/whats-new/">What\'s new</a><a href="/releases/">Releases</a></div>'
             f'</nav><p class="legal">Library is open source. &copy; {YEAR}. Library is available under the <a href="https://github.com/deansasek/library/blob/main/LICENSE" rel="noopener noreferrer">MIT License</a>.</p></footer>')
 
 
@@ -244,6 +245,20 @@ def check_build_html(path, html):
         problems.append('two lists in a row (merge them): ...' + html[max(0, m.start() - 40):m.end()] + '...')
     if problems:
         sys.exit('build check failed for %s:\n  %s' % (path, '\n  '.join(problems)))
+
+
+def check_pages_reachable():
+    """Fail the build if a SITE_PATHS page is linked from neither the footer nor the narrow-screen header.
+
+    Below 735px the stylesheet hides the header's .nav-extra links, so a link counts only when it is in the
+    footer or in the part of the header that stays visible. This is what keeps Accessibility, Releases, and
+    the other top-level pages reachable from a phone.
+    """
+    narrow_header = re.sub(r'<a class="nav-extra"[^>]*>.*?</a>', '', header())
+    chrome = narrow_header + footer()
+    missing = [p for p in SITE_PATHS if f'href="{p}"' not in chrome]
+    if missing:
+        sys.exit('build check failed: no footer or narrow-screen header link to ' + ', '.join(missing))
 
 
 # ----------------------------------------------------------------------
@@ -524,6 +539,7 @@ def write_service_worker():
 
 def build_all(check=False):
     global REVIEWED_LABEL
+    check_pages_reachable()
     import importlib.util
     spec = importlib.util.spec_from_file_location('pages', os.path.join(ROOT, 'content', 'pages.py'))
     pages = importlib.util.module_from_spec(spec)
