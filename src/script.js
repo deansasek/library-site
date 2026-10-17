@@ -85,9 +85,11 @@ function links() { return Array.prototype.slice.call(panel.querySelectorAll("a")
 function render() {
 var q = input.value.trim().toLowerCase();
 if (!q) { leave(); return; }
+var words = q.split(/\s+/);
 panel.textContent = "";
 var hits = items.filter(function (it) {
-return (it.t + " " + it.p + " " + it.s).toLowerCase().indexOf(q) !== -1;
+var text = (it.t + " " + it.p + " " + it.s).toLowerCase();
+return words.every(function (w) { return text.indexOf(w) !== -1; });
 }).slice(0, 12);
 var order = [];
 var groups = {};
