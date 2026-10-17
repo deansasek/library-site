@@ -201,6 +201,14 @@ code {
   margin-top:0;
   box-shadow:0 12px 32px var(--media-border);
 }
+/* The section the reader is in reads like a selected item: primary text, semibold, with an inset underline. */
+.nav nav a[aria-current="page"] {
+  color:var(--text);
+  font-weight:600;
+  text-decoration:underline;
+  text-decoration-thickness:2px;
+  text-underline-offset:4px;
+}
 /* ---- sections ---- */
 .block {
   padding:var(--section-space) var(--gutter);
