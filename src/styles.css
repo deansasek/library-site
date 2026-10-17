@@ -1,6 +1,7 @@
 /* ---- tokens ---- */
 :root {
   color-scheme:light dark;
+  accent-color:var(--accent);
   --hairline: 1px;
   --control: #86868b;
   --accent-pressed: #0064d2;
@@ -34,16 +35,12 @@
   --band:#f5f5f7;
   --text:#1d1d1f;
   --text-2:#6e6e73;
-  --link:#0066cc;
   --accent:#0071e3;
   --accent-hover:#0066d4;
   --on-accent:#ffffff;
-  --selection-bg:color-mix(in srgb, var(--accent) 20%, var(--bg));
-  --focus:#0071e3;
   --border:#d2d2d7;
   --media-border:rgba(0,0,0,0.08);
   --code-bg:#f5f5f7;
-  --link-hover:#004f9e;
   --nav-bg:rgba(255,255,255,0.8);
   --section-space:clamp(80px,12vw,128px);
   --gutter:16px;
@@ -54,9 +51,16 @@
 }
 }
 
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--control:#98989d;--accent-pressed:#0a7ae6;--warning:#ffb340;--bg:#000000;--band:#1d1d1f;--text:#f5f5f7;--text-2:#a1a1a6;--link:#2997ff;--accent:#0a84ff;--accent-hover:#409cff;--on-accent:#000000;--selection-bg:color-mix(in srgb,var(--accent) 26%,var(--bg));--focus:#0a84ff;--border:#424245;--media-border:rgba(255,255,255,0.12);--code-bg:#000000;--link-hover:#7cbcff;--nav-bg:rgba(0,0,0,0.8);}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--control:#98989d;--accent-pressed:#0a7ae6;--warning:#ffb340;--bg:#000000;--band:#1d1d1f;--text:#f5f5f7;--text-2:#a1a1a6;--accent:#0a84ff;--accent-hover:#409cff;--on-accent:#000000;--border:#424245;--media-border:rgba(255,255,255,0.12);--code-bg:#000000;--nav-bg:rgba(0,0,0,0.8);}}
 /* Explicit dark theme: a page sets data-theme="dark" to choose it regardless of the system setting. */
-:root[data-theme="dark"]{--control:#98989d;--accent-pressed:#0a7ae6;--warning:#ffb340;--bg:#000000;--band:#1d1d1f;--text:#f5f5f7;--text-2:#a1a1a6;--link:#2997ff;--accent:#0a84ff;--accent-hover:#409cff;--on-accent:#000000;--selection-bg:color-mix(in srgb,var(--accent) 26%,var(--bg));--focus:#0a84ff;--border:#424245;--media-border:rgba(255,255,255,0.12);--code-bg:#000000;--link-hover:#7cbcff;--nav-bg:rgba(0,0,0,0.8);}
+:root[data-theme="dark"]{--control:#98989d;--accent-pressed:#0a7ae6;--warning:#ffb340;--bg:#000000;--band:#1d1d1f;--text:#f5f5f7;--text-2:#a1a1a6;--accent:#0a84ff;--accent-hover:#409cff;--on-accent:#000000;--border:#424245;--media-border:rgba(255,255,255,0.12);--code-bg:#000000;--nav-bg:rgba(0,0,0,0.8);}
+/* Links, buttons, and focus rings all use --accent. Where the browser supports the system color
+   keywords, the accent follows the Mac accent color chosen in System Settings > Appearance, and the
+   button label follows AccentColorText so it stays legible. The hex values above are the fallback for
+   browsers without AccentColor, and match the default blue. */
+@supports (color: AccentColor) {
+  :root { --accent: AccentColor; --on-accent: AccentColorText; }
+}
 /* ---- base ---- */
 *,*::before,*::after {
   box-sizing:border-box;
@@ -85,7 +89,7 @@ h1,h2,h3 {
 }
 /* ---- other ---- */
 a {
-  color:var(--link);
+  color:var(--accent);
 }
 /* ---- base ---- */
 code {
@@ -94,7 +98,7 @@ code {
 }
 :focus-visible {
   outline:none;
-  box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--focus);
+  box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--accent);
 }
 @media (forced-colors:active) {
   :focus-visible {
@@ -173,7 +177,7 @@ code {
   text-decoration:none;
 }
 .nav nav a:hover {
-  color: var(--link-hover);
+  color: var(--accent-hover);
 }
 /* The site-wide search field sits at the right of the header, on every page. Its results open below the field. */
 .nav .search {
@@ -201,14 +205,6 @@ code {
   overflow-y:auto;
   margin-top:0;
   box-shadow:0 12px 32px var(--media-border);
-}
-/* The section the reader is in reads like a selected item: primary text, semibold, with an inset underline. */
-.nav nav a[aria-current="page"] {
-  color:var(--text);
-  font-weight:600;
-  text-decoration:underline;
-  text-decoration-thickness:2px;
-  text-underline-offset:4px;
 }
 /* ---- sections ---- */
 .block {
@@ -349,10 +345,10 @@ figcaption {
   text-decoration:none;
 }
 .text-link:active {
-  color:var(--link-hover);
+  color:var(--accent-hover);
 }
 .text-link:hover {
-  color: var(--link-hover);
+  color: var(--accent-hover);
 }
 .hero-media {
   margin-top:var(--space-16);
@@ -372,7 +368,7 @@ figcaption {
   text-decoration:none;
 }
 .learn:hover {
-  color:var(--link-hover);
+  color:var(--accent-hover);
 }
 .learn .icon {
   width: var(--icon-sm);
@@ -419,7 +415,7 @@ figcaption {
   gap:var(--space-3);
 }
 .facts.icons .icon {
-  color:var(--link);
+  color:var(--accent);
   margin-top:1px;
 }
 /* ---- code ---- */
@@ -477,6 +473,7 @@ footer {
 @media (prefers-reduced-motion:no-preference) {
   .results:not([hidden]){animation:fade-in 150ms ease-out both;}
   .results.is-leaving{animation:fade-out 150ms ease-in both;}
+  .toc-indicator{transition:transform 200ms ease-out;}
   @supports (animation-timeline:view()) {
     .hero>*{animation:rise 400ms cubic-bezier(0.2,0.6,0.2,1) both;}
     .hero>:nth-child(2){animation-delay:80ms;}
@@ -521,10 +518,10 @@ footer {
   text-decoration:none;
 }
 .card:hover {
-  border-color:var(--link);
+  border-color:var(--accent);
 }
 .card .icon {
-  color:var(--link);
+  color:var(--accent);
 }
 .card h3 {
   margin-top:var(--space-4);
@@ -675,32 +672,32 @@ footer {
   white-space:nowrap;
 }
 @media (max-width:639px) {
-  /* On a phone the header row goes off screen, so each data cell carries its column name.
-     The table keeps its native display, so the cells keep their table roles and VoiceOver
-     in Safari still reads the table with its column headers. */
-  .doc thead {
-    position:absolute;
-    width:1px;
-    height:1px;
-    margin:-1px;
-    padding:0;
-    overflow:hidden;
-    clip:rect(0,0,0,0);
-    white-space:nowrap;
-    border:0;
-  }
-  .doc table {
-    table-layout:fixed;
-  }
-  .doc th,.doc td {
-    overflow-wrap:break-word;
-  }
-  .doc tbody td::before {
-    content:attr(data-label);
+  /* On a phone each row becomes a stacked block, so long tables stay readable without sideways scrolling. */
+  .doc table,.doc tbody,.doc tr,.doc th,.doc td {
     display:block;
-    font-size:12px;
-    font-weight:500;
-    color:var(--text-2);
+    width:100%;
+  }
+  .doc thead {
+    display:none;
+  }
+  .doc tbody th {
+    width:100%;
+    padding-bottom:0;
+  }
+  .doc tbody td {
+    padding-top:var(--space-1);
+  }
+  .doc tr {
+    border-bottom:var(--hairline) solid var(--border);
+  }
+  .doc tr:last-child {
+    border-bottom:0;
+  }
+  .doc tr:last-child td {
+    border-bottom:0;
+  }
+  .doc td {
+    border-bottom:0;
   }
   .doc td code {
     white-space:normal;
@@ -729,14 +726,17 @@ footer {
   min-height: var(--tap);
   color:var(--text-2);
 }
-/* The current section reads like a selected sidebar row: primary text and semibold on a rounded accent-tinted fill. */
+/* The current section reads like a selected sidebar row: primary text, semibold, with the accent bar. */
 .toc a.is-active {
   color:var(--text);
   font-weight:600;
-  background:var(--selection-bg);
+  background:var(--bg);
   border-radius:8px;
   padding-inline:var(--space-2);
   margin-inline:calc(var(--space-2) * -1);
+}
+.toc-indicator {
+  display:none;
 }
 .guide-nav > details + details { margin-top:var(--space-2); }
 /* Group headings read like macOS sidebar section headers: small, semibold, secondary. */
@@ -759,6 +759,8 @@ footer {
 .guide-nav details ol { margin:0; }
 /* The navigation lists are not numbered, on phones as well as desktop. */
 .toc ol { list-style:none; }
+.toc{position:relative;}
+.toc-indicator{position:absolute;left:0;top:0;width:2px;height:0;background:var(--accent);}
 .back a {
   display:inline-flex;
   align-items:center;
@@ -766,7 +768,7 @@ footer {
   text-decoration:none;
 }
 .back a:hover {
-  color:var(--link-hover);
+  color:var(--accent-hover);
 }
 /* ---- nav ---- */
 .nav nav .nav-extra {
@@ -778,11 +780,12 @@ footer {
 @media (prefers-contrast:more) {
   :root{--text-2:#515154;
   --border:#86868b;
-  --link:#0040dd;
+  --accent:#0040dd;
+  --on-accent:#ffffff;
   };
 }
 
-@media (prefers-color-scheme:dark) and (prefers-contrast:more){:root:not([data-theme="light"]){--text-2:#c7c7cc;--border:#98989d;--link:#5ac8fa;}}/* ---- nav ---- */
+@media (prefers-color-scheme:dark) and (prefers-contrast:more){:root:not([data-theme="light"]){--text-2:#c7c7cc;--border:#98989d;--accent:#5ac8fa;--on-accent:#000000;}}/* ---- nav ---- */
 @media (forced-colors:active) {
   a,.learn,.text-link,.back a,.footer-cols a,.nav nav a,.related a,.toc a{text-decoration:underline;
   }.button{border:1px solid ButtonText;
@@ -791,8 +794,6 @@ footer {
   }.toc,.card,.code-block,.facts li,.requirements>div,.doc th,.doc td,.nav,footer,figure img,.hero-media img{border-color:CanvasText;
   }.card,.toc,.code-block{border:1px solid CanvasText;
   background:Canvas;
-  }.toc a.is-active{background:Highlight;
-  color:HighlightText;
   }:focus-visible{outline-color:Highlight;
   };
 }
@@ -978,16 +979,16 @@ footer {
   padding:0 var(--space-2);
   border:0;
   background:none;
-  color:var(--link);
+  color:var(--accent);
   font:inherit;
   font-size:var(--type-small);
   cursor:pointer;
 }
 .copy-button:hover {
-  color:var(--link-hover);
+  color:var(--accent-hover);
 }
 .copy-button:active {
-  color:var(--link-hover);
+  color:var(--accent-hover);
 }
 .copy-button .icon {
   width:18px;
@@ -1005,7 +1006,7 @@ footer {
   text-decoration:none;
 }
 .toc a:hover,.related a:hover,.pager a:hover {
-  color: var(--link-hover);
+  color: var(--accent-hover);
 }
 /* ---- nav ---- */
 .nav-inner {

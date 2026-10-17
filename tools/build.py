@@ -37,26 +37,20 @@ def search():
             '<div class="results" hidden></div></div>')
 
 
-def header(path='/index.html'):
-    """The shared header. The link for the page's section is marked as the current page."""
-    section = '/' + path.strip('/').split('/')[0] + '/'
-
-    def link(href, label, cls='', extra=''):
-        current = ' aria-current="page"' if href == section else ''
-        attrs = f' class="{cls}"' if cls else ''
-        return f'<a{attrs} href="{href}"{extra}{current}>{label}</a>'
-
+def header():
     return ('<header class="nav"><div class="nav-inner">'
             '<a class="nav-brand" href="/"><img src="/assets/icon.png" width="22" height="22" alt="">Library</a>'
             '<nav aria-label="Main">'
-            + link('/guide/', 'Guide')
-            + link('/privacy/', 'Privacy', 'nav-extra')
-            + link('/install/', 'Install')
-            + link('/accessibility/', 'Accessibility', 'nav-extra')
-            + link('/whats-new/', 'What\'s new', 'nav-extra')
-            + link('/releases/', 'Releases', 'nav-extra')
-            + link(REPO, 'GitHub', 'nav-extra', ' rel="noopener noreferrer"')
-            + '</nav></div></header>')
+            '<a href="/guide/">Guide</a>'
+            f'<a class="nav-extra" href="/privacy/">Privacy</a>'
+            '<a href="/install/">Install</a>'
+            '<a class="nav-extra" href="/accessibility/">Accessibility</a>'
+            '<a class="nav-extra" href="/whats-new/">What\'s new</a>'
+            '<a class="nav-extra" href="/releases/">Releases</a>'
+            f'<a class="nav-extra" href="{REPO}" rel="noopener noreferrer">GitHub</a>'
+            '</nav>'
+            + search() +
+            '</div></header>')
 
 
 def footer():
@@ -130,10 +124,10 @@ def page(path, title, desc, lede, toc, sections, plain=False, extra='', released
     related = ''.join(f'<li><a href="{h}">{l}</a></li>' for h, l in rel_items)
     back = f'<p class="back"><a href="/">{CHEV_L}Back to Library</a></p>'
     if plain:
-        return (head(title, desc, path) + header(path) +
+        return (head(title, desc, path) + header() +
                 f'<main id="main" class="doc">{back}<h1>{title}</h1><p class="lede">{lede}</p>{extra}</main>'
                 + footer() + '\n</body>\n</html>\n')
-    return (head(title, desc, path) + header(path) +
+    return (head(title, desc, path) + header() +
             f'<main id="main" class="doc">{back}<h1>{title}</h1><p class="lede">{lede}</p>'
             f'<p class="updated">' + (f'Released {released}. ' if released else 'Applies to the current release of Library. ') + f'Last reviewed {REVIEWED_LABEL}.</p>'
             f'<div class="article"><nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p>{toc_items}</nav>'
@@ -207,41 +201,6 @@ def code_bars(html):
     """Give each code block a header bar. The label is static text; script.js adds the Copy button to the bar."""
     return re.sub(r'<div class="code-block">\s*<pre>',
                   '<div class="code-block"><div class="code-head"><span class="code-label">Terminal</span></div><pre>', html)
-
-
-def table_labels(html):
-    """Copy each table's column headers onto its data cells as data-label.
-
-    On a phone the header row goes off screen, so each data cell repeats its column name (see the
-    phone rule in styles.css). Labels come from the matching th scope="col" cell, by position: the
-    first cell in a row is its row header (th scope="row"), and each data cell after it takes the
-    next column header.
-    """
-    def label_table(m):
-        table = m.group(0)
-        head = re.search(r'<thead>(.*?)</thead>', table, re.S)
-        if not head:
-            return table
-        labels = [' '.join(re.sub(r'<[^>]+>', ' ', th).split())
-                  for th in re.findall(r'<th\b[^>]*>(.*?)</th>', head.group(1), re.S)]
-        if not labels:
-            return table
-
-        def label_row(rm):
-            row = rm.group(0)
-            out, end, i = [], 0, 0
-            for cell in re.finditer(r'<(th|td)\b[^>]*>', row):
-                if cell.group(1) == 'td' and 'data-label' not in cell.group(0) and i < len(labels):
-                    label = labels[i].replace('"', '&quot;')
-                    out.append(row[end:cell.end() - 1] + f' data-label="{label}">')
-                    end = cell.end()
-                i += 1
-            out.append(row[end:])
-            return ''.join(out)
-
-        return table[:head.end()] + re.sub(r'<tr\b.*?</tr>', label_row, table[head.end():], flags=re.S)
-
-    return re.sub(r'<table>.*?</table>', label_table, html, flags=re.S)
 
 
 # ----------------------------------------------------------------------
@@ -370,6 +329,49 @@ def check_absolute_links(path, html):
                  % (path, '\n  '.join(relative)))
 
 
+# The accent colors a Mac user can pick in System Settings > Appearance. Button labels follow
+# AccentColorText, which is white or black, so each accent must reach 4.5:1 with one of them.
+MACOS_ACCENTS = [('Red', '#ff5257'), ('Orange', '#ff9f0a'), ('Yellow', '#ffd60a'), ('Green', '#30d158'),
+                 ('Blue', '#0a84ff'), ('Purple', '#bf5af2'), ('Pink', '#ff375f'), ('Graphite', '#8e8e93')]
+
+
+def luminance(color):
+    linear = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+              for c in (int(color[i:i + 2], 16) / 255 for i in (1, 3, 5))]
+    return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
+
+
+def contrast_ratio(a, b):
+    lighter, darker = sorted((luminance(a), luminance(b)), reverse=True)
+    return (lighter + 0.05) / (darker + 0.05)
+
+
+def check_accent_contrast(css):
+    """Fail the build if the accent cannot keep button labels at 4.5:1 contrast.
+
+    The accent follows AccentColor where the browser supports it, and its label follows
+    AccentColorText, so a Mac user can pick any accent and still get a legible label. Each fallback
+    accent/on-accent pair in src/styles.css must reach 4.5:1 on its own, and --accent must stay wired
+    to AccentColor so the accent follows the system.
+    """
+    problems = []
+    for name, accent in MACOS_ACCENTS:
+        best = max(contrast_ratio(accent, '#ffffff'), contrast_ratio(accent, '#000000'))
+        if best < 4.5:
+            problems.append('%s accent %s: the best label contrast is %.2f:1' % (name, accent, best))
+    if not re.search(r'--accent\s*:\s*AccentColor', css) or not re.search(r'--on-accent\s*:\s*AccentColorText', css):
+        problems.append('--accent must follow AccentColor and --on-accent must follow AccentColorText')
+    for block in re.findall(r'\{([^{}]*)\}', css, re.S):
+        tokens = dict(re.findall(r'--([a-z0-9-]+)\s*:\s*([^;}]+)', block))
+        accent, on_accent = tokens.get('accent', '').strip(), tokens.get('on-accent', '').strip()
+        if accent.startswith('#') and on_accent.startswith('#'):
+            ratio = contrast_ratio(accent, on_accent)
+            if ratio < 4.5:
+                problems.append('accent %s with label %s is %.2f:1' % (accent, on_accent, ratio))
+    if problems:
+        sys.exit('accent contrast check failed:\n  ' + '\n  '.join(problems))
+
+
 # ----------------------------------------------------------------------
 # file writers and generated files
 # ----------------------------------------------------------------------
@@ -437,7 +439,7 @@ def write(path, html):
     # /404.html is served at whatever address was missing, so relative links would resolve under that
     # missing path. Its links are written under the site's full base path instead, so they work at any depth.
     html = absolutize(html, BASE_PATH) if path == '/404.html' else relativize(html, path)
-    out = code_bars(minify_html(table_labels(html)))
+    out = code_bars(minify_html(html))
     check_build_html(path, out)
     if path == '/404.html':
         check_absolute_links(path, out)
@@ -454,7 +456,7 @@ def update_landing(install_command):
     stale = re.search(r'<section class="block band" id="download">.*?<pre><code>(.*?)</code></pre>', s, flags=re.S)
     if stale and 'git clone' in stale.group(1):
         sys.exit('install check failed:\n  the landing page must not tell visitors to git clone the repository')
-    s = re.sub(r'<header class="nav">.*?</header>', lambda m: header('/index.html'), s, flags=re.S)
+    s = re.sub(r'<header class="nav">.*?</header>', lambda m: header(), s, flags=re.S)
     s = re.sub(r'<footer>.*?</footer>', lambda m: footer(), s, flags=re.S)
     s = re.sub(r'(<section class="block band" id="download">.*?<pre><code>).*?(</code></pre>)',
                lambda m: m.group(1) + install_command + m.group(2), s, flags=re.S)
@@ -700,6 +702,7 @@ def write_service_worker():
 def build_all(check=False):
     global REVIEWED_LABEL
     check_pages_reachable()
+    check_accent_contrast(open(os.path.join(ROOT, 'src', 'styles.css')).read())
     import importlib.util
     spec = importlib.util.spec_from_file_location('pages', os.path.join(ROOT, 'content', 'pages.py'))
     pages = importlib.util.module_from_spec(spec)
@@ -711,7 +714,7 @@ def build_all(check=False):
     write_search_index(rendered, pages.GUIDE_GROUP_OF)
     write_guide_redirect(pages.GUIDE_PATH_OF)
     for path, html in rendered.items():
-        html = html.replace('__HEADER__', header(path)).replace('__FOOTER__', footer())
+        html = html.replace('__HEADER__', header()).replace('__FOOTER__', footer())
         if path.startswith('/guide/') and path != '/guide/index.html' and path.endswith('/index.html'):
             # Breadcrumbs for each guide group page, so search results show the path to it.
             crumbs = {'@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
