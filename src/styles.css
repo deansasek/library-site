@@ -11,13 +11,13 @@
   --radius-pill: 980px;
   --icon: 24px;
   --icon-sm: 20px;
-  --type-display:clamp(56px,10vw,112px);
-  --type-title:clamp(40px,5vw,56px);
-  --type-section:28px;
-  --type-subhead:clamp(21px,2.4vw,28px);
-  --type-lead:21px;
-  --type-body:17px;
-  --type-small:14px;
+  --type-display:clamp(3.5rem,10vw,7rem);
+  --type-title:clamp(2.5rem,5vw,3.5rem);
+  --type-section:1.75rem;
+  --type-subhead:clamp(1.3125rem,2.4vw,1.75rem);
+  --type-lead:1.3125rem;
+  --type-body:1.0625rem;
+  --type-small:0.875rem;
   --column:1024px;
   --inline-pad:max(var(--gutter),calc((100% - var(--column)) / 2));
   --space-1:4px;
@@ -656,7 +656,7 @@ footer {
   padding-top:var(--space-2);
   padding-bottom:var(--space-2);
   background:var(--band);
-  font-size:12px;
+  font-size:0.75rem;
   font-weight:500;
   color:var(--text-2);
 }
@@ -740,7 +740,7 @@ footer {
   min-height: var(--tap);
   display:flex;
   align-items:center;
-  font-size:12px;
+  font-size:0.75rem;
   font-weight:600;
   color:var(--text-2);
 }
@@ -905,7 +905,7 @@ footer {
    paragraph rules in the page's content do not override its size. */
 .results .results-page {
   margin: var(--space-3) 0 var(--space-1);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-2);
 }
