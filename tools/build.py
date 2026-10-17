@@ -37,20 +37,26 @@ def search():
             '<div class="results" hidden></div></div>')
 
 
-def header():
+def header(path='/index.html'):
+    """The shared header. The link for the page's section is marked as the current page."""
+    section = '/' + path.strip('/').split('/')[0] + '/'
+
+    def link(href, label, cls='', extra=''):
+        current = ' aria-current="page"' if href == section else ''
+        attrs = f' class="{cls}"' if cls else ''
+        return f'<a{attrs} href="{href}"{extra}{current}>{label}</a>'
+
     return ('<header class="nav"><div class="nav-inner">'
             '<a class="nav-brand" href="/"><img src="/assets/icon.png" width="22" height="22" alt="">Library</a>'
             '<nav aria-label="Main">'
-            '<a href="/guide/">Guide</a>'
-            f'<a class="nav-extra" href="/privacy/">Privacy</a>'
-            '<a href="/install/">Install</a>'
-            '<a class="nav-extra" href="/accessibility/">Accessibility</a>'
-            '<a class="nav-extra" href="/whats-new/">What\'s new</a>'
-            '<a class="nav-extra" href="/releases/">Releases</a>'
-            f'<a class="nav-extra" href="{REPO}" rel="noopener noreferrer">GitHub</a>'
-            '</nav>'
-            + search() +
-            '</div></header>')
+            + link('/guide/', 'Guide')
+            + link('/privacy/', 'Privacy', 'nav-extra')
+            + link('/install/', 'Install')
+            + link('/accessibility/', 'Accessibility', 'nav-extra')
+            + link('/whats-new/', 'What\'s new', 'nav-extra')
+            + link('/releases/', 'Releases', 'nav-extra')
+            + link(REPO, 'GitHub', 'nav-extra', ' rel="noopener noreferrer"')
+            + '</nav></div></header>')
 
 
 def footer():
@@ -124,10 +130,10 @@ def page(path, title, desc, lede, toc, sections, plain=False, extra='', released
     related = ''.join(f'<li><a href="{h}">{l}</a></li>' for h, l in rel_items)
     back = f'<p class="back"><a href="/">{CHEV_L}Back to Library</a></p>'
     if plain:
-        return (head(title, desc, path) + header() +
+        return (head(title, desc, path) + header(path) +
                 f'<main id="main" class="doc">{back}<h1>{title}</h1><p class="lede">{lede}</p>{extra}</main>'
                 + footer() + '\n</body>\n</html>\n')
-    return (head(title, desc, path) + header() +
+    return (head(title, desc, path) + header(path) +
             f'<main id="main" class="doc">{back}<h1>{title}</h1><p class="lede">{lede}</p>'
             f'<p class="updated">' + (f'Released {released}. ' if released else 'Applies to the current release of Library. ') + f'Last reviewed {REVIEWED_LABEL}.</p>'
             f'<div class="article"><nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p>{toc_items}</nav>'
@@ -413,7 +419,7 @@ def update_landing(install_command):
     stale = re.search(r'<section class="block band" id="download">.*?<pre><code>(.*?)</code></pre>', s, flags=re.S)
     if stale and 'git clone' in stale.group(1):
         sys.exit('install check failed:\n  the landing page must not tell visitors to git clone the repository')
-    s = re.sub(r'<header class="nav">.*?</header>', lambda m: header(), s, flags=re.S)
+    s = re.sub(r'<header class="nav">.*?</header>', lambda m: header('/index.html'), s, flags=re.S)
     s = re.sub(r'<footer>.*?</footer>', lambda m: footer(), s, flags=re.S)
     s = re.sub(r'(<section class="block band" id="download">.*?<pre><code>).*?(</code></pre>)',
                lambda m: m.group(1) + install_command + m.group(2), s, flags=re.S)
@@ -670,7 +676,7 @@ def build_all(check=False):
     write_search_index(rendered, pages.GUIDE_GROUP_OF)
     write_guide_redirect(pages.GUIDE_PATH_OF)
     for path, html in rendered.items():
-        html = html.replace('__HEADER__', header()).replace('__FOOTER__', footer())
+        html = html.replace('__HEADER__', header(path)).replace('__FOOTER__', footer())
         if path.startswith('/guide/') and path != '/guide/index.html' and path.endswith('/index.html'):
             # Breadcrumbs for each guide group page, so search results show the path to it.
             crumbs = {'@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
