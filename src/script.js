@@ -172,6 +172,23 @@ var indicator = document.createElement("span");
 indicator.className = "toc-indicator";
 indicator.setAttribute("aria-hidden", "true");
 toc.appendChild(indicator);
+var lastId = null;
+// Groups and features the reader closed on purpose, so scrolling does not spring them open again.
+var closedFolders = [];
+Array.prototype.slice.call(toc.querySelectorAll("details")).forEach(function (folder) {
+folder.addEventListener("toggle", function () {
+var i = closedFolders.indexOf(folder);
+if (folder.open) {
+if (i !== -1) { closedFolders.splice(i, 1); }
+} else if (i === -1) {
+closedFolders.push(folder);
+}
+});
+});
+function openFolder(folder) {
+if (closedFolders.indexOf(folder) !== -1) { return; }
+folder.open = true;
+}
 function markCurrent() {
 var current = null;
 tocTargets.forEach(function (t) {
@@ -192,22 +209,32 @@ a.classList.toggle("is-active", on);
 if (on) { a.setAttribute("aria-current", "location"); active = a; } else { a.removeAttribute("aria-current"); }
 });
 if (active) {
-// Open the groups and features around the current section, so its entry is visible in the navigation.
+// Open the groups and features around the current section, so its entry is visible in the
+// navigation, but only when the active section changes and never against the reader's choice.
+if (current !== lastId) {
 var folder = active.closest("details");
 while (folder) {
-folder.open = true;
+openFolder(folder);
 folder = folder.parentElement ? folder.parentElement.closest("details") : null;
+}
 }
 var box = textBox(active);
 var origin = toc.getBoundingClientRect();
 indicator.style.height = box.height + "px";
 indicator.style.transform = "translate(" + list.offsetLeft + "px," + (box.top - origin.top) + "px)";
 }
+lastId = current;
 }
 var pinnedId = null;
 tocLinks.forEach(function (a) {
 a.addEventListener("click", function () {
 pinnedId = a.getAttribute("href").slice(1);
+// Following a link shows where it goes, even inside a group the reader closed.
+var folder = a.closest("details");
+while (folder) {
+folder.open = true;
+folder = folder.parentElement ? folder.parentElement.closest("details") : null;
+}
 markCurrent();
 });
 });
