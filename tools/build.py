@@ -18,6 +18,9 @@ PAGER_ORDER = [('/install/', 'Install'), ('/guide/', 'Guide'), ('/smart-features
 SEARCH_PAGES = {'/guide/': 'Guide', '/privacy/': 'Privacy', '/install/': 'Install', '/development/': 'Development', '/smart-features/': 'Smart features'}
 SITE_PATHS = ['/', '/guide/', '/privacy/', '/install/', '/development/', '/smart-features/', '/releases/', '/whats-new/', '/accessibility/']
 REPO = 'https://github.com/deansasek/library'
+# The GitHub Pages project path. Links on /404.html must be written under it: the page is served at
+# whatever address was missing, so a relative link would resolve under the missing path.
+BASE_PATH = '/library-site'
 CHEV_R = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 6 6 6-6 6"/></svg>'
 CHEV_L = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 6-6 6 6 6"/></svg>'
 
@@ -183,6 +186,17 @@ def relativize(html, path):
     return re.sub(r'\b(href|src)="(/[^"]*)"', fix, html)
 
 
+def absolutize(html, base):
+    """Point local href/src at the site's full base path, so the page works from any address.
+
+    Used for /404.html, which GitHub Pages serves at the address that was missing. Absolute https URLs
+    and fragments are left as they are.
+    """
+    return re.sub(r'\b(href|src)="(/[^"]*)"',
+                  lambda m: m.group(0) if m.group(2).startswith('//') else f'{m.group(1)}="{base}{m.group(2)}"',
+                  html)
+
+
 def code_bars(html):
     """Give each code block a header bar. The label is static text; script.js adds the Copy button to the bar."""
     return re.sub(r'<div class="code-block">\s*<pre>',
@@ -298,6 +312,22 @@ def check_install_command(command):
     if problems:
         sys.exit('install check failed:\n  ' + '\n  '.join(problems))
 
+# A fragment, an absolute path (such as /library-site/assets/styles.css), or a full URL. Anything else
+# is relative and would resolve under the address that was missing.
+ABSOLUTE_LINK = re.compile(r'^(?:/|#|[a-zA-Z][a-zA-Z0-9+.-]*:)')
+
+
+def check_absolute_links(path, html):
+    """Fail the build if any href or src on this page is a relative path.
+
+    Paths are written with the leading `/`, so they carry the full base and work at any depth.
+    """
+    relative = [m.group(1) for m in re.finditer(r'\b(?:href|src)="([^"]*)"', html)
+                if not ABSOLUTE_LINK.match(m.group(1))]
+    if relative:
+        sys.exit('build check failed for %s (links must not be relative):\n  %s'
+                 % (path, '\n  '.join(relative)))
+
 
 # ----------------------------------------------------------------------
 # file writers and generated files
@@ -362,8 +392,14 @@ def key_caps(html):
 def write(path, html):
     full = os.path.join(ROOT, path.lstrip('/'))
     os.makedirs(os.path.dirname(full), exist_ok=True)
-    out = code_bars(minify_html(relativize(key_caps(point_guide_links(html)), path)))
+    html = key_caps(point_guide_links(html))
+    # /404.html is served at whatever address was missing, so relative links would resolve under that
+    # missing path. Its links are written under the site's full base path instead, so they work at any depth.
+    html = absolutize(html, BASE_PATH) if path == '/404.html' else relativize(html, path)
+    out = code_bars(minify_html(html))
     check_build_html(path, out)
+    if path == '/404.html':
+        check_absolute_links(path, out)
     with open(full, 'w') as f:
         f.write(out)
 
