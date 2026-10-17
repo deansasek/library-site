@@ -259,6 +259,35 @@ def check_pages_reachable():
     missing = [p for p in SITE_PATHS if f'href="{p}"' not in chrome]
     if missing:
         sys.exit('build check failed: no footer or narrow-screen header link to ' + ', '.join(missing))
+def _between(path, pattern):
+    """The first capture group of pattern in a built file, or None."""
+    with open(os.path.join(ROOT, path.lstrip('/'))) as f:
+        m = re.search(pattern, f.read(), flags=re.S)
+    return m.group(1) if m else None
+
+
+def check_install_command(command):
+    """Fail the build unless the landing page and the Install page show the same checksum-verified command.
+
+    Both come from INSTALL_COMMAND in content/pages.py, so the two cannot drift apart, and the landing
+    page must never send visitors to git clone the repository.
+    """
+    problems = []
+    landing = _between('/index.html', r'id="download".*?<pre><code>(.*?)</code></pre>')
+    install = _between('/install/index.html', r'id="install".*?<pre><code>(.*?)</code></pre>')
+    if landing != command or install != command:
+        problems.append('the landing page and the Install page must show the shared INSTALL_COMMAND')
+    if 'shasum -a 256 -c' not in (command or ''):
+        problems.append('the install command must verify the release checksum with shasum -a 256 -c')
+    landing_tools = _between('/index.html', r'<dt>Developer tools</dt><dd>(.*?)</dd>')
+    install_tools = _between('/install/index.html', r'<dt>Developer tools</dt><dd>(.*?)</dd>')
+    if landing_tools != install_tools:
+        problems.append('the landing page requirements must match the Install page')
+    with open(os.path.join(ROOT, 'index.html')) as f:
+        if 'git clone' in f.read():
+            problems.append('the landing page must not tell visitors to git clone the repository')
+    if problems:
+        sys.exit('install check failed:\n  ' + '\n  '.join(problems))
 
 
 # ----------------------------------------------------------------------
@@ -329,11 +358,19 @@ def write(path, html):
         f.write(out)
 
 
-def update_landing():
+def update_landing(install_command):
     p = os.path.join(ROOT, 'index.html')
     s = open(p).read()
+    # The Download command comes from the same constant as the Install page (content/pages.py), so the two
+    # cannot drift apart: every build rewrites it. A stale git clone command fails the build instead of
+    # being quietly replaced, so the original bug cannot come back unnoticed.
+    stale = re.search(r'<section class="block band" id="download">.*?<pre><code>(.*?)</code></pre>', s, flags=re.S)
+    if stale and 'git clone' in stale.group(1):
+        sys.exit('install check failed:\n  the landing page must not tell visitors to git clone the repository')
     s = re.sub(r'<header class="nav">.*?</header>', lambda m: header(), s, flags=re.S)
     s = re.sub(r'<footer>.*?</footer>', lambda m: footer(), s, flags=re.S)
+    s = re.sub(r'(<section class="block band" id="download">.*?<pre><code>).*?(</code></pre>)',
+               lambda m: m.group(1) + install_command + m.group(2), s, flags=re.S)
     s = re.sub(r'\s*<meta name="color-scheme"[^>]*>', '', s)
     s = re.sub(r'\s*<meta property="og:site_name"[^>]*>', '', s)
     s = code_bars(minify_html(relativize(key_caps(point_guide_links(s)), '/index.html')))
@@ -564,7 +601,8 @@ def build_all(check=False):
             html = html.replace('</body>', guide_redirect(pages.GUIDE_PATH_OF) + '</body>', 1)
         html = html.replace('</main>', pager(path) + '</main>', 1) if path_key(path) in dict(PAGER_ORDER) else html
         write(path, html)
-    update_landing()
+    update_landing(pages.INSTALL_COMMAND)
+    check_install_command(pages.INSTALL_COMMAND)
     css = open(os.path.join(ROOT, 'src', 'styles.css')).read()
     open(os.path.join(ROOT, 'assets', 'styles.css'), 'w').write(minify_css(css))
     js = open(os.path.join(ROOT, 'src', 'script.js')).read()
