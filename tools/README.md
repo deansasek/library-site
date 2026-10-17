@@ -6,7 +6,9 @@
 python3 tools/build.py
 ```
 
-It writes the HTML pages, `assets/styles.css`, `assets/script.js`, `assets/search-index.json`, `sitemap.xml`, and `robots.txt`. Run it again after every change to the sources.
+It writes the HTML pages, `assets/styles.css`, `assets/script.js`, `assets/search-index.json`, `sitemap.xml`, and `sw.js`. Run it again after every change to the sources.
+
+`robots.txt` is edited by hand; the build does not write it.
 
 To check the latest release against the version the docs were reviewed for, add `--check-release`. It prints a warning if they differ. A network failure only prints a note.
 
