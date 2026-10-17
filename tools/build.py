@@ -5,14 +5,13 @@ Shared head, nav, and footer markup lives here, so every page stays in sync.
 The landing page (index.html) keeps its own body, but its nav and footer are
 rewritten from the same templates. Output is plain static HTML and CSS.
 """
-import datetime, hashlib, html as H, json, os, re, sys, urllib.request
+import datetime, hashlib, html as H, json, os, re, sys
 from html.parser import HTMLParser
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TODAY = datetime.date.today()
 YEAR = TODAY.year
 REVIEWED_LABEL = TODAY.strftime('%B %d, %Y').replace(' 0', ' ')
-REPO_API = 'https://api.github.com/repos/deansasek/library/releases/latest'
 # Docs pages in reading order (the guide's order: start, features, then the reference pages).
 PAGER_ORDER = [('/install/', 'Install'), ('/guide/', 'Guide'), ('/smart-features/', 'Smart features'),
                ('/privacy/', 'Privacy'), ('/development/', 'Development')]
@@ -383,24 +382,50 @@ def write_search_index(rendered, guide_groups):
 # release check and build entry point
 # ----------------------------------------------------------------------
 
-def check_release(reviewed):
-    """Warn if the latest GitHub release is newer than the version the docs were reviewed against.
+def version_key(version):
+    """The numbers in a version, in order, so 1.10.0 sorts after 1.9.0. Mirrors tools/sync_releases.py."""
+    return [int(p) for p in re.findall(r'\d+', version)]
 
-    Never fails the build: a network error or timeout only prints a note.
+
+def latest_release():
+    """The newest release in content/releases.json, or None when the file is missing or empty.
+
+    The build reads the already-synced file, so the check needs no network.
     """
-    req = urllib.request.Request(REPO_API, headers={'User-Agent': 'library-site-build',
-                                                    'Accept': 'application/vnd.github+json'})
+    path = os.path.join(ROOT, 'content', 'releases.json')
     try:
-        with urllib.request.urlopen(req, timeout=10) as r:
-            tag = json.load(r).get('tag_name', '')
-    except Exception as e:  # network down, rate limited, or no release yet
-        print(f'release check skipped: {e}')
+        with open(path) as f:
+            releases = json.load(f)
+    except (OSError, ValueError):
+        return None
+    return max(releases, key=lambda r: version_key(r['version']), default=None)
+
+
+def check_release(reviewed):
+    """Warn if the latest release is newer than the version the docs were reviewed against.
+
+    The warning is repeated as a GitHub Actions annotation and step summary, so maintainers see it even though the
+    workflow stays green. Never fails the build: a missing releases file only prints a note.
+    """
+    latest = latest_release()
+    if latest is None:
+        print('release check skipped: content/releases.json is missing or empty')
         return
-    if tag.lstrip('v') != reviewed:
-        print(f'WARNING: latest release is {tag}, but the docs were last reviewed against {reviewed}. '
-              'Review the docs, then set REVIEWED_VERSION in content/pages.py.')
-    else:
+    tag, version = latest['tag'], latest['version']
+    if version == reviewed:
         print(f'release check: the docs were reviewed against {reviewed}, the latest release.')
+        return
+    message = (f'latest release is {tag}, but the docs were last reviewed against {reviewed}. '
+               'Review the docs, then set REVIEWED_VERSION in content/pages.py.')
+    if os.environ.get('GITHUB_ACTIONS'):
+        print(f'::warning file=content/pages.py,title=Docs are out of date::{message}')
+        summary = os.environ.get('GITHUB_STEP_SUMMARY')
+        if summary:
+            with open(summary, 'a') as f:
+                f.write('## Docs are out of date\n\n'
+                        f'The docs were last reviewed against **{reviewed}**, but the latest release is **{tag}**.\n\n'
+                        'Review the docs, then set `REVIEWED_VERSION` in `content/pages.py`.\n')
+    print(f'WARNING: {message}')
 
 
 SW_SKIP_DIRS = {'.git', 'src', 'content', 'tools', 'assets'}
