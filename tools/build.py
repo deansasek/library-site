@@ -343,6 +343,19 @@ def path_key(path):
     return path.replace('index.html', '')
 
 
+def sitemap_lastmod(path, release_dates, reviewed):
+    """The lastmod for one sitemap URL, or None to leave the optional element out.
+
+    A release's What's new page uses its release date; every other page uses the date the docs were last
+    reviewed. When neither is known the page has no real date, and a build date would wrongly tell search
+    engines it changed today, and give the hourly sync a diff to commit.
+    """
+    release = path[len('/whats-new/'):].strip('/') if path.startswith('/whats-new/') else ''
+    if release:
+        return release_dates.get(release)
+    return reviewed.isoformat() if reviewed else None
+
+
 def pager(path):
     """Previous and next links between the docs pages, in PAGER_ORDER."""
     keys = [k for k, _ in PAGER_ORDER]
@@ -512,8 +525,14 @@ def build_all(check=False):
     js = '\n'.join(l.strip() for l in js.splitlines() if l.strip() and not l.strip().startswith('//'))
     open(os.path.join(ROOT, 'assets', 'script.js'), 'w').write(js + '\n')
     release_paths = sorted(k.replace('index.html', '') for k in rendered if k.startswith('/whats-new/') and k != '/whats-new/index.html')
-    urls = ''.join(f'  <url>\n    <loc>https://deansasek.github.io/library-site{u}</loc>\n    <lastmod>{TODAY.isoformat()}</lastmod>\n  </url>\n'
-                   for u in SITE_PATHS + sorted(set(pages.GUIDE_PATH_OF.values())) + release_paths)
+    # Each URL carries its own real date (a release's date on a What's new page, the review date elsewhere),
+    # not the build date, so a rebuild that changes nothing writes the same sitemap.
+    release_dates = {r['version'].replace('.', '-'): r['date'] for r in pages._release_records()}
+    urls = ''
+    for u in SITE_PATHS + sorted(set(pages.GUIDE_PATH_OF.values())) + release_paths:
+        stamp = sitemap_lastmod(u, release_dates, pages.REVIEWED_DATE)
+        lastmod = f'    <lastmod>{stamp}</lastmod>\n' if stamp else ''
+        urls += f'  <url>\n    <loc>https://deansasek.github.io/library-site{u}</loc>\n{lastmod}  </url>\n'
     open(os.path.join(ROOT, 'sitemap.xml'), 'w').write(
         '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '</urlset>\n')
     write_service_worker()
