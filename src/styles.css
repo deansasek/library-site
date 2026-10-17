@@ -142,6 +142,7 @@ code {
   display:flex;
   align-items:center;
   justify-content:space-between;
+  gap:var(--space-4);
   height:48px;
   padding:0 var(--gutter);
   font-size:var(--type-small);
@@ -161,6 +162,7 @@ code {
 .nav nav {
   display:flex;
   gap:var(--space-6);
+  margin-left:auto;
 }
 .nav nav a {
   display:inline-flex;
@@ -171,6 +173,33 @@ code {
 }
 .nav nav a:hover {
   color: var(--link-hover);
+}
+/* The site-wide search field sits at the right of the header, on every page. Its results open below the field. */
+.nav .search {
+  position:relative;
+  flex:0 1 220px;
+  min-width:88px;
+  margin:0;
+}
+.nav .search-icon {
+  left:var(--space-2);
+  width:16px;
+  height:16px;
+}
+.nav .search input {
+  min-height:36px;
+  font-size:16px;
+  padding:0 var(--space-2) 0 calc(var(--space-2) + 16px + var(--space-2));
+}
+.nav .results {
+  position:absolute;
+  top:calc(100% + var(--space-2));
+  right:0;
+  width:min(340px, calc(100vw - 2 * var(--gutter)));
+  max-height:min(60vh, 400px);
+  overflow-y:auto;
+  margin-top:0;
+  box-shadow:0 12px 32px var(--media-border);
 }
 /* ---- sections ---- */
 .block {
@@ -741,7 +770,8 @@ footer {
   display:inline-flex;
 }
 
-@media (max-width:734px){.nav nav .nav-extra{display:none;}}/* ---- motion & media queries ---- */
+/* With the header search field, the extra links only fit on wide screens. */
+@media (max-width:959px){.nav nav .nav-extra{display:none;}}/* ---- motion & media queries ---- */
 @media (prefers-contrast:more) {
   :root{--text-2:#515154;
   --border:#86868b;
