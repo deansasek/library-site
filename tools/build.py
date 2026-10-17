@@ -25,6 +25,15 @@ CHEV_L = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focus
 # shared chrome: nav, footer, and document head
 # ----------------------------------------------------------------------
 
+def search():
+    """The site-wide search field that the header shows on every page. It starts hidden; script.js reveals it once the index loads."""
+    return ('<div class="search" role="search" hidden><label class="visually-hidden" for="site-search">Search the docs</label>'
+            '<div class="search-field"><svg class="icon search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
+            '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>'
+            '<input id="site-search" type="search" placeholder="Search" autocomplete="off"></div>'
+            '<div class="results" hidden></div></div>')
+
+
 def header():
     return ('<header class="nav"><div class="nav-inner">'
             '<a class="nav-brand" href="/"><img src="/assets/icon.png" width="22" height="22" alt="">Library</a>'
@@ -36,7 +45,9 @@ def header():
             '<a class="nav-extra" href="/whats-new/">What\'s new</a>'
             '<a class="nav-extra" href="/releases/">Releases</a>'
             f'<a class="nav-extra" href="{REPO}" rel="noopener noreferrer">GitHub</a>'
-            '</nav></div></header>')
+            '</nav>'
+            + search() +
+            '</div></header>')
 
 
 def footer():
@@ -99,16 +110,6 @@ RELATED = {
 # page templates and related links
 # ----------------------------------------------------------------------
 
-def search_box(path):
-    if path not in SEARCH_PAGES and not path.startswith('/guide/'):
-        return ''
-    return ('<div class="search" hidden><label class="visually-hidden" for="docs-search">Search the docs</label>'
-            '<div class="search-field"><svg class="icon search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
-            '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>'
-            '<input id="docs-search" type="search" placeholder="Search" autocomplete="off"></div>'
-            '<div class="results" hidden></div></div>')
-
-
 def page(path, title, desc, lede, toc, sections, plain=False, extra='', released=None, nav=None):
     toc_items = nav or '<ol>' + ''.join(f'<li><a href="#{i}">{l}</a></li>' for i, l in toc) + '</ol>'
     body = ''.join(f'<section id="{i}"><h2>{h}</h2>{html}</section>'
@@ -126,7 +127,7 @@ def page(path, title, desc, lede, toc, sections, plain=False, extra='', released
     return (head(title, desc, path) + header() +
             f'<main id="main" class="doc">{back}<h1>{title}</h1><p class="lede">{lede}</p>'
             f'<p class="updated">' + (f'Released {released}. ' if released else 'Applies to the current release of Library. ') + f'Last reviewed {REVIEWED_LABEL}.</p>'
-            f'<div class="article"><nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p>{search_box(path)}{toc_items}</nav>'
+            f'<div class="article"><nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p>{toc_items}</nav>'
             f'<div class="content">{body}'
             f'<section class="related"><h2>Related</h2><ul>{related}</ul></section>'
             '</div></div></main>'
