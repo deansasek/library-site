@@ -420,25 +420,59 @@ def pager(path):
     return '<nav class="pager" aria-label="Previous and next pages">' + ''.join(parts) + '</nav>'
 
 
+SEARCH_TEXT_LIMIT = 400
+# Search queries that must find a known sub-section, so word-order matching cannot regress. Each pair is a query
+# and the id of a section or sub-section it has to reach.
+SEARCH_CHECKS = [('template', 'manager-templates'), ('bulk edit', 'manager-bulk-edit'),
+                 ('queue paste', 'clipboard-paste-queue'), ('pin clipboard', 'clipboard-pin-an-item')]
+
+
+def _search_text(html):
+    """Plain text for the search index: tags dropped, entities decoded, whitespace collapsed."""
+    text = ' '.join(H.unescape(re.sub(r'<[^>]+>', ' ', html)).split())
+    return re.sub(r'\s+([.,;:!?])', r'\1', text)[:SEARCH_TEXT_LIMIT]
+
+
+def check_search_index(items, indexed, expected):
+    """Fail the build unless every <h3 id> is indexed and every word of a check query is found in any order."""
+    missing = sorted(expected - indexed)
+    if missing:
+        sys.exit('build check failed: headings missing from the search index: ' + ', '.join(missing))
+    for query, anchor in SEARCH_CHECKS:
+        words = query.lower().split()
+        if not any(it['u'].endswith('#' + anchor) and
+                   all(w in (it['t'] + ' ' + it['p'] + ' ' + it['s']).lower() for w in words) for it in items):
+            sys.exit(f'build check failed: searching for "{query}" does not find #{anchor}')
+
+
 def write_search_index(rendered, guide_groups):
-    """A small JSON index of each docs section's heading and first sentence, for script.js.
+    """A JSON index of each docs heading and its text, for script.js.
 
     Guide sections are labeled with their navigation group, such as "Find and open", not just "Guide".
+    Each <h3 id> is indexed as its own entry, so sub-sections such as Templates are searchable.
     """
-    items = []
+    items, indexed, expected = [], set(), set()
     for path, page_html in rendered.items():
         pg = path.replace('index.html', '')
         if pg == '/guide/' or not (pg in SEARCH_PAGES or pg.startswith('/guide/')):
             continue
+        # Relative to the script's folder (assets/), so the link works under any base path.
+        url = '../' + pg.strip('/') + '/#'
+        for id_ in re.findall(r'<h3 id="([^"]+)"', page_html):
+            expected.add(url + id_)
         for m in re.finditer(r'<section id="([^"]+)"><h2>([^<]*)</h2>(.*?)</section>', page_html, re.S):
             sid, title, body = m.groups()
-            text = ' '.join(H.unescape(re.sub(r'<[^>]+>', ' ', body)).split())
-            text = re.sub(r'\s+([.,;:!?])', r'\1', text)
-            first = re.split(r'(?<=[.!?])\s', text)[0][:100]
             label = guide_groups[sid] if pg.startswith('/guide/') else SEARCH_PAGES[pg]
-            items.append({'t': H.unescape(title), 'p': label,
-                          # Relative to the script's folder (assets/), so the link works under any base path.
-                          'u': '../' + pg.strip('/') + '/#' + sid, 's': first})
+            # The section's own text runs up to its first sub-heading; each sub-heading owns the text after it.
+            items.append({'t': H.unescape(title), 'p': label, 'u': url + sid,
+                          's': _search_text(re.split(r'<h3 id="', body)[0])})
+            indexed.add(url + sid)
+            for hm in re.finditer(r'<h3 id="([^"]+)"[^>]*>(.*?)(?=<h3 id="|$)', body, re.S):
+                hid, inner = hm.groups()
+                items.append({'t': _search_text(inner.split('</h3>', 1)[0]), 'p': label, 'u': url + hid,
+                              's': _search_text(inner)})
+                indexed.add(url + hid)
+    check_search_index(items, indexed, expected)
     data = json.dumps(items, ensure_ascii=False, separators=(',', ':'))
     with open(os.path.join(ROOT, 'assets', 'search-index.json'), 'w') as f:
         f.write(data)
