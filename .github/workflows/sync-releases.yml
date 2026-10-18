@@ -35,9 +35,12 @@ jobs:
           python-version: "3.12"
       - name: Read the app's releases
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           SYNC_ALLOW_REMOVAL: ${{ inputs.allow_removal && '1' || '0' }}
         run: python3 tools/sync_releases.py
       - name: Build the site
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: python3 tools/build.py --check-release
       - name: Save any change as a patch
         run: |
