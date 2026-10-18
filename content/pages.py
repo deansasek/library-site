@@ -61,6 +61,24 @@ GUIDE_GROUP_OF = {}
 GROUP_INTRO = {title: intro for title, intro, _ in GUIDE_GROUPS}
 
 
+def app_files_table():
+    """The ~/.library file table, built from the app's own docs/privacy.md at the pinned commit.
+
+    The site used to keep its own copy of these names, which drifted from the app: it listed
+    bookmarks-damaged.json where the app writes bookmarks-damaged-<time>.json. Building the rows from the app's
+    document means a name the app stops writing cannot stay on the page. Returns the body rows only, since the
+    page supplies the caption and the column headers.
+    """
+    doc = app_doc('privacy.md')
+    tables = re.findall(r'(?:^\|.*\n)+', doc, re.M)
+    if not tables:
+        raise SystemExit('the app privacy.md has no file table, so the privacy page has nothing to list')
+    rows = to_html(tables[0].strip(), row_headers=True)
+    body = re.search(r'<tbody>(.*)</tbody>', rows, re.S).group(1)
+    # The app's table puts bookmarks.json first and snippets.json last; the site keeps the same order the app does.
+    return body
+
+
 def group_slug(title):
     return re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-')
 
@@ -436,17 +454,10 @@ def render(page):
 <caption>Files in ~/.library</caption>
 <thead><tr><th scope="col">File</th><th scope="col">Contents</th></tr></thead>
 <tbody>
-<tr><th scope="row"><code>bookmarks.json</code></th><td>Your items, folders, shortcuts, and order. With <strong>Keep Library in iCloud Drive</strong> on, the file is kept in iCloud Drive, and this entry links to it.</td></tr>
-<tr><th scope="row"><code>clipboard.json</code></th><td>Pinned clipboard items, encrypted with a key kept in your Keychain</td></tr>
-<tr><th scope="row"><code>clipboard-history.json</code></th><td>Unpinned clipboard history, encrypted the same way. This file exists only when <strong>Keep clipboard history across restarts</strong> is on. It is off by default.</td></tr>
-<tr><th scope="row"><code>bookmarks-before-iCloud.json</code>, <code>bookmarks-iCloud-replaced.json</code></th><td>Backups kept when <strong>Keep Library in iCloud Drive</strong> is turned on, so no library is lost.</td></tr>
-<tr><th scope="row"><code>bookmarks-damaged-&lt;time&gt;.json</code>, <code>snippets-damaged-&lt;time&gt;.json</code></th><td>A copy of a file that could not be read, under a new timestamped name each time, so an earlier copy is never replaced. Library tells you when it launches.</td></tr>
-<tr><th scope="row"><code>clipboard-damaged-&lt;time&gt;.bin</code>, <code>clipboard-history-damaged-&lt;time&gt;.bin</code></th><td>A clipboard file that could not be read, moved aside under a new timestamped name each time.</td></tr>
-<tr><th scope="row"><code>snippets.json</code></th><td>Your snippets, as plain text. They are not encrypted, so don't keep passwords in a snippet.</td></tr>
-<tr><th scope="row"><code>favicons/</code></th><td>Cached site icons. Library downloads them again if you delete the folder.</td></tr>
+''' + app_files_table() + '''
 </tbody>
 </table>
-<p>The <code>&lt;time&gt;</code> above is the moment the file was kept, so each copy has its own name. The backup file names may change in a future update.</p>
+<p>Each <code>&lt;time&gt;</code> is the moment the copy was kept, so every one has its own name and an earlier copy is never replaced. The backup file names may change in a future update.</p>
 <p>Updates don't change your data.</p>'''),
         ('what-is-sent', 'What is sent', '''<p>Library connects to the internet only for these things.</p>
 <ul>
