@@ -261,13 +261,17 @@ class EmptyCheck(HTMLParser):
 
 def check_build_html(path, html):
     """Fail the build on empty list items, paragraphs, blocks, and table cells, on back-to-back lists,
-    and on an executable inline <script>, which the CSP in _headers would block."""
+    on an executable inline <script>, which the CSP in _headers would block, and on markup that shows as
+    literal text because it was escaped twice."""
     parser = EmptyCheck()
     parser.feed(html)
     parser.close()
     problems = list(parser.problems)
     for m in re.finditer(r'</(ul|ol)><(ul|ol)\b', html):
         problems.append('two lists in a row (merge them): ...' + html[max(0, m.start() - 40):m.end()] + '...')
+    for m in re.finditer(r'&lt;(strong|code)&gt;', html):
+        problems.append('markup escaped twice (shows as literal text): ...'
+                        + html[max(0, m.start() - 40):m.end() + 40] + '...')
     for m in re.finditer(r'<script\b([^>]*)>', html, re.I):
         attrs = m.group(1)
         # A script with a src is a file, and application/ld+json is data, so both are allowed.
