@@ -3,7 +3,7 @@
 // The shell assets are precached; the search index and images are fetched on first use and kept for offline
 // reading. The asset and page caches are versioned separately, so a page edit does not download the asset set again.
 var ASSET_CACHE = "assets-fc6469fca6af";
-var PAGE_CACHE = "pages-a9bacd0cdcf7";
+var PAGE_CACHE = "pages-a8d4dcc9391c";
 var RUNTIME_CACHE = "runtime";
 var PRECACHE_ASSETS = ["assets/styles.css", "assets/script.js", "assets/guide-redirect.js", "assets/icon.png", "assets/icon-44.png", "manifest.webmanifest"];
 var PRECACHE_PAGES = ["./", "404.html"];
