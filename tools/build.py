@@ -31,6 +31,161 @@ CHEV_R = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focus
 CHEV_L = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 6-6 6 6 6"/></svg>'
 
 # ----------------------------------------------------------------------
+# the app's own docs: a pinned copy, so the site says what the app says
+# ----------------------------------------------------------------------
+
+APP_REPO = 'https://github.com/deansasek/library.git'
+# A sibling checkout, used by --update-app-docs before it falls back to a clone.
+SIBLING_APP = os.path.join(os.path.dirname(ROOT), 'library')
+APP_DOCS = os.path.join(ROOT, 'content', 'appdocs')
+APP_DOC_NAMES = ['guide.md', 'privacy.md', 'development.md']
+
+
+def app_doc_ref():
+    """The app commit the vendored docs came from, or exit when the pin is missing.
+
+    The docs are committed, so a build needs no network and always renders the same text. A build without the pin
+    would silently fall back to the site's own copy, which is the drift this replaces, so a missing one fails.
+    """
+    path = os.path.join(APP_DOCS, 'REF')
+    if not os.path.isfile(path):
+        sys.exit('missing %s. Run python3 tools/build.py --update-app-docs to vendor the app docs.' % path)
+    ref = open(path).read().strip()
+    if not re.fullmatch(r'[0-9a-f]{40}', ref):
+        sys.exit('%s holds %r, which is not a full commit id.' % (path, ref))
+    return ref
+
+
+def app_doc(name):
+    """The app's doc at the pinned commit, as text."""
+    path = os.path.join(APP_DOCS, name)
+    if not os.path.isfile(path):
+        sys.exit('missing %s. Run python3 tools/build.py --update-app-docs to vendor the app docs.' % path)
+    return open(path).read()
+
+
+def _git_out(args, cwd=None):
+    import subprocess
+    return subprocess.run(args, cwd=cwd, check=True, stdout=subprocess.PIPE).stdout
+
+
+def app_doc_references(text):
+    """Every path a doc points at: Markdown links and images, and the src of an HTML <img>."""
+    refs = [m.group(1) for m in re.finditer(r'!?\[[^\]]*\]\(\s*([^)\s]+)', text)]
+    refs += [m.group(1) for m in re.finditer(r'<img[^>]*\bsrc="([^"]+)"', text)]
+    return [r for r in refs if not re.match(r'(https?:|mailto:|#)', r)]
+
+
+def update_app_docs(ref=None):
+    """Copy the app's docs, and the images they show, from the app repo at `ref` into content/appdocs.
+
+    Uses a sibling checkout when it has that commit, and clones otherwise. The commit is recorded in REF, so the
+    site is built from one known version of the app's words.
+    """
+    import subprocess
+    repo = None
+    if os.path.isdir(os.path.join(SIBLING_APP, '.git')):
+        try:
+            resolved = _git_out(['git', 'rev-parse', '--verify', (ref or 'HEAD') + '^{commit}'],
+                                cwd=SIBLING_APP).decode().strip()
+            repo, ref = SIBLING_APP, resolved
+        except subprocess.CalledProcessError:
+            repo = None
+    if repo is None:
+        import tempfile
+        repo = tempfile.mkdtemp(prefix='library-app-')
+        subprocess.run(['git', 'clone', '--quiet', APP_REPO, repo], check=True)
+        ref = _git_out(['git', 'rev-parse', '--verify', (ref or 'HEAD') + '^{commit}'], cwd=repo).decode().strip()
+    os.makedirs(APP_DOCS, exist_ok=True)
+    for name in APP_DOC_NAMES:
+        open(os.path.join(APP_DOCS, name), 'wb').write(_git_out(['git', 'show', ref + ':docs/' + name], cwd=repo))
+    # Only the images the docs show, so the vendored copy stays small enough to commit.
+    for name in APP_DOC_NAMES:
+        for target in app_doc_references(app_doc(name)):
+            if not target.startswith('docs/media/'):
+                continue
+            open(os.path.join(APP_DOCS, os.path.basename(target)), 'wb').write(
+                _git_out(['git', 'show', ref + ':' + target], cwd=repo))
+    open(os.path.join(APP_DOCS, 'REF'), 'w').write(ref + '\n')
+    print('vendored the app docs at %s' % ref)
+
+
+def check_app_docs():
+    """Fail when a doc points at an image or another doc that is not vendored beside it.
+
+    A missing reference would otherwise reach the page as a dead link or a broken image, and the build would pass.
+    """
+    ref = app_doc_ref()
+    problems = []
+    for name in APP_DOC_NAMES:
+        for target in app_doc_references(app_doc(name)):
+            if target.startswith('docs/media/') or target.startswith('docs/'):
+                if not os.path.isfile(os.path.join(APP_DOCS, os.path.basename(target))):
+                    problems.append('%s points at %s, which is not vendored' % (name, target))
+    if problems:
+        sys.exit('app docs check failed at %s:\n  %s' % (ref[:12], '\n  '.join(sorted(set(problems)))))
+
+
+def markdown(text, row_headers=False):
+    """Converts the app's Markdown to the HTML the site uses.
+
+    Only what the app's docs contain: headings, paragraphs, bullet lists, pipe tables, images, and the inline
+    **bold**, *italic*, `code` and [link] forms. A block that is already HTML is passed through, since the docs use
+    that for a centred image with its alt text. With `row_headers`, the first cell of each table row becomes a row
+    header, which is what the site's tables use.
+    """
+    out = []
+    for block in re.split(r'\n\s*\n', text.strip()):
+        block = block.strip()
+        if not block:
+            continue
+        if block.startswith('|'):
+            out.append(_markdown_table(block, row_headers))
+            continue
+        heading = re.match(r'(#{1,6})\s+(.*)', block)
+        if heading:
+            level = len(heading.group(1))
+            out.append(f'<h{level}>{inline(heading.group(2))}</h{level}>')
+            continue
+        if re.match(r'^\s*[-*]\s+', block):
+            items = ''.join(f'<li>{inline(re.sub(r"^\s*[-*]\s+", "", line).strip())}</li>'
+                            for line in block.splitlines() if re.match(r'^\s*[-*]\s+', line))
+            out.append('<ul>' + items + '</ul>')
+            continue
+        if block.startswith('<'):
+            out.append(block)
+            continue
+        out.append('<p>' + inline(' '.join(l.strip() for l in block.splitlines())) + '</p>')
+    return '\n'.join(out)
+
+
+def _markdown_table(block, row_headers):
+    """One pipe table as the site's table markup, without a caption: the page supplies its own."""
+    rows = [[c.strip() for c in line.strip().strip('|').split('|')]
+            for line in block.splitlines() if line.strip().startswith('|')]
+    head = rows[0]
+    body = [r for r in rows[2:] if not set(''.join(r)) <= set('-: ')]
+    thead = '<tr>' + ''.join(f'<th scope="col">{inline(c)}</th>' for c in head) + '</tr>'
+    rows_html = ''
+    for row in body:
+        cells = (f'<th scope="row">{inline(row[0])}</th>' if row_headers and row else '') \
+            + ''.join(f'<td>{inline(c)}</td>' for c in row[1:])
+        rows_html += f'<tr>{cells}</tr>'
+    return f'<table><thead>{thead}</thead><tbody>{rows_html}</tbody></table>'
+
+
+def inline(text):
+    """The inline Markdown forms the docs use, with every piece HTML-escaped first."""
+    text = H.escape(text)
+    text = re.sub(r'!\[([^\]]*)\]\(([^)\s]+)\)',
+                  lambda m: f'<img src="{m.group(2)}" alt="{m.group(1)}">', text)
+    text = re.sub(r'\[([^\]]+)\]\(([^)\s]+)\)', r'<a href="\2">\1</a>', text)
+    text = re.sub(r'\*\*([^*]+)\*\*', r'<strong>\1</strong>', text)
+    text = re.sub(r'(?<![\w*])\*([^*\n]+)\*(?![\w*])', r'<em>\1</em>', text)
+    text = re.sub(r'`([^`]+)`', r'<code>\1</code>', text)
+    return text
+
+# ----------------------------------------------------------------------
 # shared chrome: nav, footer, and document head
 # ----------------------------------------------------------------------
 
@@ -1084,12 +1239,18 @@ def write_service_worker(urls):
 def build_all(check=False):
     global REVIEWED_LABEL, REVIEWED_VERSION, REVIEWED_ISO
     check_pages_reachable()
+    check_app_docs()
     check_accent_contrast(open(os.path.join(ROOT, 'src', 'styles.css')).read())
     check_image_sizes()
     import importlib.util
     spec = importlib.util.spec_from_file_location('pages', os.path.join(ROOT, 'content', 'pages.py'))
     pages = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(pages)
+    # The app's docs at the pinned commit, and the Markdown converter: so a page can be written from the app's own
+    # words instead of a second copy that drifts.
+    pages.to_html = markdown
+    pages.app_doc = app_doc
+    pages.app_doc_ref = app_doc_ref
     reviewed_on = pages.REVIEWED_DATE or TODAY
     REVIEWED_LABEL = reviewed_on.strftime('%B %d, %Y').replace(' 0', ' ')
     REVIEWED_VERSION = pages.REVIEWED_VERSION
@@ -1144,6 +1305,10 @@ def build_all(check=False):
 
 
 if __name__ == '__main__':
-    build_all(check='--check-release' in sys.argv)
-    print('built')
+    if '--update-app-docs' in sys.argv:
+        rest = [a for a in sys.argv[1:] if a != '--update-app-docs']
+        update_app_docs(rest[0] if rest else None)
+    else:
+        build_all(check='--check-release' in sys.argv)
+        print('built')
 
