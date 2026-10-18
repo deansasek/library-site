@@ -626,6 +626,34 @@ def write(path, html):
         f.write(out)
 
 
+# Generated pages live at the site root and in folders such as guide/ and whats-new/. These folders hold
+# sources, assets, and tooling instead, so an .html file in them is not a page.
+SITE_SKIP_DIRS = {'.git', 'src', 'content', 'tools', 'assets'}
+
+
+def remove_orphan_pages(rendered):
+    """Delete generated .html files that the sources no longer render.
+
+    Pages are only ever added, so a renamed guide group or a removed release page used to stay on disk and
+    stay published even though the sitemap left it out. The generated set is every rendered page plus the
+    hand-maintained index.html; any other .html outside the source folders is an orphan. Only .html files
+    are touched, so hand-maintained top-level files such as CNAME, _headers, and .nojekyll stay put.
+    """
+    keep = {'index.html'} | {p.lstrip('/') for p in rendered}
+    orphans = []
+    for dirpath, dirnames, filenames in os.walk(ROOT):
+        dirnames[:] = [d for d in dirnames if d not in SITE_SKIP_DIRS and not d.startswith('.')]
+        for name in filenames:
+            if not name.endswith('.html'):
+                continue
+            rel = os.path.relpath(os.path.join(dirpath, name), ROOT).replace(os.sep, '/')
+            if rel not in keep:
+                orphans.append(rel)
+    for rel in sorted(orphans):
+        os.remove(os.path.join(ROOT, rel))
+    return orphans
+
+
 def update_landing(install_command):
     p = os.path.join(ROOT, 'index.html')
     s = open(p).read()
@@ -662,6 +690,40 @@ def write_guide_redirect(paths):
 
 def path_key(path):
     return path.replace('index.html', '')
+
+
+def page_urls(rendered):
+    """Every page URL in the built site, apart from 404.html, in sitemap order.
+
+    The rendered pages are the source of truth, plus the hand-maintained landing page. The fixed top-level
+    pages keep the order in SITE_PATHS; the guide group and release pages follow, sorted. Both sitemap.xml
+    and the service worker's page list come from here, so they cannot drift apart or keep a removed page.
+    """
+    urls = {path_key(p) for p in rendered if p != '/404.html'}
+    urls.add('/')
+    return [p for p in SITE_PATHS if p in urls] + sorted(urls - set(SITE_PATHS))
+
+
+def check_sitemap_matches_service_worker():
+    """Fail the build unless sw.js lists the same pages as sitemap.xml, apart from 404.html.
+
+    The service worker keeps a PAGES list so activate can drop cached pages that the sources no longer
+    render. A page that is in one list but not the other would stay published or stay cached.
+    """
+    with open(os.path.join(ROOT, 'sitemap.xml')) as f:
+        sitemap = set(re.findall(r'<loc>https://deansasek\.github\.io/library-site(/[^<]*)</loc>', f.read()))
+    with open(os.path.join(ROOT, 'sw.js')) as f:
+        match = re.search(r'^var PAGES = (\[.*?\]);$', f.read(), re.M)
+    if not match:
+        sys.exit('build check failed: sw.js must list the site pages in PAGES')
+    pages = set(json.loads(match.group(1)))
+    if pages != sitemap:
+        problems = []
+        if pages - sitemap:
+            problems.append('in sw.js but not sitemap.xml: ' + ', '.join(sorted(pages - sitemap)))
+        if sitemap - pages:
+            problems.append('in sitemap.xml but not sw.js: ' + ', '.join(sorted(sitemap - pages)))
+        sys.exit('build check failed: sw.js and sitemap.xml list different pages:\n  ' + '\n  '.join(problems))
 
 
 def sitemap_lastmod(path, release_dates, reviewed):
@@ -797,7 +859,6 @@ def check_release(reviewed):
     print(f'WARNING: {message}')
 
 
-SW_SKIP_DIRS = {'.git', 'src', 'content', 'tools', 'assets'}
 # The precache is the shell only: the assets, the home page, and the 404 fallback. Guide pages are left out
 # because the fetch handler caches each page on first navigation. The search index is left out too: at ~52 KB
 # it is larger than the headroom under the first-install budget, and script.js fetches it when search is used.
@@ -818,6 +879,7 @@ var PAGE_CACHE = "pages-%(page_version)s";
 var RUNTIME_CACHE = "runtime";
 var PRECACHE_ASSETS = %(assets)s;
 var PRECACHE_PAGES = %(pages)s;
+var PAGES = %(page_list)s;
 var SHELL_ASSETS = PRECACHE_ASSETS.map(function (u) { return new URL(u, location.href).pathname; });
 // How long a navigation waits on the network before the cached page is served instead. Kept under the 1.5 second
 // budget the issue sets for showing a cached page, so the wait is the timeout and not however long the network takes.
@@ -834,6 +896,22 @@ function precache(name, urls) {
   });
 }
 
+function prunePageCache() {
+  // A page the build no longer renders must not stay in the page cache and be served offline. PAGES is the
+  // same page set as sitemap.xml, apart from 404.html, which is precached as the offline fallback.
+  var keep = PAGES.map(function (p) { return new URL("." + p, self.registration.scope).href; })
+    .concat(PRECACHE_PAGES.map(function (p) { return new URL(p || "./", self.registration.scope).href; }));
+  return caches.open(PAGE_CACHE).then(function (cache) {
+    return cache.keys().then(function (requests) {
+      return Promise.all(requests.filter(function (request) {
+        var url = new URL(request.url);
+        url.search = "";
+        return keep.indexOf(url.href) === -1;
+      }).map(function (request) { return cache.delete(request); }));
+    });
+  });
+}
+
 self.addEventListener("install", function (event) {
   // Reload bypasses the browser's HTTP cache, so each new version precaches the files from the current deploy.
   event.waitUntil(Promise.all([
@@ -846,7 +924,7 @@ self.addEventListener("activate", function (event) {
   var keep = [ASSET_CACHE, PAGE_CACHE, RUNTIME_CACHE];
   event.waitUntil(caches.keys().then(function (keys) {
     return Promise.all(keys.filter(function (k) { return keep.indexOf(k) === -1; }).map(function (k) { return caches.delete(k); }));
-  }).then(function () { return self.clients.claim(); }));
+  }).then(prunePageCache).then(function () { return self.clients.claim(); }));
 });
 
 // Stores a fresh page under its query-free URL, but only when the body differs from what is already cached,
@@ -918,6 +996,7 @@ self.addEventListener("fetch", function (event) {
 
 def sw_source_path(rel):
     """The file on disk for one precache entry: a directory URL (or the home page) maps to its index.html."""
+    rel = rel.lstrip('/')
     return rel + 'index.html' if rel == '' or rel.endswith('/') else rel
 
 
@@ -935,12 +1014,14 @@ def sw_urls(entries):
     return json.dumps(['./' if r == '' else r for r in entries])
 
 
-def write_service_worker():
+def write_service_worker(urls):
     """Writes sw.js at the site root.
 
     The shell is precached in two caches with separate versions, so a page edit installs a new page cache
     without reinstalling the asset cache. The build fails when the first install would exceed the install
     budget, or when changing one page would make a returning visitor download more than the per-edit budget.
+    The page set comes from the rendered pages, not a disk scan, so a page that the sources drop cannot
+    linger in the worker.
     """
     precache = SW_PRECACHE_ASSETS + SW_PRECACHE_PAGES
     total = sum(os.path.getsize(os.path.join(ROOT, sw_source_path(r))) for r in precache)
@@ -951,21 +1032,17 @@ def write_service_worker():
     # also installs the other precached pages, because the page cache gets a new version. Check both.
     page_cache = sum(os.path.getsize(os.path.join(ROOT, sw_source_path(r))) for r in SW_PRECACHE_PAGES)
     precached = {sw_source_path(r) for r in SW_PRECACHE_PAGES}
-    for dirpath, dirnames, filenames in os.walk(ROOT):
-        dirnames[:] = [d for d in dirnames if d not in SW_SKIP_DIRS and not d.startswith('.')]
-        for name in filenames:
-            if not name.endswith('.html'):
-                continue
-            full = os.path.join(dirpath, name)
-            rel = os.path.relpath(full, ROOT).replace(os.sep, '/')
-            cost = os.path.getsize(full) + (page_cache if rel in precached else 0)
-            if cost > SW_PAGE_BUDGET:
-                sys.exit('build check failed: changing %s would make a returning visitor download %d bytes, '
-                         'over the %d KB page-edit budget' % (rel, cost, SW_PAGE_BUDGET // 1024))
+    for url in urls:
+        rel = sw_source_path(url)
+        cost = os.path.getsize(os.path.join(ROOT, rel)) + (page_cache if rel in precached else 0)
+        if cost > SW_PAGE_BUDGET:
+            sys.exit('build check failed: changing %s would make a returning visitor download %d bytes, '
+                     'over the %d KB page-edit budget' % (rel, cost, SW_PAGE_BUDGET // 1024))
     body = SW_TEMPLATE % {'asset_version': sw_digest(SW_PRECACHE_ASSETS),
                           'page_version': sw_digest(SW_PRECACHE_PAGES),
                           'assets': sw_urls(SW_PRECACHE_ASSETS),
-                          'pages': sw_urls(SW_PRECACHE_PAGES)}
+                          'pages': sw_urls(SW_PRECACHE_PAGES),
+                          'page_list': json.dumps(urls)}
     if 'cache: "reload"' not in body:
         sys.exit('build check failed: sw.js must precache with cache: "reload" so a new version cannot pin '
                  'stale files from the HTTP cache')
@@ -1007,6 +1084,8 @@ def build_all(check=False):
         write(path, html)
     update_landing(pages.INSTALL_COMMAND)
     check_sitemap_declared(['/index.html'] + [p for p in rendered if p != '/404.html'])
+    for rel in remove_orphan_pages(rendered):
+        print('removed orphan page: ' + rel)
     check_install_command(pages.INSTALL_COMMAND)
     check_landing_privacy()
     css = open(os.path.join(ROOT, 'src', 'styles.css')).read()
@@ -1015,18 +1094,19 @@ def build_all(check=False):
     js = '\n'.join(l.strip() for l in js.splitlines() if l.strip() and not l.strip().startswith('//'))
     open(os.path.join(ROOT, 'assets', 'script.js'), 'w').write(js + '\n')
     check_landing_media()
-    release_paths = sorted(k.replace('index.html', '') for k in rendered if k.startswith('/whats-new/') and k != '/whats-new/index.html')
+    urls = page_urls(rendered)
     # Each URL carries its own real date (a release's date on a What's new page, the review date elsewhere),
     # not the build date, so a rebuild that changes nothing writes the same sitemap.
     release_dates = {r['version'].replace('.', '-'): r['date'] for r in pages._release_records()}
-    urls = ''
-    for u in SITE_PATHS + sorted(set(pages.GUIDE_PATH_OF.values())) + release_paths:
+    sitemap = ''
+    for u in urls:
         stamp = sitemap_lastmod(u, release_dates, pages.REVIEWED_DATE)
         lastmod = f'    <lastmod>{stamp}</lastmod>\n' if stamp else ''
-        urls += f'  <url>\n    <loc>https://deansasek.github.io/library-site{u}</loc>\n{lastmod}  </url>\n'
+        sitemap += f'  <url>\n    <loc>https://deansasek.github.io/library-site{u}</loc>\n{lastmod}  </url>\n'
     open(os.path.join(ROOT, 'sitemap.xml'), 'w').write(
-        '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '</urlset>\n')
-    write_service_worker()
+        '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + sitemap + '</urlset>\n')
+    write_service_worker(urls)
+    check_sitemap_matches_service_worker()
     if check:
         check_release(pages.REVIEWED_VERSION)
 

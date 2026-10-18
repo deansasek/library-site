@@ -7,6 +7,7 @@ var PAGE_CACHE = "pages-ce2259442f2e";
 var RUNTIME_CACHE = "runtime";
 var PRECACHE_ASSETS = ["assets/styles.css", "assets/script.js", "assets/guide-redirect.js", "assets/icon.png", "assets/icon-44.png", "manifest.webmanifest"];
 var PRECACHE_PAGES = ["./", "404.html"];
+var PAGES = ["/", "/guide/", "/privacy/", "/install/", "/development/", "/smart-features/", "/releases/", "/whats-new/", "/accessibility/", "/guide/copy-and-paste/", "/guide/find-and-open/", "/guide/get-started/", "/guide/organize/", "/guide/settings-privacy-and-help/", "/guide/snippets-and-automation/", "/whats-new/1-0-0/", "/whats-new/1-1-0/", "/whats-new/1-2-0/", "/whats-new/1-3-0/", "/whats-new/1-4-0/", "/whats-new/1-5-0/", "/whats-new/1-6-0/", "/whats-new/1-6-1/", "/whats-new/1-6-2/", "/whats-new/1-6-3/", "/whats-new/1-6-4/", "/whats-new/1-6-5/", "/whats-new/1-6-6/", "/whats-new/1-6-7/", "/whats-new/1-6-8/"];
 var SHELL_ASSETS = PRECACHE_ASSETS.map(function (u) { return new URL(u, location.href).pathname; });
 // How long a navigation waits on the network before the cached page is served instead. Kept under the 1.5 second
 // budget the issue sets for showing a cached page, so the wait is the timeout and not however long the network takes.
@@ -23,6 +24,22 @@ function precache(name, urls) {
   });
 }
 
+function prunePageCache() {
+  // A page the build no longer renders must not stay in the page cache and be served offline. PAGES is the
+  // same page set as sitemap.xml, apart from 404.html, which is precached as the offline fallback.
+  var keep = PAGES.map(function (p) { return new URL("." + p, self.registration.scope).href; })
+    .concat(PRECACHE_PAGES.map(function (p) { return new URL(p || "./", self.registration.scope).href; }));
+  return caches.open(PAGE_CACHE).then(function (cache) {
+    return cache.keys().then(function (requests) {
+      return Promise.all(requests.filter(function (request) {
+        var url = new URL(request.url);
+        url.search = "";
+        return keep.indexOf(url.href) === -1;
+      }).map(function (request) { return cache.delete(request); }));
+    });
+  });
+}
+
 self.addEventListener("install", function (event) {
   // Reload bypasses the browser's HTTP cache, so each new version precaches the files from the current deploy.
   event.waitUntil(Promise.all([
@@ -35,7 +52,7 @@ self.addEventListener("activate", function (event) {
   var keep = [ASSET_CACHE, PAGE_CACHE, RUNTIME_CACHE];
   event.waitUntil(caches.keys().then(function (keys) {
     return Promise.all(keys.filter(function (k) { return keep.indexOf(k) === -1; }).map(function (k) { return caches.delete(k); }));
-  }).then(function () { return self.clients.claim(); }));
+  }).then(prunePageCache).then(function () { return self.clients.claim(); }));
 });
 
 // Stores a fresh page under its query-free URL, but only when the body differs from what is already cached,
