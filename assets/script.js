@@ -155,6 +155,25 @@ input.focus();
 }
 });
 }
+var demos = Array.prototype.slice.call(document.querySelectorAll("video.demo-video"));
+if (demos.length && window.matchMedia) {
+var motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+function syncDemos() {
+demos.forEach(function (video) {
+if (motion.matches) {
+video.removeAttribute("autoplay");
+video.pause();
+} else {
+video.setAttribute("autoplay", "");
+var started = video.play();
+if (started && started.catch) { started.catch(function () {}); }
+}
+});
+}
+syncDemos();
+if (motion.addEventListener) { motion.addEventListener("change", syncDemos); }
+else if (motion.addListener) { motion.addListener(syncDemos); }
+}
 var tocLinks = Array.prototype.slice.call(document.querySelectorAll('.toc a[href^="#"]'));
 var tocTargets = tocLinks.map(function (a) { return document.getElementById(a.getAttribute("href").slice(1)); });
 if (tocLinks.length) {
