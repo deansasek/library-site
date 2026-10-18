@@ -379,8 +379,7 @@ figcaption {
   width:min(100%,479px);
 }
 .clipboard-menu {
-  width:292px;
-  max-width:100%;
+  width:min(100%,479px);
 }
 .get-info {
   width:min(100%,455px);
