@@ -248,7 +248,8 @@ code {
 figure {
   max-width:100%;
 }
-figure img {
+figure img,
+figure video {
   display:block;
   height:auto;
   max-width:100%;
@@ -353,7 +354,8 @@ figcaption {
 .hero-media {
   margin-top:var(--space-16);
 }
-.hero-media img {
+.hero-media img,
+.hero-media video {
   width:min(100%,558px);
   border: var(--hairline) solid var(--media-border);
 }
@@ -479,7 +481,7 @@ footer {
     .hero>:nth-child(3){animation-delay:160ms;}
     .hero>:nth-child(4){animation-delay:240ms;}
     .block,.card{animation:rise linear both;animation-timeline:view();animation-range:entry 0% cover 30%;}
-    .block figure img{animation:fade-in linear both;animation-timeline:view();animation-range:entry 0% cover 30%;}
+    .block figure img,.block figure video{animation:fade-in linear both;animation-timeline:view();animation-range:entry 0% cover 30%;}
   }
 }/* ---- sections ---- */
 @media (min-width:735px) {
@@ -494,7 +496,7 @@ footer {
   padding-bottom:var(--space-20);
   }.copy>p:not(.subhead){font-size:var(--type-body);
   }.nav-brand{font-size:var(--type-body);
-  }.menu-bar,.get-info,.settings,.hero-media img{width:100%;
+  }.menu-bar,.get-info,.settings,.hero-media img,.hero-media video{width:100%;
   }.hero h1{font-size:var(--type-display);
   }.hero-media{margin-top:var(--space-12);
   };
@@ -790,7 +792,7 @@ footer {
   }.button{border:1px solid ButtonText;
   background:ButtonFace;
   color:ButtonText;
-  }.toc,.card,.code-block,.facts li,.requirements>div,.doc th,.doc td,.nav,footer,figure img,.hero-media img{border-color:CanvasText;
+  }.toc,.card,.code-block,.facts li,.requirements>div,.doc th,.doc td,.nav,footer,figure img,figure video,.hero-media img,.hero-media video{border-color:CanvasText;
   }.card,.toc,.code-block{border:1px solid CanvasText;
   background:Canvas;
   }:focus-visible{outline-color:Highlight;

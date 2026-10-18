@@ -361,6 +361,101 @@ def check_absolute_links(path, html):
                  % (path, '\n  '.join(relative)))
 
 
+# The landing page demos, which replaced the two GIFs. The issue sets a 200 KB budget for the pair
+# of clips and a 400 KB budget for the first screen's images, so the build fails if either is missed.
+DEMO_CLIPS = {'menu_bar': (479, 462), 'quick_open': (558, 316)}
+CLIP_BUDGET = 200 * 1024
+FIRST_VIEW_BUDGET = 400 * 1024
+
+
+def _asset_bytes(ref, problems):
+    """The size of a local asset referenced from the landing page, or 0 with a problem if it is missing."""
+    if not ref or ref.startswith(('data:', 'http:', 'https:', '//')):
+        return 0
+    rel = ref[2:] if ref.startswith('./') else ref.lstrip('/')
+    path = os.path.join(ROOT, rel)
+    if not os.path.isfile(path):
+        problems.append('landing page asset is missing: ' + ref)
+        return 0
+    return os.path.getsize(path)
+
+
+def _has_attr(attrs, name):
+    return re.search(r'(?:^|\s)%s(?:[\s=]|$)' % name, attrs) is not None
+
+
+def check_landing_media():
+    """Fail the build unless the landing demos are small, looping videos that still work without script.
+
+    Each demo is a <video> with its original width and height, a poster, and native autoplay (muted,
+    looping, playsinline), with MP4 and WebM sources. A GIF may not come back. The pair must fit the
+    200 KB clip budget, counting every source and poster, and the first screen's media must fit the
+    400 KB image budget. script.js must pause the clips under prefers-reduced-motion: reduce.
+    """
+    with open(os.path.join(ROOT, 'index.html')) as f:
+        html = f.read()
+    problems = []
+    if re.search(r'\bsrc="[^"]*\.gif"', html):
+        problems.append('the landing page must not load a GIF; use the video demos instead')
+    videos = re.findall(r'<video\b([^>]*)>(.*?)</video>', html, re.S)
+    if len(videos) != len(DEMO_CLIPS):
+        problems.append('the landing page needs the %d demo <video> elements' % len(DEMO_CLIPS))
+    clip_bytes = 0
+    for attrs, inner in videos:
+        stem = next((s for s in DEMO_CLIPS if s in attrs or s in inner), '')
+        if not stem:
+            problems.append('unrecognized demo <video>: ' + attrs[:80])
+            continue
+        width, height = DEMO_CLIPS[stem]
+        if not re.search(r'\bwidth="%d"' % width, attrs) or not re.search(r'\bheight="%d"' % height, attrs):
+            problems.append('%s demo must keep its %dx%d size' % (stem, width, height))
+        for name in ('autoplay', 'muted', 'loop', 'playsinline'):
+            if not _has_attr(attrs, name):
+                problems.append('%s demo must have the %s attribute so it loops without script' % (stem, name))
+        poster = re.search(r'\bposter="([^"]*)"', attrs)
+        if not poster:
+            problems.append('%s demo must have a poster image' % stem)
+        else:
+            clip_bytes += _asset_bytes(poster.group(1), problems)
+        sources = {}
+        for tag in re.findall(r'<source\b([^>]*)>', inner):
+            src = re.search(r'\bsrc="([^"]*)"', tag)
+            kind = re.search(r'\btype="video/([a-z0-9]+)"', tag)
+            if src and kind:
+                sources[kind.group(1)] = src.group(1)
+        for kind in ('mp4', 'webm'):
+            if kind not in sources:
+                problems.append('%s demo needs a %s source' % (stem, kind))
+            else:
+                clip_bytes += _asset_bytes(sources[kind], problems)
+    if clip_bytes > CLIP_BUDGET:
+        problems.append('the demo clips are %d bytes, over the %d byte budget' % (clip_bytes, CLIP_BUDGET))
+    # The first screen: images that are not deferred, plus each autoplaying clip and its poster.
+    first_view = 0
+    for attrs in re.findall(r'<img\b([^>]*)>', html):
+        if 'loading="lazy"' in attrs:
+            continue
+        src = re.search(r'\bsrc="([^"]*)"', attrs)
+        if src:
+            first_view += _asset_bytes(src.group(1), problems)
+    for attrs, inner in videos:
+        for src in re.findall(r'<source\b[^>]*\bsrc="([^"]*)"[^>]*\btype="video/mp4"', inner):
+            first_view += _asset_bytes(src, problems)
+        poster = re.search(r'\bposter="([^"]*)"', attrs)
+        if poster:
+            first_view += _asset_bytes(poster.group(1), problems)
+    if first_view > FIRST_VIEW_BUDGET:
+        problems.append('the first screen loads %d bytes of images, over the %d byte budget'
+                        % (first_view, FIRST_VIEW_BUDGET))
+    with open(os.path.join(ROOT, 'assets', 'script.js')) as f:
+        script = f.read()
+    if ('video.demo-video' not in script or '.pause()' not in script
+            or 'prefers-reduced-motion: reduce' not in script):
+        problems.append('assets/script.js must pause video.demo-video under prefers-reduced-motion: reduce')
+    if problems:
+        sys.exit('landing media check failed:\n  ' + '\n  '.join(problems))
+
+
 # The accent colors a Mac user can pick in System Settings > Appearance. Button labels follow
 # AccentColorText, which is white or black, so each accent must reach 4.5:1 with one of them.
 MACOS_ACCENTS = [('Red', '#ff5257'), ('Orange', '#ff9f0a'), ('Yellow', '#ffd60a'), ('Green', '#30d158'),
@@ -858,6 +953,7 @@ def build_all(check=False):
     js = open(os.path.join(ROOT, 'src', 'script.js')).read()
     js = '\n'.join(l.strip() for l in js.splitlines() if l.strip() and not l.strip().startswith('//'))
     open(os.path.join(ROOT, 'assets', 'script.js'), 'w').write(js + '\n')
+    check_landing_media()
     release_paths = sorted(k.replace('index.html', '') for k in rendered if k.startswith('/whats-new/') and k != '/whats-new/index.html')
     # Each URL carries its own real date (a release's date on a What's new page, the review date elsewhere),
     # not the build date, so a rebuild that changes nothing writes the same sitemap.
