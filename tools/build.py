@@ -321,6 +321,29 @@ def check_install_command(command):
     if problems:
         sys.exit('install check failed:\n  ' + '\n  '.join(problems))
 
+
+def check_landing_privacy():
+    """Fail the build unless the landing privacy section agrees with the privacy page.
+
+    The landing heading must name the iCloud Drive exception, because Keep Library in iCloud Drive moves
+    the library into iCloud Drive and to the user's other Macs. Its internet list must include Update in
+    Terminal, which the privacy page's What is sent list names. The claims are checked against the built
+    files, so the landing page cannot drift back to the older wording unnoticed.
+    """
+    heading = _between('/index.html', r'id="privacy".*?<h2>(.*?)</h2>')
+    facts = _between('/index.html', r'id="privacy".*?<ul class="facts">(.*?)</ul>')
+    sent = _between('/privacy/index.html', r'id="what-is-sent".*?<ul>(.*?)</ul>')
+    problems = []
+    if not heading or 'iCloud Drive' not in heading:
+        problems.append('the landing privacy heading must name the iCloud Drive exception')
+    if not facts or 'Update in Terminal' not in facts:
+        problems.append('the landing internet list must include Update in Terminal')
+    if not sent or 'Update in Terminal' not in sent:
+        problems.append('the privacy page What is sent list must include Update in Terminal')
+    if problems:
+        sys.exit('landing privacy check failed:\n  ' + '\n  '.join(problems))
+
+
 # A fragment, an absolute path (such as /library-site/assets/styles.css), or a full URL. Anything else
 # is relative and would resolve under the address that was missing.
 ABSOLUTE_LINK = re.compile(r'^(?:/|#|[a-zA-Z][a-zA-Z0-9+.-]*:)')
@@ -741,6 +764,7 @@ def build_all(check=False):
         write(path, html)
     update_landing(pages.INSTALL_COMMAND)
     check_install_command(pages.INSTALL_COMMAND)
+    check_landing_privacy()
     css = open(os.path.join(ROOT, 'src', 'styles.css')).read()
     open(os.path.join(ROOT, 'assets', 'styles.css'), 'w').write(minify_css(css))
     js = open(os.path.join(ROOT, 'src', 'script.js')).read()
