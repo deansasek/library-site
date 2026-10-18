@@ -655,7 +655,7 @@ def write_guide_redirect(paths):
     """Writes assets/guide-redirect.js for the guide index: a link with a section's anchor moves to that
     section's group page. It is a file, not an inline script, because the CSP in _headers blocks inline scripts."""
     body = ('(function(){var map=' + script_json(paths) + ';var id=location.hash.slice(1);'
-            'if(id&&map[id]){location.replace(map[id]+"#"+id);}})();\n')
+            'if(id&&Object.prototype.hasOwnProperty.call(map,id)){location.replace(map[id]+"#"+id);}})();\n')
     with open(os.path.join(ROOT, 'assets', 'guide-redirect.js'), 'w') as f:
         f.write(body)
 
