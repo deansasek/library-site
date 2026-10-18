@@ -485,6 +485,26 @@ def check_landing_media():
         sys.exit('landing media check failed:\n  ' + '\n  '.join(problems))
 
 
+# A root-absolute URL path such as "/guide/find-and-open/" resolves against the host root, not the
+# deployed base path, so the site stops working under /library-site/. The lookahead keeps full URLs
+# and protocol-relative addresses (//host) out, and the charset skips markup inside string literals
+# such as an inline SVG's d="M5.5 15.5...".
+SCRIPT_ABS_PATH = re.compile(r'(["\'])(/(?!/)[^\s"\'<>\\]*)\1')
+
+
+def check_script_paths(path, script):
+    """Fail the build if a generated page script contains a root-absolute URL path.
+
+    Scripts must use paths relative to their page (or full https URLs), so old guide links such as
+    /guide/#quick-open stay under the deployed base path instead of leaving it for a 404. The service
+    worker is not checked: it stores root-absolute page URLs and rebases them against its scope itself.
+    """
+    absolute = [m.group(2) for m in SCRIPT_ABS_PATH.finditer(script)]
+    if absolute:
+        sys.exit('build check failed for %s (scripts must not use root-absolute paths):\n  %s'
+                 % (path, '\n  '.join(absolute)))
+
+
 # The accent colors a Mac user can pick in System Settings > Appearance. Button labels follow
 # AccentColorText, which is white or black, so each accent must reach 4.5:1 with one of them.
 MACOS_ACCENTS = [('Red', '#ff5257'), ('Orange', '#ff9f0a'), ('Yellow', '#ffd60a'), ('Green', '#30d158'),
@@ -679,13 +699,24 @@ def script_json(data):
     return json.dumps(data, separators=(',', ':')).replace('<', '\\u003c').replace('>', '\\u003e').replace('&', '\\u0026')
 
 
+# The guide index page. Its redirect script's map is written relative to this page's folder.
+GUIDE_INDEX_PATH = '/guide/index.html'
+
+
 def write_guide_redirect(paths):
     """Writes assets/guide-redirect.js for the guide index: a link with a section's anchor moves to that
-    section's group page. It is a file, not an inline script, because the CSP in _headers blocks inline scripts."""
-    body = ('(function(){var map=' + script_json(paths) + ';var id=location.hash.slice(1);'
+    section's group page. It is a file, not an inline script, because the CSP in _headers blocks inline scripts.
+
+    The map's paths are relative to the guide index, so /guide/#quick-open replaces to
+    find-and-open/#quick-open and stays under the deployed base path instead of the host root.
+    """
+    base = GUIDE_INDEX_PATH.rsplit('/', 1)[0] + '/'
+    relative = {sid: url[len(base):] if url.startswith(base) else url for sid, url in paths.items()}
+    body = ('(function(){var map=' + script_json(relative) + ';var id=location.hash.slice(1);'
             'if(id&&Object.prototype.hasOwnProperty.call(map,id)){location.replace(map[id]+"#"+id);}})();\n')
     with open(os.path.join(ROOT, 'assets', 'guide-redirect.js'), 'w') as f:
         f.write(body)
+    check_script_paths('/assets/guide-redirect.js', body)
 
 
 def path_key(path):
@@ -1094,6 +1125,7 @@ def build_all(check=False):
     js = '\n'.join(l.strip() for l in js.splitlines() if l.strip() and not l.strip().startswith('//'))
     open(os.path.join(ROOT, 'assets', 'script.js'), 'w').write(js + '\n')
     check_landing_media()
+    check_script_paths('/assets/script.js', js)
     urls = page_urls(rendered)
     # Each URL carries its own real date (a release's date on a What's new page, the review date elsewhere),
     # not the build date, so a rebuild that changes nothing writes the same sitemap.
