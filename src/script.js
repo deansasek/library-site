@@ -190,6 +190,7 @@ if (closedFolders.indexOf(folder) !== -1) { return; }
 folder.open = true;
 }
 function markCurrent() {
+// Find the new current section from rect reads only.
 var current = null;
 tocTargets.forEach(function (t) {
 if (t && t.getBoundingClientRect().top <= 120) { current = t.id; }
@@ -204,13 +205,12 @@ if (!current && tocTargets[0]) { current = tocTargets[0].id; }
 if (pinnedId) { current = pinnedId; }
 var active = null;
 tocLinks.forEach(function (a) {
-var on = current !== null && a.getAttribute("href") === "#" + current;
-a.classList.toggle("is-active", on);
-if (on) { a.setAttribute("aria-current", "location"); active = a; } else { a.removeAttribute("aria-current"); }
+if (current !== null && a.getAttribute("href") === "#" + current) { active = a; }
 });
 if (active) {
 // Open the groups and features around the current section, so its entry is visible in the
 // navigation, but only when the active section changes and never against the reader's choice.
+// This moves the entry, so it happens before the indicator is measured.
 if (current !== lastId) {
 var folder = active.closest("details");
 while (folder) {
@@ -218,10 +218,19 @@ openFolder(folder);
 folder = folder.parentElement ? folder.parentElement.closest("details") : null;
 }
 }
-var box = textBox(active);
-var origin = toc.getBoundingClientRect();
+}
+// Read every rect before writing any class or style, so the whole update needs one layout pass.
+var box = active ? textBox(active) : null;
+var origin = active ? toc.getBoundingClientRect() : null;
+var listLeft = list.offsetLeft;
+tocLinks.forEach(function (a) {
+var on = current !== null && a.getAttribute("href") === "#" + current;
+a.classList.toggle("is-active", on);
+if (on) { a.setAttribute("aria-current", "location"); } else { a.removeAttribute("aria-current"); }
+});
+if (active) {
 indicator.style.height = box.height + "px";
-indicator.style.transform = "translate(" + list.offsetLeft + "px," + (box.top - origin.top) + "px)";
+indicator.style.transform = "translate(" + listLeft + "px," + (box.top - origin.top) + "px)";
 }
 lastId = current;
 }
@@ -245,7 +254,17 @@ window.addEventListener("resize", markCurrent);
 window.addEventListener("load", markCurrent);
 if (document.fonts && document.fonts.ready) { document.fonts.ready.then(markCurrent); }
 if (window.ResizeObserver) { new ResizeObserver(markCurrent).observe(toc); }
-window.addEventListener("scroll", markCurrent, { passive: true });
+// A wheel or trackpad can fire many scroll events per frame; coalesce them into one update per animation frame.
+var scrollQueued = false;
+function onScroll() {
+if (scrollQueued) { return; }
+scrollQueued = true;
+requestAnimationFrame(function () {
+scrollQueued = false;
+markCurrent();
+});
+}
+window.addEventListener("scroll", onScroll, { passive: true });
 markCurrent();
 }
 })();

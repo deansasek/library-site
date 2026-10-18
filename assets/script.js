@@ -201,9 +201,7 @@ if (!current && tocTargets[0]) { current = tocTargets[0].id; }
 if (pinnedId) { current = pinnedId; }
 var active = null;
 tocLinks.forEach(function (a) {
-var on = current !== null && a.getAttribute("href") === "#" + current;
-a.classList.toggle("is-active", on);
-if (on) { a.setAttribute("aria-current", "location"); active = a; } else { a.removeAttribute("aria-current"); }
+if (current !== null && a.getAttribute("href") === "#" + current) { active = a; }
 });
 if (active) {
 if (current !== lastId) {
@@ -213,10 +211,18 @@ openFolder(folder);
 folder = folder.parentElement ? folder.parentElement.closest("details") : null;
 }
 }
-var box = textBox(active);
-var origin = toc.getBoundingClientRect();
+}
+var box = active ? textBox(active) : null;
+var origin = active ? toc.getBoundingClientRect() : null;
+var listLeft = list.offsetLeft;
+tocLinks.forEach(function (a) {
+var on = current !== null && a.getAttribute("href") === "#" + current;
+a.classList.toggle("is-active", on);
+if (on) { a.setAttribute("aria-current", "location"); } else { a.removeAttribute("aria-current"); }
+});
+if (active) {
 indicator.style.height = box.height + "px";
-indicator.style.transform = "translate(" + list.offsetLeft + "px," + (box.top - origin.top) + "px)";
+indicator.style.transform = "translate(" + listLeft + "px," + (box.top - origin.top) + "px)";
 }
 lastId = current;
 }
@@ -239,7 +245,16 @@ window.addEventListener("resize", markCurrent);
 window.addEventListener("load", markCurrent);
 if (document.fonts && document.fonts.ready) { document.fonts.ready.then(markCurrent); }
 if (window.ResizeObserver) { new ResizeObserver(markCurrent).observe(toc); }
-window.addEventListener("scroll", markCurrent, { passive: true });
+var scrollQueued = false;
+function onScroll() {
+if (scrollQueued) { return; }
+scrollQueued = true;
+requestAnimationFrame(function () {
+scrollQueued = false;
+markCurrent();
+});
+}
+window.addEventListener("scroll", onScroll, { passive: true });
 markCurrent();
 }
 })();
