@@ -174,9 +174,12 @@ def release_history(minor_ids, limit=None, curated=None):
         date = datetime.date.fromisoformat(r['date']).strftime('%B %-d, %Y')
         wn_id = r['version'].replace('.', '-')
         # The changes shown and counted are the ones on the release's What's new page, so the two always agree.
-        notes = curated[r['version']] if curated and r['version'] in curated else r['notes']
+        # Curated items are hand-written HTML and are inserted as-is; notes from releases.json are plain text
+        # and are escaped, so a note can never inject markup.
+        from_curated = bool(curated and r['version'] in curated)
+        notes = curated[r['version']] if from_curated else r['notes']
         shown = notes if limit is None else notes[:limit]
-        items = ''.join(f'<li>{_html.escape(n)}</li>' for n in shown)
+        items = ''.join(f'<li>{n if from_curated else _html.escape(n)}</li>' for n in shown)
         changes = f'<ul>{items}</ul>' if items else '<p>No changes listed.</p>'
         # A long release shows only its first changes here; the What's new page has all of them.
         if len(notes) > len(shown):
