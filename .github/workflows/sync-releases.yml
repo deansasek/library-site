@@ -7,6 +7,12 @@ on:
     - cron: "17 * * * *"
   workflow_dispatch:
 
+# Only one sync runs at a time. A run that starts while another is in flight waits for it to finish rather
+# than cancelling it, so overlapping runs cannot both reach the commit step at once.
+concurrency:
+  group: sync-releases
+  cancel-in-progress: false
+
 # Read-only by default. The build job reads and builds with no write access, and saves its changes as a patch.
 # Only the commit job, which applies that patch and pushes it, has write access.
 permissions:
@@ -52,8 +58,19 @@ jobs:
             echo "No changes."
             exit 0
           fi
-          git apply --index "$RUNNER_TEMP/changes/changes.patch"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Apply the patch on top of the main that exists now, not the commit this run started from. If main
+          # has moved in a way the patch no longer fits, leave it for the next run to rebuild.
+          git fetch origin main
+          git checkout -B main origin/main
+          if ! git apply --index "$RUNNER_TEMP/changes/changes.patch"; then
+            echo "Main has moved and the patch no longer applies; the next run will rebuild."
+            exit 0
+          fi
           git commit -m "Sync releases from the Library app"
-          git push
+          # Another push may land between the fetch above and here; rebase onto it and retry once.
+          if ! git push origin main; then
+            git pull --rebase origin main
+            git push origin main
+          fi
