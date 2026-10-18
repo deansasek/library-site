@@ -23,6 +23,10 @@ REPO = 'https://github.com/deansasek/library'
 # The GitHub Pages project path. Links on /404.html must be written under it: the page is served at
 # whatever address was missing, so a relative link would resolve under the missing path.
 BASE_PATH = '/library-site'
+# Crawlers read robots.txt only from the host root, which a GitHub Pages project site does not own. Every page
+# therefore declares the sitemap in its head, so search engines can find it without a root robots.txt.
+SITEMAP_LINK = ('<link rel="sitemap" type="application/xml" title="Sitemap" '
+                'href="https://deansasek.github.io/library-site/sitemap.xml">')
 CHEV_R = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 6 6 6-6 6"/></svg>'
 CHEV_L = '<svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 6-6 6 6 6"/></svg>'
 
@@ -80,6 +84,7 @@ def head(title, desc, path):
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <link rel="canonical" href="{url}">
+{SITEMAP_LINK}
 <meta property="og:title" content="{t}">
 <meta property="og:description" content="{desc}">
 <meta property="og:type" content="website">
@@ -301,6 +306,20 @@ def check_pages_reachable():
     missing = [p for p in SITE_PATHS if f'href="{p}"' not in chrome]
     if missing:
         sys.exit('build check failed: no footer or narrow-screen header link to ' + ', '.join(missing))
+
+
+def check_sitemap_declared(paths):
+    """Fail the build unless every indexable page declares the sitemap in its head.
+
+    A GitHub Pages project site cannot serve robots.txt from the host root, where crawlers look for it, so
+    the pages themselves point crawlers at the sitemap. /404.html is noindex, so it is left out.
+    """
+    missing = [p for p in paths
+               if SITEMAP_LINK not in open(os.path.join(ROOT, p.lstrip('/'))).read()]
+    if missing:
+        sys.exit('build check failed: no sitemap link in ' + ', '.join(missing))
+
+
 def _between(path, pattern):
     """The first capture group of pattern in a built file, or None."""
     with open(os.path.join(ROOT, path.lstrip('/'))) as f:
@@ -987,6 +1006,7 @@ def build_all(check=False):
         html = html.replace('</main>', pager(path) + '</main>', 1) if path_key(path) in dict(PAGER_ORDER) else html
         write(path, html)
     update_landing(pages.INSTALL_COMMAND)
+    check_sitemap_declared(['/index.html'] + [p for p in rendered if p != '/404.html'])
     check_install_command(pages.INSTALL_COMMAND)
     check_landing_privacy()
     css = open(os.path.join(ROOT, 'src', 'styles.css')).read()
