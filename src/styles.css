@@ -51,9 +51,7 @@
 }
 }
 
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--control:#98989d;--accent-pressed:#0a7ae6;--warning:#ffb340;--bg:#000000;--band:#1d1d1f;--text:#f5f5f7;--text-2:#a1a1a6;--accent:#0a84ff;--accent-hover:#409cff;--on-accent:#000000;--border:#424245;--media-border:rgba(255,255,255,0.12);--code-bg:#000000;--nav-bg:rgba(0,0,0,0.8);}}
-/* Explicit dark theme: a page sets data-theme="dark" to choose it regardless of the system setting. */
-:root[data-theme="dark"]{--control:#98989d;--accent-pressed:#0a7ae6;--warning:#ffb340;--bg:#000000;--band:#1d1d1f;--text:#f5f5f7;--text-2:#a1a1a6;--accent:#0a84ff;--accent-hover:#409cff;--on-accent:#000000;--border:#424245;--media-border:rgba(255,255,255,0.12);--code-bg:#000000;--nav-bg:rgba(0,0,0,0.8);}
+@media (prefers-color-scheme:dark){:root{--control:#98989d;--accent-pressed:#0a7ae6;--warning:#ffb340;--bg:#000000;--band:#1d1d1f;--text:#f5f5f7;--text-2:#a1a1a6;--accent:#0a84ff;--accent-hover:#409cff;--on-accent:#000000;--border:#424245;--media-border:rgba(255,255,255,0.12);--code-bg:#000000;--nav-bg:rgba(0,0,0,0.8);}}
 /* Links, buttons, and focus rings all use --accent. Where the browser supports the system color
    keywords, the accent follows the Mac accent color chosen in System Settings > Appearance, and the
    button label follows AccentColorText so it stays legible. The hex values above are the fallback for
@@ -786,7 +784,7 @@ footer {
   };
 }
 
-@media (prefers-color-scheme:dark) and (prefers-contrast:more){:root:not([data-theme="light"]){--text-2:#c7c7cc;--border:#98989d;--accent:#5ac8fa;--on-accent:#000000;}}/* ---- nav ---- */
+@media (prefers-color-scheme:dark) and (prefers-contrast:more){:root{--text-2:#c7c7cc;--border:#98989d;--accent:#5ac8fa;--on-accent:#000000;}}/* ---- nav ---- */
 @media (forced-colors:active) {
   a,.learn,.text-link,.back a,.footer-cols a,.nav nav a,.related a,.toc a{text-decoration:underline;
   }.button{border:1px solid ButtonText;
