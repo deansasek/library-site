@@ -279,6 +279,12 @@ def check_build_html(path, html):
             continue
         problems.append('executable inline <script> (the CSP in _headers blocks it; '
                         'move the code to a file): ' + html[m.start():m.end()][:80])
+    # A noindex page must not point a canonical or og:url at itself: noindex says drop the page, while a
+    # canonical would claim the page (or, on 404.html, any missing address) is a copy of that URL.
+    if re.search(r'<meta name="robots" content="[^"]*\bnoindex\b', html):
+        for tag in ('<link rel="canonical"', '<meta property="og:url"'):
+            if tag in html:
+                problems.append('a noindex page must not declare %s' % tag)
     if problems:
         sys.exit('build check failed for %s:\n  %s' % (path, '\n  '.join(problems)))
 
