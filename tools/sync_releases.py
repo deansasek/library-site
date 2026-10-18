@@ -36,13 +36,13 @@ def version_key(version):
     return [int(p) for p in re.findall(r'\d+', version)]
 
 
-def existing_count():
-    """How many releases the current file lists. A missing or unreadable file counts as none."""
+def existing_releases():
+    """The releases the current file lists, newest first. A missing or unreadable file counts as none."""
     try:
         with open(OUT) as f:
-            return len(json.load(f))
+            return json.load(f)
     except (OSError, ValueError):
-        return 0
+        return []
 
 
 def notes(body):
@@ -68,10 +68,29 @@ def main():
         published = datetime.datetime.strptime(r['published_at'], '%Y-%m-%dT%H:%M:%SZ').date()
         out.append({'tag': tag, 'version': tag.lstrip('v'), 'date': published.isoformat(),
                     'url': r['html_url'], 'notes': notes(r.get('body'))})
-    # Never shrink the list: a short or partial response would drop releases from the Releases page.
-    existing = existing_count()
-    if len(out) < existing:
-        sys.exit(f'refusing to write {len(out)} releases over the {existing} in {os.path.relpath(OUT, ROOT)}')
+    # Compare by tag, not by count: a release published in the same window as one that was removed keeps the count
+    # equal, and a short response is told apart from a real removal by how much of the known list is missing.
+    existing = existing_releases()
+    fetched = {r['tag'] for r in out}
+    missing = [r for r in existing if r['tag'] not in fetched]
+    newly_missing = [r for r in missing if not r.get('removed')]
+    allow_removal = os.environ.get('SYNC_ALLOW_REMOVAL') == '1'
+    if newly_missing and not allow_removal and len(newly_missing) > 2:
+        tags = ', '.join(r['tag'] for r in newly_missing)
+        sys.exit(f'refusing to write {len(out)} releases: {len(newly_missing)} of the {len(existing)} in '
+                 f'{os.path.relpath(OUT, ROOT)} are missing from GitHub ({tags}). '
+                 'Treating this as a partial response. Run the workflow by hand with allow_removal to drop them.')
+    if missing:
+        tags = ', '.join(r['tag'] for r in missing)
+        if allow_removal:
+            print(f'dropping {len(missing)} release(s) missing from GitHub: {tags}')
+        else:
+            # Keep a removed release in the file, flagged, so its date, notes, and URL are not lost. Once it is
+            # flagged, later syncs carry it forward quietly instead of failing or flagging it again.
+            out.extend({**r, 'removed': True} for r in missing)
+            if newly_missing:
+                print(f'keeping {len(newly_missing)} release(s) missing from GitHub, marked removed: '
+                      f'{", ".join(r["tag"] for r in newly_missing)}')
     out.sort(key=lambda x: version_key(x['version']), reverse=True)
     with open(OUT, 'w') as f:
         json.dump(out, f, indent=2, ensure_ascii=False)

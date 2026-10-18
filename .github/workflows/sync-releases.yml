@@ -6,6 +6,11 @@ on:
   schedule:
     - cron: "17 * * * *"
   workflow_dispatch:
+    inputs:
+      allow_removal:
+        description: "Drop releases that GitHub no longer lists instead of keeping them flagged"
+        type: boolean
+        default: false
 
 # Only one sync runs at a time. A run that starts while another is in flight waits for it to finish rather
 # than cancelling it, so overlapping runs cannot both reach the commit step at once.
@@ -29,6 +34,8 @@ jobs:
         with:
           python-version: "3.12"
       - name: Read the app's releases
+        env:
+          SYNC_ALLOW_REMOVAL: ${{ inputs.allow_removal && '1' || '0' }}
         run: python3 tools/sync_releases.py
       - name: Build the site
         run: python3 tools/build.py --check-release
